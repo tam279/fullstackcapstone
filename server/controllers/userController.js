@@ -18,7 +18,7 @@ db.getConnection((err, connection) => {
 
 exports.getUsers = (req, res) => {
     const query = `
-      SELECT users.UserID, users.FirstName, users.LastName, users.Email, roles.RoleName, companies.CompanyName
+      SELECT users.UserID, users.FirstName, users.LastName, users.Email, users.RoleID, users.CompanyID, roles.RoleName, companies.CompanyName
       FROM users
       LEFT JOIN roles ON users.RoleID = roles.RoleID
       LEFT JOIN companies ON users.CompanyID = companies.CompanyID
@@ -26,7 +26,7 @@ exports.getUsers = (req, res) => {
 
     db.query(query, (error, results) => {
         if (error) {
-            console.log('Error: ', error);
+            console.error('Error: ', error);
             return res.status(500).send({ error: error.message });
         }
 
@@ -34,52 +34,10 @@ exports.getUsers = (req, res) => {
             return res.status(404).send({ message: 'No users found' });
         }
 
-        // Fetch role and company names separately for all users
-        const userIds = results.map((user) => user.UserID);
-        const roleQuery = 'SELECT RoleID, RoleName FROM roles WHERE RoleID IN (?)';
-        const companyQuery = 'SELECT CompanyID, CompanyName FROM companies WHERE CompanyID IN (?)';
-
-        db.query(roleQuery, [userIds], (roleError, roleResults) => {
-            if (roleError) {
-                console.log('Error: ', roleError);
-                return res.status(500).send({ error: roleError.message });
-            }
-
-            db.query(companyQuery, [userIds], (companyError, companyResults) => {
-                if (companyError) {
-                    console.log('Error: ', companyError);
-                    return res.status(500).send({ error: companyError.message });
-                }
-
-                // Build a map of role names and company names based on user ID
-                const roleMap = {};
-                roleResults.forEach((row) => {
-                    if (!roleMap[row.RoleID]) {
-                        roleMap[row.RoleID] = [];
-                    }
-                    roleMap[row.RoleID].push(row.RoleName);
-                });
-
-                const companyMap = {};
-                companyResults.forEach((row) => {
-                    if (!companyMap[row.CompanyID]) {
-                        companyMap[row.CompanyID] = [];
-                    }
-                    companyMap[row.CompanyID].push(row.CompanyName);
-                });
-
-                // Assign role and company names to each user
-                const usersWithDetails = results.map((user) => ({
-                    ...user,
-                    RoleName: roleMap[user.RoleID] || [],
-                    CompanyName: companyMap[user.CompanyID] || [],
-                }));
-
-                res.status(200).send(usersWithDetails);
-            });
-        });
+        res.status(200).send(results);
     });
 };
+
 
 exports.createUser = (req, res) => {
     const { firstName, lastName, email, password, role, company } = req.body;

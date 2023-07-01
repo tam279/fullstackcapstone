@@ -4,12 +4,14 @@ import axios from 'axios';
 
 const NewUserModal = ({ show, onHide, onUserCreated }) => {
     const [newUser, setNewUser] = useState({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         role: '',
         company: '',
     });
+
 
     const [roles, setRoles] = useState([]);
     const [companies, setCompanies] = useState([]);
@@ -50,6 +52,7 @@ const NewUserModal = ({ show, onHide, onUserCreated }) => {
         }));
     };
 
+
     return (
         <Modal show={show} onHide={onHide} size="lg">
             <Modal.Header closeButton>
@@ -60,16 +63,28 @@ const NewUserModal = ({ show, onHide, onUserCreated }) => {
                 <Form>
                     <Row>
                         <Col>
-                            <Form.Group controlId="formName">
-                                <Form.Label>Name</Form.Label>
+                            <Form.Group controlId="formFirstName">
+                                <Form.Label>First Name</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    placeholder="John Doe"
-                                    name="name"
-                                    value={newUser.name}
+                                    placeholder="John"
+                                    name="firstName"
+                                    value={newUser.firstName}
                                     onChange={handleChange}
                                 />
                             </Form.Group>
+
+                            <Form.Group controlId="formLastName">
+                                <Form.Label>Last Name</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Doe"
+                                    name="lastName"
+                                    value={newUser.lastName}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+
                             <Form.Group controlId="formCompany">
                                 <Form.Label>Company</Form.Label>
                                 <Form.Control
