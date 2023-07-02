@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button, Container, Row, Col, Tabs, Tab, Table } from 'react-bootstrap';
 import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import NewUserModal from '../../modals/CreateNewUserModal/CreateNewUserModal';
+import EditUserModal from '../../modals/EditUserModal/EditUserModal';
 import axios from 'axios';
+import NewCompanyModal from '../../modals/CreateNewCompanyModal/CreateNewCompanyModal';
 
 interface User {
   EMAIL: string;
@@ -24,11 +26,13 @@ interface Company {
   COMPANYNAME: string;
 }
 
-
 const UserManagementPage = () => {
   const [userData, setUserData] = useState<User[]>([]);
   const [showUserModal, setShowUserModal] = useState(false);
   const [companyData, setCompanyData] = useState<Company[]>([]);
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const fetchUserData = () => {
     axios
@@ -44,6 +48,44 @@ const UserManagementPage = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  const fetchCompanyData = () => {
+    axios
+      .get('http://localhost:5000/api/companies')
+      .then(response => {
+        setCompanyData(response.data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
+
+  useEffect(() => {
+    fetchCompanyData();
+  }, []);
+
+  const handleEditClick = (user: User) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleHideModal = () => {
+    setSelectedUser(null);
+    setShowEditModal(false);
+  };
+
+  const handleUpdateUser = (id: string, updatedUser: any) => {
+    // Implement your user updating logic here
+    // After updating, don't forget to call handleHideModal to close the modal.
+  };
+
+  const handleDeleteUser = (id: string) => {
+    // Implement your user deleting logic here
+  };
+
+  const handleDeactivateUser = (id: string) => {
+    // Implement your user deactivating logic here
+  };
 
   const handleShowUserModal = () => setShowUserModal(true);
   const handleCloseUserModal = () => setShowUserModal(false);
@@ -79,7 +121,7 @@ const UserManagementPage = () => {
                   {userData.map((user, index) => (
                     <tr key={index}>
                       <td>
-                        <Button onClick={() => console.log('Edit clicked:', user)}>Edit</Button>
+                        <Button onClick={() => handleEditClick(user)}>Edit</Button>
                       </td>
                       <td>{user.FIRSTNAME}</td>
                       <td>{user.LASTNAME}</td>
@@ -99,6 +141,11 @@ const UserManagementPage = () => {
               <Table striped bordered hover>
                 <thead>
                   <tr>
+                    <th>
+                      <Button onClick={() => setShowCompanyModal(true)} className="mb-3 ml-auto">
+                        + New Company
+                      </Button>
+                    </th>
                     <th>Company ID</th>
                     <th>Company Name</th>
                   </tr>
@@ -106,11 +153,13 @@ const UserManagementPage = () => {
                 <tbody>
                   {companyData.map((company, index) => (
                     <tr key={index}>
+                      <td>
+                        <Button onClick={() => console.log('Edit clicked:', company)}>Edit</Button>
+                      </td>
                       <td>{company.COMPANYID}</td>
                       <td>{company.COMPANYNAME}</td>
                     </tr>
                   ))}
-
                 </tbody>
               </Table>
             </Tab>
@@ -118,6 +167,18 @@ const UserManagementPage = () => {
         </Col>
       </Row>
       <NewUserModal show={showUserModal} onHide={handleCloseUserModal} onUserCreated={fetchUserData} />
+
+      {selectedUser && (
+        <EditUserModal
+          show={showEditModal}
+          onHide={handleHideModal}
+          user={selectedUser}
+          updateUser={handleUpdateUser}
+          deleteUser={handleDeleteUser}
+          deactivateUser={handleDeactivateUser}
+        />
+      )}
+      <NewCompanyModal show={showCompanyModal} onHide={() => setShowCompanyModal(false)} onSuccess={fetchCompanyData} />
     </Container>
   );
 };

@@ -38,8 +38,6 @@ exports.createUser = async (req, res) => {
     try {
         const { firstName, lastName, email, password, roleID, companyID, methodID } = req.body;
 
-        console.log('Received password:', password);  // Add this line
-
         const saltRounds = 10;
         const hash = await bcrypt.hash(password, saltRounds);
 
@@ -57,6 +55,7 @@ exports.createUser = async (req, res) => {
         return res.status(500).send({ error: error.message });
     }
 };
+
 
 exports.getRoles = async (req, res) => {
     try {
@@ -78,6 +77,28 @@ exports.getCompanies = async (req, res) => {
         const [results] = await db.query(query);
 
         res.status(200).send(results);
+    } catch (error) {
+        console.log('Error: ', error);
+        return res.status(500).send({ error: error.message });
+    }
+};
+
+exports.createCompany = async (req, res) => {
+    try {
+        const { companyName } = req.body;
+
+        if (!companyName) {
+            return res.status(400).send({ message: 'Company name is required' });
+        }
+
+        const query = `
+            INSERT INTO COMPANY (COMPANYNAME)
+            VALUES (?)
+        `;
+
+        await db.query(query, [companyName]);
+
+        res.status(201).send({ message: 'Company created' });
     } catch (error) {
         console.log('Error: ', error);
         return res.status(500).send({ error: error.message });

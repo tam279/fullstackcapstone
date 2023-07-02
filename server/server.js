@@ -5,10 +5,28 @@ const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
 const userController = require('./controllers/userController');
+const bodyParser = require('body-parser');
 
 const app = express();
-app.use(cors());
+// Configure CORS here
+app.use(cors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST'],
+    credentials: true // enable set cookie
+}));
+
 app.use(express.json());
+// parse requests of content-type - application/json
+app.use(bodyParser.json());
+// Apply the Content Security Policy
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'", 'http://localhost:5000'],
+            // other directives...
+        },
+    })
+); app.use(express.json());
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
 // Apply the Content Security Policy
@@ -33,9 +51,12 @@ app.get('/', (req, res) => {
 app.get('/api/users', userController.getUsers);
 app.post('/api/createUser', userController.createUser);
 
-app.get('/api/roles', userController.getRoles);
-app.get('/api/companies', userController.getCompanies);
 
+app.get('/api/companies', userController.getCompanies);
+app.post('/api/createCompany', userController.createCompany);
+
+
+app.get('/api/roles', userController.getRoles);
 // Route not found error handler
 app.use((req, res, next) => {
     const error = new Error('Route not found');
