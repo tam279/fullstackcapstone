@@ -1,0 +1,31 @@
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .content-wrap {
+    flex: 1;
+  }
+  
+  .logo-custom-login {
+    width: 100px;  /* Adjust this value based on how big you want your logo to be */
+    height: auto;
+  }
+  
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .login-form label {
+    text-align: center;
+  }
+  
+  .login-form input[type="email"],
+  .login-form input[type="password"] {
+    width: 550px;
+  }
+  

@@ -1,0 +1,61 @@
+/* AboutPage.css */
+
+.about-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    }
+    .it-services {
+ margin-top: 20px; /* Adjust this value to move the content down */
+}
+    
+    .about-title {
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-size: 48px;
+    line-height: 1.2;
+    text-align: center;
+    color: #000000;
+    margin-top: 40px;
+    }
+    
+    .about-facts {
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #000000;
+    margin-top: 40px;
+    }
+    
+    .about-facts-title {
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1.2;
+    color: #000000;
+    margin-bottom: 20px;
+    }
+    
+    .it-services-title {
+    font-family: 'Source Sans Pro';
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1.2;
+    color: #000000;
+    margin-bottom: 20px;
+    }
+    
+    .it-services-description {
+    font-family: 'Source Sans Pro';
+    font-weight: 200;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #000000;
+    margin-bottom: 40px;
+    }
+   
+    .it-services {
+        margin-top: 60px; /* Adjust this value to move the content down */
+        margin-left: 50px;
+       }

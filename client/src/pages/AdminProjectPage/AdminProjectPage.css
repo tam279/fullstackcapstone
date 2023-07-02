@@ -1,0 +1,22 @@
+.AdminProjectPage {
+  display: flex;
+}
+
+.projects {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 32px;
+  color: #32324D;
+}

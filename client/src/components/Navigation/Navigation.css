@@ -1,0 +1,61 @@
+/* Navigation.css */
+#logo.logo-custom {
+  width: 80px;
+  height: auto;
+  border: 2px solid white; /* Add a white border */
+  cursor: pointer; /* Change cursor to hand */
+}
+
+.navbar-custom .nav-link {
+  font-size: 40px;
+  padding: 10px 20px;
+  height: 80px;
+  color: white;
+}
+
+.navbar-custom {
+  background-color: #2F5CAC;
+}
+
+.navbar-custom .nav-link:last-child {
+  margin-left: auto;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .navbar-custom .nav-link {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 992px) {
+  .navbar-custom .nav-link {
+    font-size: 20px;
+  }
+
+  #logo.logo-custom {
+    width: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-custom .nav-link {
+    font-size: 16px;
+    padding: 5px 10px;
+    height: 40px;
+  }
+
+  #logo.logo-custom {
+    width: 40px;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-custom .nav-link {
+    font-size: 14px;
+  }
+
+  #logo.logo-custom {
+    width: 30px;
+  }
+}

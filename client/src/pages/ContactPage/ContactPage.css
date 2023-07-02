@@ -1,0 +1,51 @@
+/* ContactPage.css */
+
+.contact-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.contact-container {
+    margin-top: 50px; /* add some margin to the top of the container */
+}
+
+.contact-details {
+    margin-top: 50px; /* reduce margin-top value */
+}
+
+.contact-item h3 {
+    color: #2F5CAC; /* make your labels stand out */
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 50px; /* reduce margin-top value */
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #2F5CAC; /* Add a border to make your input fields stand out */
+}
+
+.contact-form textarea {
+    height: 100px;
+}
+
+.contact-form button {
+    background-color: #2F5CAC;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px; /* Add some margin to the top of the button */
+    width: 100%; /* Make the button fill the width of the form */
+}
