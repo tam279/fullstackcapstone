@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Navbar, Nav, Image } from 'react-bootstrap';
-import { FaBell, FaUsers, FaCog, FaProjectDiagram } from 'react-icons/fa';
+import { Button, Navbar, Image } from 'react-bootstrap';
+import { FaUsers, FaCog, FaProjectDiagram } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import SettingsModal from '../../modals/SettingsModal/SettingsModal';
 import ProfileModal from '../../modals/ProfileModal/ProfileModal';

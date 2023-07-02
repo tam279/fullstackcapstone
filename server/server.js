@@ -1,11 +1,10 @@
-// server.js . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\server\server.js
+// server.js
 
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-const userController = require('./controllers/userController'); // updated path
-
+const userController = require('./controllers/userController');
 
 const app = express();
 app.use(cors());
@@ -35,8 +34,6 @@ app.post('/api/createUser', userController.createUser);
 
 app.get('/api/roles', userController.getRoles);
 app.get('/api/companies', userController.getCompanies);
-
-
 
 // Route not found error handler
 app.use((req, res, next) => {
