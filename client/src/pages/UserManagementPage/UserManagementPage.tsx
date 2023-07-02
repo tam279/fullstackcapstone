@@ -8,8 +8,8 @@ interface User {
   EMAIL: string;
   FIRSTNAME: string;
   LASTNAME: string;
-  ISACTIVE: boolean;
-  IS_EMAIL_VERIFIED: boolean;
+  ISACTIVE: number;
+  IS_EMAIL_VERIFIED: number;
   TAG: string;
   COMPANYID: number;
   ROLEID: number;
@@ -22,24 +22,15 @@ interface User {
 interface Company {
   COMPANYID: number;
   COMPANYNAME: string;
-  CREATED_AT: string;
-  ISACTIVE: number;
 }
+
 
 const UserManagementPage = () => {
   const [userData, setUserData] = useState<User[]>([]);
-  const [companyData, setCompanyData] = useState<Company[]>([]);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [companyData, setCompanyData] = useState<Company[]>([]);
 
-  const handleShowUserModal = () => {
-    setShowUserModal(true);
-  };
-
-  const handleCloseUserModal = () => {
-    setShowUserModal(false);
-  };
-
-  useEffect(() => {
+  const fetchUserData = () => {
     axios
       .get('http://localhost:5000/api/users')
       .then(response => {
@@ -48,18 +39,14 @@ const UserManagementPage = () => {
       .catch(error => {
         console.error('Error:', error);
       });
-  }, []);
+  };
 
   useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/companies')
-      .then(response => {
-        setCompanyData(response.data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    fetchUserData();
   }, []);
+
+  const handleShowUserModal = () => setShowUserModal(true);
+  const handleCloseUserModal = () => setShowUserModal(false);
 
   return (
     <Container fluid>
@@ -123,13 +110,14 @@ const UserManagementPage = () => {
                       <td>{company.COMPANYNAME}</td>
                     </tr>
                   ))}
+
                 </tbody>
               </Table>
             </Tab>
           </Tabs>
         </Col>
       </Row>
-      <NewUserModal show={showUserModal} onHide={handleCloseUserModal} />
+      <NewUserModal show={showUserModal} onHide={handleCloseUserModal} onUserCreated={fetchUserData} />
     </Container>
   );
 };

@@ -1,43 +1,72 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
 interface NewUserModalProps {
   show: boolean;
   onHide: () => void;
+  onUserCreated: () => void;
 }
 
-const NewUserModal: FC<NewUserModalProps> = ({ show, onHide }) => {
+interface Company {
+  COMPANYID: number;
+  COMPANYNAME: string;
+  CREATED_AT: string;
+  ISACTIVE: number;
+}
+
+const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
+  const [company, setCompany] = useState<number | null>(null);
+  const [role, setRole] = useState<number | null>(null);
   const [email, setEmail] = useState('');
-  const [loginMethod, setLoginMethod] = useState('');
+  const [loginMethod, setLoginMethod] = useState<number | null>(null);
+  const [password, setPassword] = useState('');
   const [tag, setTag] = useState('');
+  const [companies, setCompanies] = useState<Company[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/companies')
+      .then(response => response.json())
+      .then(data => setCompanies(data))
+      .catch(error => console.error('Error:', error));
+  }, []);
 
   const handleCreateUser = () => {
-    // Perform the necessary logic to create a new user with the form data
     const newUser = {
-      FIRSTNAME: firstName,
-      LASTNAME: lastName,
-      COMPANYNAME: company,
-      ROLENAME: role,
-      EMAIL: email,
-      METHODNAME: loginMethod,
-      TAG: tag,
+      firstName: firstName,
+      lastName: lastName,
+      companyID: company,
+      roleID: role,
+      email: email,
+      password: password,
+      methodID: loginMethod,
+      tag: tag,
     };
-    console.log('New user:', newUser);
 
-    // Clear the form fields
+    fetch('http://localhost:5000/api/createUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUser),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        onUserCreated();
+      })
+      .catch((error) => console.error('Error:', error));
+
     setFirstName('');
     setLastName('');
-    setCompany('');
-    setRole('');
+    setCompany(null);
+    setRole(null);
     setEmail('');
-    setLoginMethod('');
+    setLoginMethod(null);
+    setPassword('');
     setTag('');
 
-    // Close the modal
     onHide();
   };
 
@@ -71,32 +100,34 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide }) => {
                 />
               </Form.Group>
 
-              <Form.Group controlId="formCompany">
-                <Form.Label>Company</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Google"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                />
-              </Form.Group>
+              <Form.Control
+                as="select"
+                value={company || ''}
+                onChange={(e) => setCompany(Number(e.target.value) || null)}
+              >
+                <option value="">Select Company</option>
+                {companies.map((company, index) => (
+                  <option key={index} value={company.COMPANYID}>
+                    {company.COMPANYNAME}
+                  </option>
+                ))}
+              </Form.Control>
 
               <Form.Group controlId="formRole">
                 <Form.Label>Role</Form.Label>
                 <Form.Control
                   as="select"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  value={role || ''}
+                  onChange={(e) => setRole(Number(e.target.value) || null)}
                 >
-                  <option>Admin</option>
-                  <option>Project Manager</option>
-                  <option>IT Technicians</option>
-                  <option>Viewers</option>
+                  <option value="">Select Role</option>
+                  <option value={1}>Admin</option>
+                  <option value={2}>Project Manager</option>
+                  <option value={3}>IT Technicians</option>
+                  <option value={4}>Viewers</option>
                 </Form.Control>
               </Form.Group>
-            </Col>
 
-            <Col>
               <Form.Group controlId="formEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -111,20 +142,33 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide }) => {
                 <Form.Label>Login Method</Form.Label>
                 <Form.Control
                   as="select"
-                  value={loginMethod}
-                  onChange={(e) => setLoginMethod(e.target.value)}
+                  value={loginMethod || ''}
+                  onChange={(e) => setLoginMethod(Number(e.target.value) || null)}
                 >
-                  <option>Google</option>
-                  <option>Microsoft</option>
-                  <option>Our own password</option>
+                  <option value="">Select Login Method</option>
+                  <option value={1}>Google</option>
+                  <option value={2}>Microsoft</option>
+                  <option value={3}>Our own password</option>
                 </Form.Control>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group controlId="formPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  placeholder="Enter a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </Form.Group>
 
               <Form.Group controlId="formTag">
                 <Form.Label>Tag</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="A+ Certification , Cisco +"
+                  placeholder="A+ Certification, Cisco +"
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
                 />

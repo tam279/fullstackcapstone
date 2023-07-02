@@ -1,3 +1,5 @@
+// userController.js
+
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 
@@ -35,6 +37,8 @@ exports.getUsers = async (req, res) => {
 exports.createUser = async (req, res) => {
     try {
         const { firstName, lastName, email, password, roleID, companyID, methodID } = req.body;
+
+        console.log('Received password:', password);  // Add this line
 
         const saltRounds = 10;
         const hash = await bcrypt.hash(password, saltRounds);

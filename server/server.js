@@ -9,7 +9,8 @@ const userController = require('./controllers/userController');
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+// parse requests of content-type - application/json
+app.use(bodyParser.json());
 // Apply the Content Security Policy
 app.use(
     helmet.contentSecurityPolicy({
