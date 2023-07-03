@@ -11,7 +11,7 @@ const app = express();
 // Configure CORS here
 app.use(cors({
     origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT'], // added 'PUT' here
     credentials: true // enable set cookie
 }));
 
@@ -50,7 +50,9 @@ app.get('/', (req, res) => {
 
 app.get('/api/users', userController.getUsers);
 app.post('/api/createUser', userController.createUser);
-
+app.put('/api/updateUser/:email', userController.updateUser); // added :email
+app.delete('/api/deleteUser/:email', userController.deleteUser);
+app.put('/api/deactivateUser/:email', userController.deactivateUser);
 
 app.get('/api/companies', userController.getCompanies);
 app.post('/api/createCompany', userController.createCompany);

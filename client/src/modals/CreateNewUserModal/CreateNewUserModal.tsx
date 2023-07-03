@@ -23,6 +23,8 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
   const [loginMethod, setLoginMethod] = useState<number | null>(null);
   const [password, setPassword] = useState('');
   const [tag, setTag] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
@@ -42,6 +44,8 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
       password: password,
       methodID: loginMethod,
       tag: tag,
+      phoneNumber: phoneNumber,
+      jobTitle: jobTitle,
     };
 
     fetch('http://localhost:5000/api/createUser', {
@@ -66,6 +70,8 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
     setLoginMethod(null);
     setPassword('');
     setTag('');
+    setPhoneNumber('');
+    setJobTitle('');
 
     onHide();
   };
@@ -80,6 +86,15 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
         <Form>
           <Row>
             <Col>
+              <Form.Group controlId="formEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Johndoes@mail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </Form.Group>
               <Form.Group controlId="formFirstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
@@ -89,7 +104,6 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </Form.Group>
-
               <Form.Group controlId="formLastName">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
@@ -99,7 +113,7 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setLastName(e.target.value)}
                 />
               </Form.Group>
-
+              <Form.Label>Company</Form.Label>
               <Form.Control
                 as="select"
                 value={company || ''}
@@ -112,7 +126,6 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   </option>
                 ))}
               </Form.Control>
-
               <Form.Group controlId="formRole">
                 <Form.Label>Role</Form.Label>
                 <Form.Control
@@ -127,17 +140,6 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   <option value={4}>Viewers</option>
                 </Form.Control>
               </Form.Group>
-
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Johndoes@mail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Form.Group>
-
               <Form.Group controlId="formLoginMethod">
                 <Form.Label>Login Method</Form.Label>
                 <Form.Control
@@ -152,7 +154,6 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                 </Form.Control>
               </Form.Group>
             </Col>
-
             <Col>
               <Form.Group controlId="formPassword">
                 <Form.Label>Password</Form.Label>
@@ -163,7 +164,6 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </Form.Group>
-
               <Form.Group controlId="formTag">
                 <Form.Label>Tag</Form.Label>
                 <Form.Control
@@ -171,6 +171,24 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   placeholder="A+ Certification, Cisco +"
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group controlId="formPhoneNumber">
+                <Form.Label>Phone Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter phone number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group controlId="formJobTitle">
+                <Form.Label>Job Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter job title"
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
                 />
               </Form.Group>
             </Col>

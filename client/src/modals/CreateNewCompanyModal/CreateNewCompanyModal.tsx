@@ -7,13 +7,16 @@ interface NewCompanyModalProps {
   onHide: () => void;
 }
 
-const NewCompanyModal: FC<NewCompanyModalProps & { onSuccess: () => void; }> = ({ show, onHide, onSuccess }) => {
-  const [name, setName] = useState("");
+const NewCompanyModal: FC<NewCompanyModalProps & { onSuccess: () => void }> = ({ show, onHide, onSuccess }) => {
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [website, setWebsite] = useState('');
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/createCompany', { companyName: name });
+      await axios.post('http://localhost:5000/api/createCompany', { companyName: name, address, phoneNumber, website });
       onHide();
       onSuccess(); // After successful creation, call the onSuccess function
     } catch (error) {
@@ -32,6 +35,18 @@ const NewCompanyModal: FC<NewCompanyModalProps & { onSuccess: () => void; }> = (
           <Form.Group controlId="formName">
             <Form.Label>Company Name</Form.Label>
             <Form.Control type="text" placeholder="Google" onChange={(e) => setName(e.target.value)} value={name} required />
+          </Form.Group>
+          <Form.Group controlId="formAddress">
+            <Form.Label>Address</Form.Label>
+            <Form.Control type="text" placeholder="123 Main St" onChange={(e) => setAddress(e.target.value)} value={address} required />
+          </Form.Group>
+          <Form.Group controlId="formPhoneNumber">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control type="text" placeholder="555-555-5555" onChange={(e) => setPhoneNumber(e.target.value)} value={phoneNumber} required />
+          </Form.Group>
+          <Form.Group controlId="formWebsite">
+            <Form.Label>Website</Form.Label>
+            <Form.Control type="text" placeholder="https://www.example.com" onChange={(e) => setWebsite(e.target.value)} value={website} required />
           </Form.Group>
           <Modal.Footer>
             <Button variant="secondary" onClick={onHide}>

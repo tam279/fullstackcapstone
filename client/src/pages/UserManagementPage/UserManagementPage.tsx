@@ -10,20 +10,32 @@ interface User {
   EMAIL: string;
   FIRSTNAME: string;
   LASTNAME: string;
-  ISACTIVE: number;
-  IS_EMAIL_VERIFIED: number;
-  TAG: string;
-  COMPANYID: number;
-  ROLEID: number;
-  METHODID: number;
-  ROLENAME: string;
   COMPANYNAME: string;
+  ROLENAME: string;
   METHODNAME: string;
+  TAG: string;
+  PHONE_NUMBER: string;
+  JOB_TITLE: string;
+  ISACTIVE: number;
+  COMPANY: string;
+  ROLE: string;
+  LOGIN_METHOD: string;
 }
+
 
 interface Company {
   COMPANYID: number;
   COMPANYNAME: string;
+  ADDRESS: string; // Add ADDRESS field
+  PHONE_NUMBER: string; // Add PHONE_NUMBER field
+  WEBSITE: string; // Add WEBSITE field
+}
+
+
+interface Role {
+  ROLEID: number;
+  ROLENAME: string;
+  // Add other properties of a role here
 }
 
 const UserManagementPage = () => {
@@ -33,6 +45,7 @@ const UserManagementPage = () => {
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [roleData, setRoleData] = useState<Role[]>([]);
 
   const fetchUserData = () => {
     axios
@@ -47,6 +60,8 @@ const UserManagementPage = () => {
 
   useEffect(() => {
     fetchUserData();
+    fetchCompanyData();
+    fetchRoleData();
   }, []);
 
   const fetchCompanyData = () => {
@@ -60,9 +75,16 @@ const UserManagementPage = () => {
       });
   };
 
-  useEffect(() => {
-    fetchCompanyData();
-  }, []);
+  const fetchRoleData = () => {
+    axios
+      .get('http://localhost:5000/api/roles')
+      .then(response => {
+        setRoleData(response.data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
 
   const handleEditClick = (user: User) => {
     setSelectedUser(user);
@@ -73,6 +95,9 @@ const UserManagementPage = () => {
     setSelectedUser(null);
     setShowEditModal(false);
   };
+
+  const handleShowUserModal = () => setShowUserModal(true);
+  const handleCloseUserModal = () => setShowUserModal(false);
 
   const handleUpdateUser = (id: string, updatedUser: any) => {
     // Implement your user updating logic here
@@ -87,8 +112,20 @@ const UserManagementPage = () => {
     // Implement your user deactivating logic here
   };
 
-  const handleShowUserModal = () => setShowUserModal(true);
-  const handleCloseUserModal = () => setShowUserModal(false);
+  useEffect(() => {
+    Promise.all([
+      axios.get('http://localhost:5000/api/users'),
+      axios.get('http://localhost:5000/api/companies'),
+      axios.get('http://localhost:5000/api/roles'),
+    ]).then(([usersRes, companiesRes, rolesRes]) => {
+      // Create mapping from companyID and roleID to their names
+
+
+      setUserData(userData);
+      setCompanyData(companiesRes.data);
+      setRoleData(rolesRes.data);
+    }).catch(error => console.error('Error:', error));
+  }, []);
 
   return (
     <Container fluid>
@@ -108,12 +145,16 @@ const UserManagementPage = () => {
                     <th>
                       <Button onClick={handleShowUserModal}>+ New User</Button>
                     </th>
+                    <th>Email</th>
                     <th>First Name</th>
                     <th>Last Name</th>
-                    <th>Email</th>
                     <th>Company</th>
                     <th>Role</th>
+                    <th>Login Methods</th>
                     <th>Tag</th>
+                    <th>Phone Number</th>
+                    <th>Job Title</th>
+                    <th>User status</th>
                     <th>Filter</th>
                   </tr>
                 </thead>
@@ -123,12 +164,17 @@ const UserManagementPage = () => {
                       <td>
                         <Button onClick={() => handleEditClick(user)}>Edit</Button>
                       </td>
+                      <td>{user.EMAIL}</td>
                       <td>{user.FIRSTNAME}</td>
                       <td>{user.LASTNAME}</td>
-                      <td>{user.EMAIL}</td>
                       <td>{user.COMPANYNAME}</td>
                       <td>{user.ROLENAME}</td>
+                      <td>{user.METHODNAME}</td>
                       <td>{user.TAG}</td>
+                      <td>{user.PHONE_NUMBER}</td>
+                      <td>{user.JOB_TITLE}</td>
+                      <td>{user.ISACTIVE}</td>
+
                       <td>
                         <Button>Filter</Button>
                       </td>
@@ -148,6 +194,9 @@ const UserManagementPage = () => {
                     </th>
                     <th>Company ID</th>
                     <th>Company Name</th>
+                    <th>Address</th> {/* Add Address column */}
+                    <th>Phone Number</th> {/* Add Phone Number column */}
+                    <th>Website</th> {/* Add Website column */}
                   </tr>
                 </thead>
                 <tbody>
@@ -158,10 +207,14 @@ const UserManagementPage = () => {
                       </td>
                       <td>{company.COMPANYID}</td>
                       <td>{company.COMPANYNAME}</td>
+                      <td>{company.ADDRESS}</td> {/* Display Address */}
+                      <td>{company.PHONE_NUMBER}</td> {/* Display Phone Number */}
+                      <td>{company.WEBSITE}</td> {/* Display Website */}
                     </tr>
                   ))}
                 </tbody>
               </Table>
+
             </Tab>
           </Tabs>
         </Col>
@@ -176,8 +229,12 @@ const UserManagementPage = () => {
           updateUser={handleUpdateUser}
           deleteUser={handleDeleteUser}
           deactivateUser={handleDeactivateUser}
+          fetchUsers={fetchUserData}
+          companies={companyData}
+          roles={roleData}
         />
       )}
+
       <NewCompanyModal show={showCompanyModal} onHide={() => setShowCompanyModal(false)} onSuccess={fetchCompanyData} />
     </Container>
   );
