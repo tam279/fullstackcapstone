@@ -12,7 +12,6 @@ interface ProjectData {
   NAME: string;
   STARTDATE: string;
   ENDDATE: string;
-  PROGRESS: number;
   MANAGEREMAIL: string;
   DESCRIPTION: string;
   COMPANYID: number;
@@ -72,7 +71,6 @@ const AdminProjectPage = () => {
               <th>Name</th>
               <th>Start date</th>
               <th>End date</th>
-              <th>Progress</th>
               <th>Manager email</th>
               <th>Description</th>
               <th>Company ID</th>
@@ -99,9 +97,7 @@ const AdminProjectPage = () => {
                 </td>
                 <td>{project.STARTDATE}</td>
                 <td>{project.ENDDATE}</td>
-                <td>
-                  <ProgressBar now={project.PROGRESS} label={`${project.PROGRESS}%`} />
-                </td>
+      
                 <td>{project.MANAGEREMAIL}</td>
                 <td>{project.DESCRIPTION}</td>
                 <td>{project.COMPANYID}</td>

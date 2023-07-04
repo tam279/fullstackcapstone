@@ -6,7 +6,6 @@ interface Project {
   NAME: string;
   STARTDATE: string;
   ENDDATE: string;
-  PROGRESS: number;
   MANAGEREMAIL: string;
   DESCRIPTION: string;
   COMPANYID: number;

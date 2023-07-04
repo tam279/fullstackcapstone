@@ -248,3 +248,26 @@ exports.deleteCompany = (req, res) => {
         }
     });
 };
+
+exports.getUserActivity = async (req, res) => {
+    try {
+        const [result] = await db.query('SELECT * FROM USER_ACTIVITY ORDER BY TIMESTAMP DESC');
+        res.status(200).json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+exports.createUserActivity = async (req, res) => {
+    try {
+        const { email, description } = req.body;
+        const result = await pool.query(
+            'INSERT INTO USER_ACTIVITY (EMAIL, DESCRIPTION) VALUES ($1, $2) RETURNING *',
+            [email, description]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};

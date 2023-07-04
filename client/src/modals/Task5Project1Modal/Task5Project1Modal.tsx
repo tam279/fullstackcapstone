@@ -27,8 +27,6 @@ const Task5Project1Modal: FC<Task5Project1ModalProps> = ({ show, handleClose }) 
                         </Form.Group>
 
                         <h4>Tags: A+ Certification, Cisco</h4>
-                        <h4>Hours spent:</h4>
-
                         <h4>Files:</h4>
                         <p>PNG 2.00 MB, PDF 1.00 MB</p>
                         <Form.Group controlId="exampleForm.ControlSelect1">

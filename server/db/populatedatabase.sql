@@ -136,40 +136,54 @@ INSERT INTO PROJECT (
     NAME,
     STARTDATE,
     ENDDATE,
-    PROGRESS,
     MANAGEREMAIL,
     DESCRIPTION,
     COMPANYID,
-    ISACTIVE
+    STATUS
 ) VALUES (
-    'Project A',
-    '2022-01-01',
-    '2022-02-01',
-    50,
-    'john.doe@example.com',
-    'Description of Project A',
+    "Project 1",
+    "2023-01-01",
+    "2024-01-01",
+    "john.doe@example.com",
+    "This is a description of Project 1.",
     1,
-    1
+    "In Progress"
+);
+
+INSERT INTO PROJECT (
+    NAME,
+    STARTDATE,
+    ENDDATE,
+    MANAGEREMAIL,
+    DESCRIPTION,
+    COMPANYID,
+    STATUS
+) VALUES (
+    "Project 2",
+    "2023-02-01",
+    "2024-02-01",
+    "john.doe@example.com",
+    "This is a description of Project 2.",
+    1,
+    "In Progress"
 ),
 (
-    'Project B',
-    '2022-02-01',
-    '2022-03-01',
-    25,
-    'john.doe@example.com',
-    'Description of Project B',
-    1,
-    1
+    "Project 3",
+    "2023-03-01",
+    "2024-03-01",
+    "john.doe@example.com",
+    "This is a description of Project 3.",
+    2,
+    "In Progress"
 ),
 (
-    'Project C',
-    '2022-03-01',
-    '2022-04-01',
-    75,
-    'jane.smith@example.com',
-    'Description of Project C',
-    1,
-    1
+    "Project 4",
+    "2023-04-01",
+    "2024-04-01",
+    "john.doe@example.com",
+    "This is a description of Project 4.",
+    2,
+    "Completed"
 );
 
 -- Sample data for VIEWER_BRIDGE table
@@ -194,62 +208,52 @@ INSERT INTO TASK (
     DESCRIPTION,
     STATUS,
     PRIORITY,
-    ISACTIVE,
-    PROJECTID
+    PROJECTID,
+    DURATION,
+    TECHNICIAN,
+    TAG,
+    FILTER
 ) VALUES (
-    'Task 1',
-    '2022-01-01',
-    '2022-01-10',
+    "Task 1",
+    "2023-01-01 07:00:00",
+    "2023-01-10 07:00:00",
     80,
-    'Description of Task 1',
-    'In Progress',
-    'High',
+    "Description of Task 1",
+    "In Progress",
+    "High",
     1,
-    1
+    5,
+    "Technician 1",
+    "Tag 1",
+    "Filter 1"
 ),
 (
-    'Task 2',
-    '2022-01-05',
-    '2022-01-15',
+    "Task 2",
+    "2023-01-11 07:00:00",
+    "2023-01-20 07:00:00",
     60,
-    'Description of Task 2',
-    'In Progress',
-    'Medium',
+    "Description of Task 2",
+    "In Progress",
+    "Medium",
     1,
-    1
+    5,
+    "Technician 2",
+    "Tag 2",
+    "Filter 2"
 ),
 (
-    'Task 3',
-    '2022-02-01',
-    '2022-02-10',
-    90,
-    'Description of Task 3',
-    'Completed',
-    'High',
+    "Task 3",
+    "2023-01-21 07:00:00",
+    "2023-01-30 07:00:00",
+    40,
+    "Description of Task 3",
+    "In Progress",
+    "Low",
     1,
-    2
-),
-(
-    'Task 4',
-    '2022-02-05',
-    '2022-02-15',
-    50,
-    'Description of Task 4',
-    'In Progress',
-    'Medium',
-    1,
-    2
-),
-(
-    'Task 5',
-    '2022-03-01',
-    '2022-03-10',
-    70,
-    'Description of Task 5',
-    'In Progress',
-    'High',
-    1,
-    3
+    5,
+    "Technician 3",
+    "Tag 3",
+    "Filter 3"
 );
 
 -- Sample data for TASK_USER_BRIDGE table
@@ -420,10 +424,6 @@ INSERT INTO DEPENDENCY_BRIDGE (
 (
     3,
     2
-),
-(
-    4,
-    1
 );
 
 -- Sample data for PASSWORD_RESET_TOKENS table

@@ -91,6 +91,13 @@ app.delete('/api/tasks/:id', taskController.deleteTask);
 
 app.get('/api/roles', userController.getRoles);
 
+
+// User activity routes
+app.get('/api/userActivity', userController.getUserActivity);
+app.post('/api/createUserActivity', userController.createUserActivity);
+
+
+
 app.use((req, res, next) => {
     const error = new Error('Route not found');
     error.status = 404;
