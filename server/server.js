@@ -63,6 +63,7 @@ app.get('/', (req, res) => {
 
 app.get('/api/users', userController.getUsers);
 app.post('/api/createUser', userController.createUser);
+
 app.put('/api/updateUser/:email', userController.updateUser);
 app.delete('/api/deleteUser/:email', userController.deleteUser);
 app.put('/api/deactivateUser/:email', userController.deactivateUser);

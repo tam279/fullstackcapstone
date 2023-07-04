@@ -49,6 +49,16 @@ exports.getUsers = async (req, res) => {
     }
 };
 
+
+exports.getLoginMethods = async (req, res, next) => {
+    try {
+        const [loginMethods] = await db.query('SELECT * FROM LOGIN_METHOD');
+        res.json(loginMethods);
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getCompanies = async (req, res) => {
     try {
         const query = 'SELECT * FROM COMPANY';
@@ -104,12 +114,12 @@ exports.updateUser = async (req, res) => {
 
         const existingUser = existingUsers[0];
 
-        // If a field is not provided in the request body, use the existing value
-        const firstName = req.body.firstName !== undefined ? req.body.firstName : existingUser.FIRSTNAME;
-        const lastName = req.body.lastName !== undefined ? req.body.lastName : existingUser.LASTNAME;
-        const companyId = req.body.companyId !== undefined ? req.body.companyId : existingUser.COMPANYID;
-        const roleId = req.body.roleId !== undefined ? req.body.roleId : existingUser.ROLEID;
-        const loginMethodId = req.body.loginMethodId !== undefined ? req.body.loginMethodId : existingUser.METHODID;
+        // // If a field is not provided in the request body, use the existing value
+        const firstName = req.body.FIRSTNAME !== undefined ? req.body.FIRSTNAME : existingUser.FIRSTNAME;
+        const lastName = req.body.LASTNAME !== undefined ? req.body.LASTNAME : existingUser.LASTNAME;
+        const companyId = req.body.COMPANYID !== undefined ? req.body.COMPANYID : existingUser.COMPANYID;
+        const roleId = req.body.ROLEID !== undefined ? req.body.ROLEID : existingUser.ROLEID;
+        const loginMethodId = req.body.METHODID !== undefined ? req.body.METHODID : existingUser.METHODID;
         const phoneNumber = req.body.phoneNumber !== undefined ? req.body.phoneNumber : existingUser.PHONE_NUMBER;
         const jobTitle = req.body.jobTitle !== undefined ? req.body.jobTitle : existingUser.JOB_TITLE;
 
@@ -211,14 +221,6 @@ exports.createCompany = async (req, res) => {
 };
 
 
-exports.getLoginMethods = async (req, res, next) => {
-    try {
-        const loginMethods = await db.query('SELECT * FROM LOGIN_METHOD');
-        res.json(loginMethods);
-    } catch (error) {
-        next(error);
-    }
-};
 
 exports.updateCompany = (req, res) => {
     const id = req.params.id;

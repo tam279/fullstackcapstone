@@ -18,15 +18,26 @@ interface ProjectData {
   ISACTIVE: number;
 }
 
+interface CompanyData {
+  COMPANYID: number;
+  COMPANYNAME: string;
+  // other company fields...
+}
+
+
 const AdminProjectPage = () => {
   const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [companies, setCompanies] = useState<CompanyData[]>([]); // New state for companies
   const [show, setShow] = useState(false);
   const [editingProject, setEditingProject] = useState<ProjectData | null>(null);
   const location = useLocation();
 
+
   useEffect(() => {
     fetchProjects();
+    fetchCompanies(); // Fetch companies on component mount
   }, []);
+
 
   const fetchProjects = () => {
     axios
@@ -39,6 +50,17 @@ const AdminProjectPage = () => {
       });
   };
 
+  // New fetch function for companies
+  const fetchCompanies = () => {
+    axios
+      .get('http://localhost:5000/api/companies')
+      .then(response => {
+        setCompanies(response.data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -87,22 +109,22 @@ const AdminProjectPage = () => {
                   <Button variant="primary" onClick={() => setEditingProject(project)}>
                     Edit
                   </Button>
-                  </td>
-                  <td>
-                  <Link to={`/project/${project.NAME.replace(/\s/g, '-')}`}>{project.PROJECTID}</Link> 
-                  
-                  </td>
-                  
-                  <td>             <div onClick={() => handleProjectClick(project)}>{project.NAME}</div>
+                </td>
+                <td>
+                  <Link to={`/project/${project.NAME.replace(/\s/g, '-')}`}>{project.PROJECTID}</Link>
+
+                </td>
+
+                <td>             <div onClick={() => handleProjectClick(project)}>{project.NAME}</div>
                 </td>
                 <td>{project.STARTDATE}</td>
                 <td>{project.ENDDATE}</td>
-      
+
                 <td>{project.MANAGEREMAIL}</td>
                 <td>{project.DESCRIPTION}</td>
-                <td>{project.COMPANYID}</td>
-                <td>{project.ISACTIVE}</td>
-                <td>{/* Filter */}</td>
+                {
+                  companies.find(company => company.COMPANYID === project.COMPANYID)?.COMPANYNAME || 'Unknown'
+                }                <td>{project.ISACTIVE === 1 ? 'Active' : project.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td>
               </tr>
             ))}
           </tbody>

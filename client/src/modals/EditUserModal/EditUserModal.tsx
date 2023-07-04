@@ -172,7 +172,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       console.error('Error deleting user', error);
     }
   };
-
+  const log = loginMethods
+  console.log(loginMethods);
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
@@ -233,7 +234,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               </Form.Group>
 
               <Form.Group controlId="formMethod">
-                <Form.Label>Log in Method</Form.Label>
+                <Form.Label>Login Method</Form.Label>
                 <Form.Control
                   as="select"
                   value={loginMethodId}
@@ -246,6 +247,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   ))}
                 </Form.Control>
               </Form.Group>
+
 
               <Form.Group controlId="formTag">
                 <Form.Label>Tag</Form.Label>

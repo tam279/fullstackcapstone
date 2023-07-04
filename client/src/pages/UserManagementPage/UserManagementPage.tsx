@@ -244,7 +244,9 @@ const UserManagementPage = () => {
                       <td>{user.TAG}</td>
                       <td>{user.PHONE_NUMBER}</td>
                       <td>{user.JOB_TITLE}</td>
-                      <td>{user.ISACTIVE}</td>
+                      <td>{user.ISACTIVE === 1 ? 'Active' : user.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td>
+
+
                       <td>
                         <Button>Filter</Button>
                       </td>
