@@ -154,6 +154,8 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                 </Form.Control>
               </Form.Group>
             </Col>
+      
+         
             <Col>
               <Form.Group controlId="formPassword">
                 <Form.Label>Password</Form.Label>

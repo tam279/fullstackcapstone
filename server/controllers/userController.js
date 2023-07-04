@@ -10,6 +10,8 @@ const db = mysql.createPool({
     database: 'pmsdatabase',
 });
 
+
+
 exports.getUsers = async (req, res) => {
     try {
         const query = `
@@ -86,19 +88,38 @@ exports.createUser = async (req, res) => {
 };
 
 
-// ...
 exports.updateUser = async (req, res) => {
+    console.log('updateUser called with req.params', req.params);
+
     try {
-        const { firstName, lastName, roleID, companyID, methodID } = req.body;
         const { email } = req.params;
+
+        // First fetch the existing user data
+        const [existingUsers] = await db.query('SELECT * FROM USER WHERE EMAIL = ?', [email]);
+
+        // If the user does not exist, return an error
+        if (existingUsers.length === 0) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        const existingUser = existingUsers[0];
+
+        // If a field is not provided in the request body, use the existing value
+        const firstName = req.body.firstName !== undefined ? req.body.firstName : existingUser.FIRSTNAME;
+        const lastName = req.body.lastName !== undefined ? req.body.lastName : existingUser.LASTNAME;
+        const companyId = req.body.companyId !== undefined ? req.body.companyId : existingUser.COMPANYID;
+        const roleId = req.body.roleId !== undefined ? req.body.roleId : existingUser.ROLEID;
+        const loginMethodId = req.body.loginMethodId !== undefined ? req.body.loginMethodId : existingUser.METHODID;
+        const phoneNumber = req.body.phoneNumber !== undefined ? req.body.phoneNumber : existingUser.PHONE_NUMBER;
+        const jobTitle = req.body.jobTitle !== undefined ? req.body.jobTitle : existingUser.JOB_TITLE;
 
         const query = `
             UPDATE USER
-            SET FIRSTNAME = ?, LASTNAME = ?, ROLEID = ?, COMPANYID = ?, METHODID = ?
+            SET FIRSTNAME = ?, LASTNAME = ?, ROLEID = ?, COMPANYID = ?, METHODID = ?, PHONE_NUMBER = ?, JOB_TITLE = ?
             WHERE EMAIL = ?
         `;
 
-        await db.query(query, [firstName, lastName, roleID, companyID, methodID, email]);
+        await db.query(query, [firstName, lastName, roleId, companyId, loginMethodId, phoneNumber, jobTitle, email]);
 
         console.log('User updated');
         res.status(200).send({ message: 'User updated' });
@@ -108,9 +129,15 @@ exports.updateUser = async (req, res) => {
     }
 };
 
+
+
+
+
+
+
 exports.deleteUser = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email } = req.params;
 
         const query = `
             DELETE FROM USER
@@ -129,7 +156,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.deactivateUser = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email } = req.params;
 
         const query = `
             UPDATE USER
@@ -146,6 +173,7 @@ exports.deactivateUser = async (req, res) => {
         return res.status(500).send({ error: error.message });
     }
 };
+
 
 
 exports.getRoles = async (req, res) => {
@@ -180,4 +208,43 @@ exports.createCompany = async (req, res) => {
         console.log('Error: ', error);
         return res.status(500).send({ error: error.message });
     }
+};
+
+
+exports.getLoginMethods = async (req, res, next) => {
+    try {
+        const loginMethods = await db.query('SELECT * FROM LOGIN_METHOD');
+        res.json(loginMethods);
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.updateCompany = (req, res) => {
+    const id = req.params.id;
+    const { companyName, address, phoneNumber, website } = req.body;
+    const sql = `UPDATE COMPANY SET COMPANYNAME = ?, ADDRESS = ?, PHONE_NUMBER = ?, WEBSITE = ? WHERE COMPANYID = ?`;
+
+    db.query(sql, [companyName, address, phoneNumber, website, id], (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send({ message: 'An error occurred' });
+        } else {
+            res.status(200).send({ message: 'Company updated successfully' });
+        }
+    });
+};
+
+exports.deleteCompany = (req, res) => {
+    const id = req.params.id;
+    const sql = `DELETE FROM COMPANY WHERE COMPANYID = ?`;
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send({ message: 'An error occurred' });
+        } else {
+            res.status(200).send({ message: 'Company deleted successfully' });
+        }
+    });
 };

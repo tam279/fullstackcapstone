@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -6,42 +6,51 @@ interface User {
   EMAIL: string;
   FIRSTNAME: string;
   LASTNAME: string;
-  COMPANY: string;
-  ROLE: string;
-  LOGIN_METHOD: string;
+  COMPANYNAME: string;
+  ROLENAME: string;
+  METHODNAME: string;
   TAG: string;
   PHONE_NUMBER: string;
   JOB_TITLE: string;
   ISACTIVE: number;
+  COMPANY: string;
+  ROLE: string;
+  LOGIN_METHOD: string;
+  COMPANYID: number | undefined;
+  ROLEID: number | undefined;
+  METHODID: number | undefined;
 }
 
 interface Company {
   COMPANYID: number;
   COMPANYNAME: string;
-  ADDRESS: string; // Add ADDRESS field
-  PHONE_NUMBER: string; // Add PHONE_NUMBER field
-  WEBSITE: string; // Add WEBSITE field
+  ADDRESS: string;
+  PHONE_NUMBER: string;
+  WEBSITE: string;
 }
-
 
 interface Role {
   ROLEID: number;
   ROLENAME: string;
-  // Add other properties of a role here
+}
+
+interface LoginMethod {
+  METHODID: number;
+  METHODNAME: string;
 }
 
 interface EditUserModalProps {
   show: boolean;
   onHide: () => void;
   user: User;
-  updateUser: (id: string, updatedUser: any) => void;
-  deleteUser: (id: string) => void;
-  deactivateUser: (id: string) => void;
+  updateUser: (email: string, updatedUser: User) => void;
+  deleteUser: (email: string) => void;
+  deactivateUser: (email: string) => void;
   fetchUsers: () => void;
-  companies: Company[]; // Add the 'companies' prop
-  roles: Role[]; // Add the 'roles' prop
+  companies: Company[];
+  roles: Role[];
+  loginMethods: LoginMethod[];
 }
-
 
 const EditUserModal: React.FC<EditUserModalProps> = ({
   show,
@@ -51,14 +60,69 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   deleteUser,
   deactivateUser,
   fetchUsers,
-  companies, // Add this line
-  roles, // Add this line
+  companies,
+  roles,
+  loginMethods,
 }) => {
+  const getCompanyId = (companyName: string) => {
+    const company = companies.find((comp) => comp.COMPANYNAME === companyName);
+    return company ? company.COMPANYID : undefined;
+  };
+
+  const getRoleId = (roleName: string) => {
+    const role = roles.find((rol) => rol.ROLENAME === roleName);
+    return role ? role.ROLEID : undefined;
+  };
+
+  const getMethodId = (methodName: string) => {
+    const method = loginMethods.find((method) => method.METHODNAME === methodName);
+    return method ? method.METHODID : undefined;
+  };
+
+  const getCompanyName = (companyId: number | undefined): string | undefined => {
+    const company = companies.find(c => c.COMPANYID === companyId);
+    return company ? company.COMPANYNAME : undefined;
+  };
+
+  const getRoleName = (roleId: number | undefined): string | undefined => {
+    const role = roles.find(r => r.ROLEID === roleId);
+    return role ? role.ROLENAME : undefined;
+  };
+
+  const getMethodName = (loginMethodId: number | undefined): string | undefined => {
+    const method = loginMethods.find(m => m.METHODID === loginMethodId);
+    return method ? method.METHODNAME : undefined;
+  };
+
+  useEffect(() => {
+    console.log(loginMethods);
+  }, [loginMethods]);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.FIRSTNAME);
+      setLastName(user.LASTNAME);
+      setCompanyId(user.COMPANYID !== undefined ? user.COMPANYID.toString() : undefined);
+      setRoleId(user.ROLEID !== undefined ? user.ROLEID.toString() : undefined);
+      setLoginMethodId(user.METHODID !== undefined ? user.METHODID.toString() : undefined);
+      setTag(user.TAG);
+      setPhoneNumber(user.PHONE_NUMBER);
+      setJobTitle(user.JOB_TITLE);
+      setIsActive(user.ISACTIVE);
+    }
+  }, [user]);
+
   const [firstName, setFirstName] = useState(user.FIRSTNAME);
   const [lastName, setLastName] = useState(user.LASTNAME);
-  const [company, setCompany] = useState(user.COMPANY);
-  const [role, setRole] = useState(user.ROLE);
-  const [loginMethod, setLoginMethod] = useState(user.LOGIN_METHOD);
+  const [companyId, setCompanyId] = useState<string | undefined>(
+    user.COMPANYID !== undefined ? user.COMPANYID.toString() : undefined
+  );
+  const [roleId, setRoleId] = useState<string | undefined>(
+    user.ROLEID !== undefined ? user.ROLEID.toString() : undefined
+  );
+  const [loginMethodId, setLoginMethodId] = useState<string | undefined>(
+    user.METHODID !== undefined ? user.METHODID.toString() : undefined
+  );
   const [tag, setTag] = useState(user.TAG);
   const [phoneNumber, setPhoneNumber] = useState(user.PHONE_NUMBER);
   const [jobTitle, setJobTitle] = useState(user.JOB_TITLE);
@@ -66,16 +130,17 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const updatedUser = {
-      firstName: firstName,
-      lastName: lastName,
-      company: company,
-      role: role,
-      loginMethod: loginMethod,
-      tag: tag,
-      phoneNumber: phoneNumber,
-      jobTitle: jobTitle,
-      isActive: isActive,
+    const updatedUser: User = {
+      ...user, // Include existing user properties
+      FIRSTNAME: firstName,
+      LASTNAME: lastName,
+      COMPANYID: companyId !== undefined ? Number(companyId) : undefined,
+      ROLEID: roleId !== undefined ? Number(roleId) : undefined,
+      METHODID: loginMethodId !== undefined ? Number(loginMethodId) : undefined,
+      TAG: tag,
+      PHONE_NUMBER: phoneNumber,
+      JOB_TITLE: jobTitle,
+      ISACTIVE: isActive,
     };
 
     try {
@@ -87,6 +152,17 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   };
 
+
+  const handleDeactivate = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/deactivateUser/${user.EMAIL}`);
+      fetchUsers();
+      onHide();
+    } catch (error) {
+      console.error('Error deactivating user', error);
+    }
+  };
+
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:5000/api/deleteUser/${user.EMAIL}`);
@@ -94,16 +170,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       onHide();
     } catch (error) {
       console.error('Error deleting user', error);
-    }
-  };
-
-  const handleDeactivate = async () => {
-    try {
-      await axios.post(`http://localhost:5000/api/deactivateUser/${user.EMAIL}/deactivate`);
-      fetchUsers();
-      onHide();
-    } catch (error) {
-      console.error('Error deactivating user', error);
     }
   };
 
@@ -140,8 +206,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                 <Form.Label>Company</Form.Label>
                 <Form.Control
                   as="select"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
+                  value={companyId}
+                  onChange={(e) => setCompanyId(e.target.value)}
                 >
                   {companies.map((comp) => (
                     <option key={comp.COMPANYID} value={comp.COMPANYID}>
@@ -155,8 +221,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                 <Form.Label>Role</Form.Label>
                 <Form.Control
                   as="select"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  value={roleId}
+                  onChange={(e) => setRoleId(e.target.value)}
                 >
                   {roles.map((role) => (
                     <option key={role.ROLEID} value={role.ROLEID}>
@@ -166,16 +232,19 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                 </Form.Control>
               </Form.Group>
 
-
-
-              <Form.Group controlId="formLoginMethod">
-                <Form.Label>Login Method</Form.Label>
+              <Form.Group controlId="formMethod">
+                <Form.Label>Log in Method</Form.Label>
                 <Form.Control
-                  type="text"
-                  placeholder="Login Method"
-                  value={loginMethod}
-                  onChange={(e) => setLoginMethod(e.target.value)}
-                />
+                  as="select"
+                  value={loginMethodId}
+                  onChange={(e) => setLoginMethodId(e.target.value)}
+                >
+                  {loginMethods.map((method) => (
+                    <option key={method.METHODID} value={method.METHODID}>
+                      {method.METHODNAME}
+                    </option>
+                  ))}
+                </Form.Control>
               </Form.Group>
 
               <Form.Group controlId="formTag">

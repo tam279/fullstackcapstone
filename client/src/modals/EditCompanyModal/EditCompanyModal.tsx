@@ -1,63 +1,47 @@
-import React, { FC } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Form, Modal, Button } from 'react-bootstrap';
 
-interface EditCompanyModalProps {
-  show: boolean;
-  onHide: () => void;
-  company: any;
-  updateCompany: (id: string, updatedCompany: any) => void;
-  deleteCompany: (id: string) => void;
-}
-
-const EditCompanyModal: FC<EditCompanyModalProps> = ({ show, onHide, company, updateCompany, deleteCompany }) => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const updatedCompany = {
-      name: e.currentTarget.formName.value,
-      photo: e.currentTarget.formPhoto.value,
-    };
-
-    updateCompany(company.id, updatedCompany);
-    onHide();
-  };
-
-  const handleDelete = () => {
-    deleteCompany(company.id);
-    onHide();
-  };
+const EditCompanyModal = ({ onHide }) => {
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [website, setWebsite] = useState("");
 
   return (
-    <Modal show={show} onHide={onHide} size="lg">
+    <Modal onHide={onHide} size="lg">
       <Modal.Header closeButton>
         <Modal.Title>Edit Company</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <Form.Group controlId="formName">
-            <Form.Label>Name</Form.Label>
-            <Form.Control type="text" placeholder="Google" defaultValue={company.name} />
+            <Form.Label>Company Name</Form.Label>
+            <Form.Control type="text" placeholder="Google" onChange={(e) => setName(e.target.value)} value={name} required />
           </Form.Group>
-
-          <Form.Group controlId="formPhoto">
-            <Form.Label>Photo</Form.Label>
-            <Form.Control type="file" defaultValue={company.photo} />
+          <Form.Group controlId="formAddress">
+            <Form.Label>Address</Form.Label>
+            <Form.Control type="text" placeholder="123 Main St" onChange={(e) => setAddress(e.target.value)} value={address} required />
+          </Form.Group>
+          <Form.Group controlId="formPhoneNumber">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control type="text" placeholder="555-555-5555" onChange={(e) => setPhoneNumber(e.target.value)} value={phoneNumber} required />
+          </Form.Group>
+          <Form.Group controlId="formWebsite">
+            <Form.Label>Website</Form.Label>
+            <Form.Control type="text" placeholder="https://www.example.com" onChange={(e) => setWebsite(e.target.value)} value={website} required />
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="danger" onClick={handleDelete}>
-          Delete
-        </Button>
         <Button variant="secondary" onClick={onHide}>
-          Cancel
+          Close
         </Button>
-        <Button variant="primary" type="submit">
-          Update
+        <Button variant="primary" onClick={/*implement your save method here*/}>
+          Save Changes
         </Button>
       </Modal.Footer>
     </Modal>
   );
-};
+}
 
 export default EditCompanyModal;
