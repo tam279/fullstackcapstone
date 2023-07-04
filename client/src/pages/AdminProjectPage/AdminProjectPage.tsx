@@ -1,39 +1,52 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import { Button, Table, ProgressBar, Form } from 'react-bootstrap';
 import './AdminProjectPage.css';
 import CreateNewProjectModal from '../../modals/CreateNewProjectModal/CreateNewProjectModal';
 import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
+import axios from 'axios';
 
-interface Project {
-  name: string;
-  progress: number;
+interface ProjectData {
+  PROJECTID: number;
+  NAME: string;
+  STARTDATE: string;
+  ENDDATE: string;
+  PROGRESS: number;
+  MANAGEREMAIL: string;
+  DESCRIPTION: string;
+  COMPANYID: number;
+  ISACTIVE: number;
 }
 
 const AdminProjectPage = () => {
-
-  const projects: Project[] = [
-    { name: 'Project 1', progress: 60 },
-    { name: 'Project 2', progress: 30 },  
-    { name: 'Project 3', progress: 80 },  
-  ];
-
+  const [projects, setProjects] = useState<ProjectData[]>([]);
   const [show, setShow] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingProject, setEditingProject] = useState<ProjectData | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = () => {
+    axios
+      .get('http://localhost:5000/api/projects')
+      .then(response => {
+        setProjects(response.data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const [sortKey, setSortKey] = useState<'name' | 'progress'>('name');
-const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-const sortedProjects = [...projects].sort((a, b) => {
-  if (a[sortKey] < b[sortKey]) return sortDirection === 'asc' ? -1 : 1;
-  if (a[sortKey] > b[sortKey]) return sortDirection === 'asc' ? 1 : -1;
-  return 0;
-});
-
+  const handleProjectClick = (project: ProjectData) => {
+    const projectPath = `/project/${project.NAME.replace(/\s/g, '-')}`;
+    window.location.href = projectPath;
+  };
 
   return (
     <div className="AdminProjectPage">
@@ -45,62 +58,54 @@ const sortedProjects = [...projects].sort((a, b) => {
           <div className="project-info">
             <h1 className="title">Projects List</h1>
           </div>
-      
         </div>
 
         <Table striped bordered hover className="mt-3">
           <thead>
             <tr>
-              <th>    <Button variant="primary" onClick={handleShow}>
-            + New Project
-          </Button></th>
+              <th>
+                <Button variant="primary" onClick={handleShow}>
+                  + New Project
+                </Button>
+              </th>
+              <th>Project ID</th>
               <th>Name</th>
-              <th>Status</th>
+              <th>Start date</th>
+              <th>End date</th>
               <th>Progress</th>
-              <th>Deadline</th>
-              <th>Company</th>
-              <th>Manager</th>
-              <th> <Button>Filter</Button>
-</th>
+              <th>Manager email</th>
+              <th>Description</th>
+              <th>Company ID</th>
+              <th>Is Active</th>
+              <th>
+                <Button>Filter</Button>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {projects.map((project, index) => (
-              <tr key={index}>
-               <td>  <Button variant="primary" onClick={() => setEditingProject(project)}>
+            {projects.map(project => (
+              <tr key={project.PROJECTID}>
+                <td>
+                  <Button variant="primary" onClick={() => setEditingProject(project)}>
                     Edit
-                  </Button></td>
-               <td>
-                  <Link to={`/project/${project.name.replace(/\s/g, '-')}`}>{project.name}</Link>
-                
+                  </Button>
+                  </td>
+                  <td>
+                  <Link to={`/project/${project.NAME.replace(/\s/g, '-')}`}>{project.PROJECTID}</Link> 
+                  
+                  </td>
+                  
+                  <td>             <div onClick={() => handleProjectClick(project)}>{project.NAME}</div>
                 </td>
+                <td>{project.STARTDATE}</td>
+                <td>{project.ENDDATE}</td>
                 <td>
-                  <Form.Control as="select">
-                    <option>Good</option>
-                    <option>Warning</option>
-                    <option>Bad</option>
-                  </Form.Control>
+                  <ProgressBar now={project.PROGRESS} label={`${project.PROGRESS}%`} />
                 </td>
-                <td>
-                  <ProgressBar now={project.progress} label={`${project.progress}%`} />
-                </td>
-                <td>
-                  <Form.Control type="date" />
-                </td>
-                <td>
-                  <Form.Control as="select">
-                    {/* Replace with your actual company data */}
-                    <option>Company 1</option>
-                    <option>Company 2</option>
-                  </Form.Control>
-                </td>
-                <td>
-                  <Form.Control as="select">
-                    {/* Replace with your actual manager data */}
-                    <option>Manager 1</option>
-                    <option>Manager 2</option>
-                  </Form.Control>
-                </td>
+                <td>{project.MANAGEREMAIL}</td>
+                <td>{project.DESCRIPTION}</td>
+                <td>{project.COMPANYID}</td>
+                <td>{project.ISACTIVE}</td>
                 <td>{/* Filter */}</td>
               </tr>
             ))}
@@ -108,7 +113,11 @@ const sortedProjects = [...projects].sort((a, b) => {
         </Table>
 
         <CreateNewProjectModal show={show} handleClose={handleClose} />
-        <EditProjectModal show={editingProject !== null} handleClose={() => setEditingProject(null)} project={editingProject} />
+        <EditProjectModal
+          show={editingProject !== null}
+          handleClose={() => setEditingProject(null)}
+          project={editingProject}
+        />
       </div>
     </div>
   );

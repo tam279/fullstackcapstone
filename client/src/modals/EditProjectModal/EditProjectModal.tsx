@@ -2,18 +2,28 @@ import React, { FC } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
 interface Project {
-    name: string;
-    progress: number;
-  }
-  
-  interface EditProjectModalProps {
-    show: boolean;
-    handleClose: () => void;
-    project: Project | null; // Add the project prop, allow it to be null
-  }
-  
+  PROJECTID: number;
+  NAME: string;
+  STARTDATE: string;
+  ENDDATE: string;
+  PROGRESS: number;
+  MANAGEREMAIL: string;
+  DESCRIPTION: string;
+  COMPANYID: number;
+  ISACTIVE: number;
+}
+
+interface EditProjectModalProps {
+  show: boolean;
+  handleClose: () => void;
+  project: Project | null;
+}
 
 const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, project }) => {
+  if (!project) {
+    return null;
+  }
+
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -26,15 +36,14 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
             <Col>
               <Form.Group>
                 <Form.Label>Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter project name" defaultValue={project?.name} />
+                <Form.Control type="text" placeholder="Enter project name" defaultValue={project.NAME} />
               </Form.Group>
 
               <Form.Group>
                 <Form.Label>Start Date</Form.Label>
-                <Form.Control type="date" />
+                <Form.Control type="date" defaultValue={project.STARTDATE} />
               </Form.Group>
 
-     
               <Form.Group>
                 <Form.Label>Manager</Form.Label>
                 <Form.Control as="select" multiple>
@@ -45,7 +54,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
               <Form.Group>
                 <Form.Label>Description</Form.Label>
-                <Form.Control as="textarea" rows={3} />
+                <Form.Control as="textarea" rows={3} defaultValue={project.DESCRIPTION} />
               </Form.Group>
             </Col>
 
@@ -57,7 +66,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
               <Form.Group>
                 <Form.Label>End Date</Form.Label>
-                <Form.Control type="date" />
+                <Form.Control type="date" defaultValue={project.ENDDATE} />
               </Form.Group>
 
               <Form.Group>
@@ -68,17 +77,13 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
                 </Form.Control>
               </Form.Group>
 
-              
-
               <Form.Group>
-                <Form.Label>IT Techcian</Form.Label>
+                <Form.Label>IT Technician</Form.Label>
                 <Form.Control as="select" multiple>
-                  <option>IT Techcian 1</option>
-                  <option>IT Techcian 2</option>
+                  <option>IT Technician 1</option>
+                  <option>IT Technician 2</option>
                 </Form.Control>
               </Form.Group>
-
-              
             </Col>
           </Row>
         </Form>
