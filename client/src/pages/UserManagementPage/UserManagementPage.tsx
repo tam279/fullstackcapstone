@@ -174,9 +174,9 @@ const UserManagementPage = () => {
     setShowEditCompanyModal(false);
   };
 
-  const handleUpdateCompany = (id: string, updatedCompany: any) => {
+  const handleUpdateCompany = (COMPANYID: number, updatedCompany: any) => {
     axios
-      .put(`http://localhost:5000/api/updateCompany/${id}`, updatedCompany)
+      .put(`http://localhost:5000/api/updateCompany/${COMPANYID}`, updatedCompany)
       .then(response => {
         console.log(response.data);
         handleHideCompanyModal(); // to close the modal
@@ -187,9 +187,9 @@ const UserManagementPage = () => {
       });
   };
 
-  const handleDeleteCompany = (id: string) => {
+  const handleDeleteCompany = (COMPANYID: number) => {
     axios
-      .delete(`http://localhost:5000/api/deleteCompany/${id}`)
+      .delete(`http://localhost:5000/api/deleteCompany/${COMPANYID}`)
       .then(response => {
         console.log(response.data);
         fetchCompanyData(); // Refresh the company data
