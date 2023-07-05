@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Tabs, Tab, Table, Form } from 'react-bootstrap';
 import { AiFillEdit } from 'react-icons/ai';
 import './Project1Page.css';
@@ -7,11 +7,57 @@ import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import CreateNewTaskModal from '../../modals/CreateNewTaskModal/CreateNewTaskModal';
 import Task5Project1Modal from '../../modals/Task5Project1Modal/Task5Project1Modal';
 import EditTaskModal from '../../modals/EditTaskModal/EditTaskModal';
+import axios from 'axios';
 
+interface Task {
+  TASKID: string;
+  NAME: string;
+  STARTDATE: string;
+  ENDDATE: string;
+  PROGRESS: number;
+  DESCRIPTION: string;
+  STATUS: string;
+  PRIORITY: string;
+  ISACTIVE: number;
+  PROJECTID: number;
+  DURATION: number;
+  TECHNICIAN: string;
+  TAG: string;
+  FILTER: string;
+}
+
+interface Project {
+  PROJECTID: number;
+  NAME: string;
+  MANAGEREMAIL: string;
+  TECHNICIANS: string;
+  VIEWERS: string;
+  DESCRIPTION: string;
+  STARTDATE: string;
+  ENDDATE: string;
+  STATUS: string;
+  TOTAL_TASKS: number;
+  COMPLETED_TASKS: number;
+  PROGRESS: number;
+  ISACTIVE: number;
+  COMPANYID: number;
+}
+
+interface UserActivity {
+  ACTIVITYID: number;
+  EMAIL: string;
+  TIMESTAMP: string;
+  DESCRIPTION: string;
+  PROJECTID: number;
+}
 
 type TabKey = 'Tasks' | 'Grantt' | 'Details' | 'User activity';
 
 const Project1Page: React.FC = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [project, setProject] = useState<Project | null>(null);
+  const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
+
 
   const [editModalShow, setEditModalShow] = useState(false);
   const handleEditModalClose = () => setEditModalShow(false);
@@ -24,7 +70,35 @@ const Project1Page: React.FC = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  // Data for Gantt chart
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const response = await axios.get('http://localhost:5000/api/tasks');
+      setTasks(response.data);
+    }
+
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      // replace '1' with the project ID you need
+      const projectId = '1';
+      const response = await axios.get(`http://localhost:5000/api/project/${projectId}`);
+      setProject(response.data);
+    }
+
+    fetchProject();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchUserActivity = async () => {
+      const response = await axios.get('http://localhost:5000/api/userActivity');
+      setUserActivity(response.data);
+    };
+
+    fetchUserActivity();
+  }, []);
   const data = [
     [
       { type: 'string', label: 'Task ID' },
@@ -35,13 +109,10 @@ const Project1Page: React.FC = () => {
       { type: 'number', label: 'Percent Complete' },
       { type: 'string', label: 'Dependencies' },
     ],
-    ['Task 1', 'Task 1 name', new Date(2023, 6, 1), new Date(2023, 6, 3), null, 100, null],
-    ['Task 2', 'Task 2 name', new Date(2023, 6, 4), new Date(2023, 6, 6), null, 80, null],
-    ['Task 3', 'Task 3 name', new Date(2023, 6, 7), new Date(2023, 6, 9), null, 50, null],
-    ['Task 4', 'Task 4 name', new Date(2023, 6, 10), new Date(2023, 6, 12), null, 30, null],
-    ['Task 5', 'Task 5 name', new Date(2023, 6, 13), new Date(2023, 6, 15), null, 0, null]
-    // Add more tasks here...
+    ...tasks.map(task => ([task.TASKID, task.NAME, new Date(task.STARTDATE), new Date(task.ENDDATE), null, task.PROGRESS, null])),
   ];
+
+
 
   const [task5ModalShow, setTask5ModalShow] = useState(false);
   const handleTask5ModalClose = () => setTask5ModalShow(false);
@@ -49,6 +120,14 @@ const Project1Page: React.FC = () => {
   const handleTask5Click = () => {
     handleTask5ModalShow();
   };
+
+  const originalWarn = console.warn;
+  console.warn = function (...args) {
+    const arg = args && args[0];
+    if (arg && arg.includes('Attempting to load version \'51\' of Google Charts')) return;
+    originalWarn(...args);
+  };
+
 
   return (
     <div className="project1-container" style={{ padding: '0', margin: '0', width: '100vw', height: '100vh' }}>
@@ -72,99 +151,34 @@ const Project1Page: React.FC = () => {
               <thead>
                 <tr>
                   <th>          <Button variant="primary" onClick={handleShow}>+ New Task</Button> </th>
-                  <th>Name</th>
                   <th>Priority</th>
-                  <th>Technician</th>
+                  <th>Technician email</th>
                   <th>Duration</th>
                   <th>Tag</th>
+
                   <th>Filter</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td >
-                    <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
-                    Task 1
-                  </td>
-                  <td>
-                    <Form.Control as="select">
-                      <option>High</option>
-                      <option>Medium</option>
-                      <option>Low</option>
-                    </Form.Control>
-                  </td>
-                  <td>Technician 1</td>
-                  <td>5 hours</td>
-                  <td>Tag 1</td>
-                  <td>Filter 1</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
-                    Task 2</td>
-                  <td>
-                    <Form.Control as="select">
-                      <option>High</option>
-                      <option>Medium</option>
-                      <option>Low</option>
-                    </Form.Control>
-                  </td>
-                  <td>Technician 1</td>
-                  <td>5 hours</td>
-                  <td>Tag 1</td>
-                  <td>Filter 1</td>
-                </tr>
-
-                <tr>
-                  <td> <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
-                    Task 3</td>
-                  <td>
-                    <Form.Control as="select">
-                      <option>High</option>
-                      <option>Medium</option>
-                      <option>Low</option>
-                    </Form.Control>
-                  </td>
-                  <td>Technician 1</td>
-                  <td>5 hours</td>
-                  <td>Tag 1</td>
-                  <td>Filter 1</td>
-                </tr>
-
-
-                <tr>
-                  <td>  <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
-                    Task 4</td>
-                  <td>
-                    <Form.Control as="select">
-                      <option>High</option>
-                      <option>Medium</option>
-                      <option>Low</option>
-                    </Form.Control>
-                  </td>
-                  <td>Technician 1</td>
-                  <td>5 hours</td>
-                  <td>Tag 1</td>
-                  <td>Filter 1</td>
-                </tr>
-
-
-                <tr>
-                  <td onClick={handleTask5Click}> <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
-                    Task 5</td>
-                  <td>
-                    <Form.Control as="select">
-                      <option>High</option>
-                      <option>Medium</option>
-                      <option>Low</option>
-                    </Form.Control>
-                  </td>
-                  <td>Technician 1</td>
-                  <td>5 hours</td>
-                  <td>Tag 1</td>
-                  <td>Filter 1</td>
-                </tr>                     </tbody>
+                {tasks.map((task) => (
+                  <tr key={task.TASKID}>
+                    <td>
+                      <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
+                      {task.NAME}
+                    </td>
+                    <td>
+                      <Form.Control as="select">
+                        <option>{task.PRIORITY}</option>
+                        {/* Add more options here if needed */}
+                      </Form.Control>
+                    </td>
+                    <td>{task.TECHNICIAN}</td>
+                    <td>{task.DURATION} hours</td>
+                    <td>{task.TAG}</td>
+                    <td>{task.FILTER}</td>
+                  </tr>
+                ))}
+              </tbody>
             </Table>
           </Tab>
           <Tab eventKey="Grantt" title="Grantt">
@@ -177,64 +191,70 @@ const Project1Page: React.FC = () => {
             />
           </Tab>
           <Tab eventKey="Details" title="Details">
-            <Form className="mt-3">
-              <Form.Group controlId="project">
-                <Form.Label>Project:</Form.Label>
-                <Form.Control type="text" value="Project 1" readOnly />
-              </Form.Group>
-              <Form.Group controlId="manager">
-                <Form.Label>Manager:</Form.Label>
-                <Form.Control type="text" value="John Doe" readOnly />
-              </Form.Group>
-              <Form.Group controlId="description">
-                <Form.Label>Description:</Form.Label>
-                <Form.Control as="textarea" rows={4} value="This project involves developing a custom ERP (Enterprise Resource Planning) software solution for Acme Corporation. The ERP system will integrate various business functions, including finance, human resources, supply chain management, and customer relationship management, into a single, streamlined software platform. The project will encompass the full software development life cycle, from requirements gathering and system design to development, testing, deployment, and post-implementation support." readOnly />
-              </Form.Group>
-              <Form.Group controlId="startDate">
-                <Form.Label>Start Date:</Form.Label>
-                <Form.Control type="text" value="June 1, 2023" readOnly />
-              </Form.Group>
-              <Form.Group controlId="endDate">
-                <Form.Label>End Date:</Form.Label>
-                <Form.Control type="text" value="May 31, 2024" readOnly />
-              </Form.Group>
-              <Form.Group controlId="technicians">
-                <Form.Label>Technicians:</Form.Label>
-                <Form.Control as="select" multiple value={['jane Smith', 'Mark Johnson', 'Emily Roberts']} readOnly>
-                  <option>jane Smith</option>
-                  <option>Mark Johnson</option>
-                  <option>Emily Roberts</option>
-                </Form.Control>
-              </Form.Group>
-              <Form.Group controlId="viewers">
-                <Form.Label>Viewers:</Form.Label>
-                <Form.Control as="select" multiple value={['Steve', 'Aderson', 'Linda Davis']} readOnly>
-                  <option>Steve</option>
-                  <option>Aderson</option>
-                  <option>Linda Davis</option>
-                </Form.Control>
-              </Form.Group>
-              <Form.Group controlId="status">
-                <Form.Label>Status:</Form.Label>
-                <Form.Control as="select" defaultValue="In process" readOnly>
-                  <option>In process</option>
-                  <option>Pending</option>
-                  <option>Completed</option>
-                </Form.Control>
-              </Form.Group>
-              <Form.Group controlId="totalTasks">
-                <Form.Label>Total Tasks:</Form.Label>
-                <Form.Control type="text" value="26" readOnly />
-              </Form.Group>
-              <Form.Group controlId="completedTasks">
-                <Form.Label>Completed Tasks:</Form.Label>
-                <Form.Control type="text" value="11" readOnly />
-              </Form.Group>
-              <Button variant="primary" className="mt-3">
-                Export
-              </Button>
-            </Form>
+            {project ? (
+              <Form className="mt-3">
+                <Form.Group controlId="project">
+                  <Form.Label>Project:</Form.Label>
+                  <Form.Control type="text" value={project.NAME} readOnly />
+                </Form.Group>
+                <Form.Group controlId="manager">
+                  <Form.Label>Manager:</Form.Label>
+                  <Form.Control type="text" value={project.MANAGEREMAIL} readOnly />
+                </Form.Group>
+                <Form.Group controlId="description">
+                  <Form.Label>Description:</Form.Label>
+                  <Form.Control as="textarea" rows={4} value={project.DESCRIPTION} readOnly />
+                </Form.Group>
+                <Form.Group controlId="startDate">
+                  <Form.Label>Start Date:</Form.Label>
+                  <Form.Control type="text" value={new Date(project.STARTDATE).toLocaleDateString()} readOnly />
+                </Form.Group>
+                <Form.Group controlId="endDate">
+                  <Form.Label>End Date:</Form.Label>
+                  <Form.Control type="text" value={new Date(project.ENDDATE).toLocaleDateString()} readOnly />
+                </Form.Group>
+                <Form.Group controlId="technicians">
+                  <Form.Label>Technicians:</Form.Label>
+                  <Form.Control as="select" multiple readOnly>
+                    {project && project.TECHNICIANS && project.TECHNICIANS.split(',').map((tech, index) => (
+                      <option key={index}>{tech}</option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group controlId="viewers">
+                  <Form.Label>Viewers:</Form.Label>
+                  <Form.Control as="select" multiple readOnly>
+                    {project && project.VIEWERS && project.VIEWERS.split(',').map((viewer, index) => (
+                      <option key={index}>{viewer}</option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+
+                <Form.Group controlId="totalTasks">
+                  <Form.Label>Total Tasks:</Form.Label>
+                  <Form.Control type="text" value={project.TOTAL_TASKS} readOnly />
+                </Form.Group>
+                <Form.Group controlId="completedTasks">
+                  <Form.Label>Completed Tasks:</Form.Label>
+                  <Form.Control type="text" value={project.COMPLETED_TASKS} readOnly />
+                </Form.Group>
+
+
+                <Form.Group controlId="status">
+                  <Form.Label>Status:</Form.Label>
+                  <Form.Control as="select" defaultValue={project.STATUS} readOnly>
+                    <option value="In process">In process</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                  </Form.Control>
+                </Form.Group>
+                <button>Export data</button>
+              </Form>
+            ) : (
+              <p>Loading...</p>
+            )}
           </Tab>
+
           <Tab eventKey="User activity" title="User activity">
             <div className="user-activity-mode">
               <h2>User Activity</h2>
@@ -249,52 +269,18 @@ const Project1Page: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>2023-06-15</td>
-                    <td>14:30</td>
-                    <td>User A</td>
-                    <td>Performed action X</td>
-                    <td>Filter 1</td>
-                  </tr>
-                  <tr>
-                    <td>2023-06-16</td>
-                    <td>09:45</td>
-                    <td>User B</td>
-                    <td>Viewed page Y</td>
-                    <td>Filter 2</td>
-                  </tr>
-                  <tr>
-                    <td>2023-06-17</td>
-                    <td>18:20</td>
-                    <td>User C</td>
-                    <td>Updated record Z</td>
-                    <td>Filter 3</td>
-                  </tr>
-                  <tr>
-                    <td>2023-06-18</td>
-                    <td>12:00</td>
-                    <td>User D</td>
-                    <td>Deleted item W</td>
-                    <td>Filter 4</td>
-                  </tr>
-                  <tr>
-                    <td>2023-06-19</td>
-                    <td>16:45</td>
-                    <td>User E</td>
-                    <td>Created new record V</td>
-                    <td>Filter 5</td>
-                  </tr>
-                  <tr>
-                    <td>2023-06-20</td>
-                    <td>10:30</td>
-                    <td>User F</td>
-                    <td>Performed action U</td>
-                    <td>Filter 6</td>
-                  </tr>
+                  {userActivity.map((activity) => (
+                    <tr key={activity.ACTIVITYID}>
+                      <td>{new Date(activity.TIMESTAMP).toLocaleDateString()}</td>
+                      <td>{new Date(activity.TIMESTAMP).toLocaleTimeString()}</td>
+                      <td>{activity.EMAIL}</td>
+                      <td>{activity.DESCRIPTION}</td>
+                      <td>Filter 1</td> {/* Update this as needed */}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-
           </Tab>
         </Tabs>
 

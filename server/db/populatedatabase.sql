@@ -1,4 +1,3 @@
--- Sample data for COMPANY table
 INSERT INTO COMPANY (
     COMPANYNAME,
     CREATED_AT,
@@ -7,53 +6,46 @@ INSERT INTO COMPANY (
     PHONE_NUMBER,
     WEBSITE
 ) VALUES (
-    'ABC Corporation',
-    '2022-01-01',
+    'ABC Inc.',
+    '2023-05-15 10:30:00',
     1,
-    '123 Main Street',
+    '123 Main St, City',
     '123-456-7890',
-    'www.abccorp.com'
+    'www.abcinc.com'
 ),
 (
-    'XYZ Ltd.',
-    '2022-02-01',
+    'XYZ Corporation',
+    '2023-06-01 09:45:00',
     1,
-    '456 Oak Avenue',
+    '456 Elm St, Town',
     '987-654-3210',
-    'www.xyzltd.com'
+    'www.xyzcorp.com'
 );
 
--- Sample data for ROLE table
 INSERT INTO ROLE (
     ROLENAME
 ) VALUES (
-    'Admin'
-),
-(
     'Manager'
 ),
 (
     'Technician'
 ),
 (
-    'User'
+    'Viewer'
 );
 
--- Sample data for LOGIN_METHOD table
 INSERT INTO LOGIN_METHOD (
     METHODNAME
 ) VALUES (
-    'Mircosoft'
-),
-(
     'Google'
 ),
 (
-    'Customer password'
+    'Mircosoft'
+),
+(
+    'Our custom password'
 );
 
--- Sample data for USER table
--- Sample data for USER table
 INSERT INTO USER (
     EMAIL,
     PASSWORD,
@@ -68,138 +60,132 @@ INSERT INTO USER (
     PHONE_NUMBER,
     JOB_TITLE
 ) VALUES (
-    'john.doe@example.com',
+    'manager@example.com',
     'password123',
     'John',
     'Doe',
     1,
     1,
-    'Tag1',
+    'Manager',
     1,
     1,
     1,
     '123-456-7890',
-    'Manager'
+    'Project Manager'
 ),
 (
-    'jane.smith@example.com',
+    'technician1@example.com',
     'password456',
     'Jane',
     'Smith',
     1,
     1,
-    'Tag2',
+    'Technician',
     1,
     2,
     1,
     '987-654-3210',
-    'User'
+    'Field Technician'
 ),
 (
-    'tech.user@example.com',
+    'technician2@example.com',
     'password789',
-    'Tech',
-    'User',
+    'Mike',
+    'Johnson',
     1,
     1,
-    'Tag3',
+    'Technician',
+    1,
     2,
+    1,
+    '555-123-4567',
+    'Service Technician'
+),
+(
+    'viewer@example.com',
+    'password123',
+    'Emily',
+    'Davis',
+    1,
+    1,
+    'Viewer',
+    1,
     3,
     1,
-    '555-555-5555',
-    'Technician'
-);
-
--- Sample data for USER_ACTIVITY table
-INSERT INTO USER_ACTIVITY (
-    EMAIL,
-    TIMESTAMP,
-    DESCRIPTION
-) VALUES (
-    'john.doe@example.com',
-    '2022-01-01 09:00:00',
-    'Logged in'
-),
-(
-    'jane.smith@example.com',
-    '2022-01-02 10:00:00',
-    'Updated profile'
-),
-(
-    'tech.user@example.com',
-    '2022-01-03 11:00:00',
-    'Viewed tasks'
-);
-
--- Sample data for PROJECT table
-INSERT INTO PROJECT (
-    NAME,
-    STARTDATE,
-    ENDDATE,
-    MANAGEREMAIL,
-    DESCRIPTION,
-    COMPANYID,
-    STATUS
-) VALUES (
-    "Project 1",
-    "2023-01-01",
-    "2024-01-01",
-    "john.doe@example.com",
-    "This is a description of Project 1.",
-    1,
-    "In Progress"
+    '111-222-3333',
+    'Viewer'
 );
 
 INSERT INTO PROJECT (
     NAME,
+    MANAGEREMAIL,
+    TECHNICIANS,
+    VIEWERS,
+    DESCRIPTION,
     STARTDATE,
     ENDDATE,
-    MANAGEREMAIL,
-    DESCRIPTION,
-    COMPANYID,
-    STATUS
+    STATUS,
+    TOTAL_TASKS,
+    COMPLETED_TASKS,
+    PROGRESS,
+    ISACTIVE,
+    COMPANYID
 ) VALUES (
-    "Project 2",
-    "2023-02-01",
-    "2024-02-01",
-    "john.doe@example.com",
-    "This is a description of Project 2.",
+    'Project 1',
+    'manager@example.com',
+    'technician1@example.com,technician2@example.com',
+    'viewer@example.com',
+    'Sample project A',
+    '2023-07-01',
+    '2023-07-31',
+    'In Progress',
+    5,
+    2,
+    40,
     1,
-    "In Progress"
-),
-(
-    "Project 3",
-    "2023-03-01",
-    "2024-03-01",
-    "john.doe@example.com",
-    "This is a description of Project 3.",
-    2,
-    "In Progress"
-),
-(
-    "Project 4",
-    "2023-04-01",
-    "2024-04-01",
-    "john.doe@example.com",
-    "This is a description of Project 4.",
-    2,
-    "Completed"
-);
-
--- Sample data for VIEWER_BRIDGE table
-INSERT INTO VIEWER_BRIDGE (
-    EMAIL,
-    PROJECTID
-) VALUES (
-    'jane.smith@example.com',
     1
 ),
 (
-    'tech.user@example.com',
+    'Project B',
+    'manager@example.com',
+    'technician2@example.com',
+    'viewer@example.com',
+    'Sample project B',
+    '2023-08-01',
+    '2023-08-31',
+    'Not Started',
+    3,
+    0,
+    0,
+    1,
+    1
+);
+
+INSERT INTO USER_ACTIVITY (
+    EMAIL,
+    DESCRIPTION,
+    PROJECTID
+) VALUES (
+    'manager@example.com',
+    'Created Project A',
+    1
+),
+(
+    'manager@example.com',
+    'Assigned technicians to Project A',
+    1
+),
+(
+    'manager@example.com',
+    'Created Project B',
+    2
+),
+(
+    'manager@example.com',
+    'Assigned technician to Project B',
     2
 );
 
--- Sample data for TASK table
 INSERT INTO TASK (
     NAME,
     STARTDATE,
@@ -208,119 +194,138 @@ INSERT INTO TASK (
     DESCRIPTION,
     STATUS,
     PRIORITY,
+    ISACTIVE,
     PROJECTID,
     DURATION,
     TECHNICIAN,
     TAG,
     FILTER
 ) VALUES (
-    "Task 1",
-    "2023-01-01 07:00:00",
-    "2023-01-10 07:00:00",
-    80,
-    "Description of Task 1",
-    "In Progress",
-    "High",
+    'Task 1',
+    '2023-07-01 10:00:00',
+    '2023-07-03 15:00:00',
+    100,
+    'Sample task 1',
+    'Completed',
+    'High',
     1,
-    5,
-    "Technician 1",
-    "Tag 1",
-    "Filter 1"
+    1,
+    2,
+    'technician1@example.com',
+    'Tag 1',
+    'Filter 1'
 ),
 (
-    "Task 2",
-    "2023-01-11 07:00:00",
-    "2023-01-20 07:00:00",
-    60,
-    "Description of Task 2",
-    "In Progress",
-    "Medium",
+    'Task 2',
+    '2023-07-02 09:00:00',
+    '2023-07-05 12:00:00',
+    50,
+    'Sample task 2',
+    'In Progress',
+    'Medium',
     1,
-    5,
-    "Technician 2",
-    "Tag 2",
-    "Filter 2"
+    1,
+    3,
+    'technician1@example.com',
+    'Tag 2',
+    'Filter 1'
 ),
 (
-    "Task 3",
-    "2023-01-21 07:00:00",
-    "2023-01-30 07:00:00",
-    40,
-    "Description of Task 3",
-    "In Progress",
-    "Low",
+    'Task 3',
+    '2023-07-03 11:00:00',
+    '2023-07-06 14:00:00',
+    25,
+    'Sample task 3',
+    'Not Started',
+    'Low',
     1,
-    5,
-    "Technician 3",
-    "Tag 3",
-    "Filter 3"
+    1,
+    4,
+    'technician2@example.com',
+    'Tag 1',
+    'Filter 2'
 );
 
--- Sample data for TASK_USER_BRIDGE table
+INSERT INTO TAG (
+    TAGNAME
+) VALUES (
+    'Tag 1'
+),
+(
+    'Tag 2'
+),
+(
+    'Tag 3'
+);
+
+INSERT INTO VIEWER_BRIDGE (
+    EMAIL,
+    PROJECTID
+) VALUES (
+    'viewer@example.com',
+    1
+),
+(
+    'viewer@example.com',
+    2
+);
+
 INSERT INTO TASK_USER_BRIDGE (
     EMAIL,
     TASKID
 ) VALUES (
-    'jane.smith@example.com',
+    'technician1@example.com',
     1
 ),
 (
-    'tech.user@example.com',
+    'technician1@example.com',
     2
 ),
 (
-    'tech.user@example.com',
+    'technician2@example.com',
+    1
+),
+(
+    'technician2@example.com',
     3
 );
 
--- Sample data for TASK_TECHNICIAN_BRIDGE table
 INSERT INTO TASK_TECHNICIAN_BRIDGE (
     EMAIL,
     TASKID
 ) VALUES (
-    'tech.user@example.com',
+    'technician1@example.com',
     1
 ),
 (
-    'tech.user@example.com',
+    'technician1@example.com',
     2
 ),
 (
-    'tech.user@example.com',
+    'technician2@example.com',
     3
 );
 
--- Sample data for TAG table
-INSERT INTO TAG (
-    TAGNAME
-) VALUES (
-    'Tag1'
-),
-(
-    'Tag2'
-),
-(
-    'Tag3'
-);
-
--- Sample data for USERTAGBRIDGE table
 INSERT INTO USERTAGBRIDGE (
     TAGID,
     EMAIL
 ) VALUES (
     1,
-    'jane.smith@example.com'
+    'manager@example.com'
 ),
 (
     2,
-    'jane.smith@example.com'
+    'technician1@example.com'
+),
+(
+    2,
+    'technician2@example.com'
 ),
 (
     3,
-    'tech.user@example.com'
+    'viewer@example.com'
 );
 
--- Sample data for PROJECTTAGBRIDGE table
 INSERT INTO PROJECTTAGBRIDGE (
     TAGID,
     PROJECTID
@@ -337,49 +342,36 @@ INSERT INTO PROJECTTAGBRIDGE (
     2
 );
 
--- Sample data for COMMENT table
 INSERT INTO COMMENT (
     COMMENT,
     DATE,
     TASKID,
     EMAIL
 ) VALUES (
-    'Comment 1',
-    '2022-01-02',
+    'This is a comment.',
+    '2023-07-01',
     1,
-    'jane.smith@example.com'
+    'manager@example.com'
 ),
 (
-    'Comment 2',
-    '2022-01-03',
+    'Another comment.',
+    '2023-07-02',
     1,
-    'john.doe@example.com'
-),
-(
-    'Comment 3',
-    '2022-02-05',
-    3,
-    'jane.smith@example.com'
+    'technician1@example.com'
 );
 
--- Sample data for FILE table
 INSERT INTO FILE (
     FILENAME,
     FILELOCATION
 ) VALUES (
     'File 1',
-    '/path/to/file1'
+    '/path/to/file1.pdf'
 ),
 (
     'File 2',
-    '/path/to/file2'
-),
-(
-    'File 3',
-    '/path/to/file3'
+    '/path/to/file2.pdf'
 );
 
--- Sample data for COMMENT_FILE_BRIDGE table
 INSERT INTO COMMENT_FILE_BRIDGE (
     COMMENTID,
     FILEID
@@ -388,15 +380,10 @@ INSERT INTO COMMENT_FILE_BRIDGE (
     1
 ),
 (
-    1,
-    2
-),
-(
     2,
-    3
+    2
 );
 
--- Sample data for TASK_FILE_BRIDGE table
 INSERT INTO TASK_FILE_BRIDGE (
     FILEID,
     TASKID
@@ -406,14 +393,9 @@ INSERT INTO TASK_FILE_BRIDGE (
 ),
 (
     2,
-    1
-),
-(
-    3,
-    3
+    2
 );
 
--- Sample data for DEPENDENCY_BRIDGE table
 INSERT INTO DEPENDENCY_BRIDGE (
     TASKID,
     DEPENDSON_TASKID
@@ -423,21 +405,19 @@ INSERT INTO DEPENDENCY_BRIDGE (
 ),
 (
     3,
+    1
+),
+(
+    3,
     2
 );
 
--- Sample data for PASSWORD_RESET_TOKENS table
 INSERT INTO PASSWORD_RESET_TOKENS (
     EMAIL,
     TOKEN,
     EXPIRY_DATE
 ) VALUES (
-    'john.doe@example.com',
+    'manager@example.com',
     'token123',
-    '2022-01-01 12:00:00'
-),
-(
-    'jane.smith@example.com',
-    'token456',
-    '2022-02-01 12:00:00'
+    '2023-07-31 23:59:59'
 );

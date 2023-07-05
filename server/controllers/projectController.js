@@ -1,3 +1,5 @@
+// projectController.js
+
 const mysql = require('mysql2/promise');
 
 const db = mysql.createPool({
@@ -55,6 +57,25 @@ exports.deleteProject = async (req, res) => {
         res.status(200).send({ message: 'Project deleted successfully' });
     } catch (err) {
         console.log(err);
+        res.status(500).send({ message: 'An error occurred', error: err.message });
+    }
+};
+
+
+exports.getProject = async (req, res) => {
+    const id = req.params.id;
+    const sql = "SELECT * FROM PROJECT WHERE PROJECTID = ?";
+
+    try {
+        const [result, fields] = await db.query(sql, [id]);
+        // Assuming you are expecting to return a single project, hence returning result[0]
+        if(result.length > 0) {
+            res.status(200).json(result[0]);
+        } else {
+            res.status(404).send({ message: 'No project found with the provided ID' });
+        }
+    } catch (err) {
+        console.log("Error message: ", err.message);
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };

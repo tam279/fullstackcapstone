@@ -1,3 +1,4 @@
+// taskController.js . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\server\controllers\taskController.js
 const mysql = require('mysql2/promise');
 
 const db = mysql.createPool({
@@ -58,3 +59,5 @@ exports.deleteTask = async (req, res) => {
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+
+
