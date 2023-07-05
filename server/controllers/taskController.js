@@ -61,3 +61,19 @@ exports.deleteTask = async (req, res) => {
 };
 
 
+exports.getTask = async (req, res) => {
+    const taskId = req.params.id; // Get the taskId from the request parameters
+    const sql = "SELECT * FROM TASK WHERE TASKID = ?"; // Modify the SQL query to fetch a specific task
+
+    try {
+        const [result, fields] = await db.query(sql, [taskId]);
+        if (result.length === 0) {
+            // If no task is found with the specified taskId, return a 404 response
+            return res.status(404).send({ message: 'Task not found' });
+        }
+        res.status(200).json(result[0]); // Return the first (and only) task found
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: 'An error occurred', error: err.message });
+    }
+};

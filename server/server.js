@@ -6,6 +6,8 @@ const path = require('path');
 const userController = require('./controllers/userController');
 const projectController = require('./controllers/projectController');
 const taskController = require('./controllers/taskController');
+const commentController = require('./controllers/commentController');
+
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
@@ -98,6 +100,16 @@ app.get('/api/roles', userController.getRoles);
 // User activity routes
 app.get('/api/userActivity', userController.getUserActivity);
 app.post('/api/createUserActivity', userController.createUserActivity);
+
+// Comment routes
+app.get('/api/comments', commentController.getComments);
+app.post('/api/comments', commentController.createComment);
+app.put('/api/comments/:id', commentController.updateComment);
+app.delete('/api/comments/:id', commentController.deleteComment);
+app.get('/api/tasks/:id', taskController.getTask);
+
+
+
 
 
 app.use((req, res, next) => {

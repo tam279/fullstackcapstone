@@ -244,6 +244,36 @@ INSERT INTO TASK (
     'technician2@example.com',
     'Tag 1',
     'Filter 2'
+),
+(
+    'Task 4',
+    '2023-07-04 12:00:00',
+    '2023-07-04 16:00:00',
+    15,
+    'Sample task 4',
+    'Not Started',
+    'Low',
+    1,
+    1,
+    4,
+    'technician2@example.com',
+    'Tag 3',
+    'Filter 2'
+),
+(
+    'Task 5',
+    '2023-07-05 12:00:00',
+    '2023-07-04 17:00:00',
+    0,
+    'Sample task 5',
+    'Not Started',
+    'Low',
+    1,
+    1,
+    4,
+    'technician2@example.com',
+    'Tag 5',
+    'Filter 2'
 );
 
 INSERT INTO TAG (

@@ -10,7 +10,7 @@ import EditTaskModal from '../../modals/EditTaskModal/EditTaskModal';
 import axios from 'axios';
 
 interface Task {
-  TASKID: string;
+  TASKID: number;
   NAME: string;
   STARTDATE: string;
   ENDDATE: string;
@@ -57,6 +57,7 @@ const Project1Page: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
 
   const [editModalShow, setEditModalShow] = useState(false);
@@ -117,7 +118,8 @@ const Project1Page: React.FC = () => {
   const [task5ModalShow, setTask5ModalShow] = useState(false);
   const handleTask5ModalClose = () => setTask5ModalShow(false);
   const handleTask5ModalShow = () => setTask5ModalShow(true);
-  const handleTask5Click = () => {
+  const handleTask5Click = (task: Task) => {
+    setSelectedTask(task);
     handleTask5ModalShow();
   };
 
@@ -161,7 +163,7 @@ const Project1Page: React.FC = () => {
               </thead>
               <tbody>
                 {tasks.map((task) => (
-                  <tr key={task.TASKID}>
+                  <tr key={task.TASKID} onClick={() => handleTask5Click(task)}>
                     <td>
                       <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
                       {task.NAME}
@@ -285,7 +287,7 @@ const Project1Page: React.FC = () => {
         </Tabs>
 
         <CreateNewTaskModal show={show} handleClose={handleClose} />
-        <Task5Project1Modal show={task5ModalShow} handleClose={handleTask5ModalClose} />
+        {selectedTask && <Task5Project1Modal show={task5ModalShow} handleClose={handleTask5ModalClose} taskId={selectedTask.TASKID} />}
         <EditTaskModal show={editModalShow} handleClose={handleEditModalClose} />
 
 
