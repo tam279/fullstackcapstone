@@ -4,13 +4,9 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import './Navigation.css';
 
-
-
 const Navigation: FC = () => {
   return (
-    
-    
-    <Navbar className="navbar-custom" expand="lg">
+    <Navbar className="navbar-light bg-light" expand="lg">
       <Container>
         <Navbar.Brand>
           <LinkContainer to="/">
@@ -21,18 +17,18 @@ const Navigation: FC = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <LinkContainer to="/services">
-              <Nav.Link>Services</Nav.Link>
+              <Nav.Link className="text-primary">Services</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/contact">
-              <Nav.Link>Contact</Nav.Link>
+              <Nav.Link className="text-primary">Contact</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/about">
-              <Nav.Link>About</Nav.Link>
+              <Nav.Link className="text-primary">About</Nav.Link>
             </LinkContainer>
           </Nav>
           <Nav>
             <LinkContainer to="/login">
-              <Nav.Link>Log In</Nav.Link>
+              <Nav.Link className="text-primary">Log In</Nav.Link>
             </LinkContainer>
           </Nav>
         </Navbar.Collapse>

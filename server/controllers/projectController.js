@@ -22,11 +22,28 @@ exports.getProjects = async (req, res) => {
 };
 
 exports.createProject = async (req, res) => {
-    const { NAME, STARTDATE, ENDDATE, PROGRESS, MANAGEREMAIL, DESCRIPTION, COMPANYID } = req.body;
-    const sql = "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, PROGRESS, MANAGEREMAIL, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const {
+        NAME,
+        STARTDATE,
+        ENDDATE,
+        PROGRESS,
+        MANAGEREMAIL,
+        DESCRIPTION,
+        COMPANYID
+    } = req.body;
+    const sql =
+        "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, PROGRESS, MANAGEREMAIL, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     try {
-        const [result, fields] = await db.query(sql, [NAME, STARTDATE, ENDDATE, PROGRESS, MANAGEREMAIL, DESCRIPTION, COMPANYID]);
+        const [result, fields] = await db.query(sql, [
+            NAME,
+            STARTDATE,
+            ENDDATE,
+            PROGRESS,
+            MANAGEREMAIL,
+            DESCRIPTION,
+            COMPANYID
+        ]);
         res.status(200).send({ message: 'Project created successfully' });
     } catch (err) {
         console.log(err);
@@ -36,11 +53,29 @@ exports.createProject = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
     const id = req.params.id;
-    const { NAME, STARTDATE, ENDDATE, PROGRESS, MANAGEREMAIL, DESCRIPTION, COMPANYID } = req.body;
-    const sql = "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, MANAGEREMAIL = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
+    const {
+        NAME,
+        STARTDATE,
+        ENDDATE,
+        PROGRESS,
+        MANAGEREMAIL,
+        DESCRIPTION,
+        COMPANYID
+    } = req.body;
+    const sql =
+        "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, MANAGEREMAIL = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
 
     try {
-        const [result, fields] = await db.query(sql, [NAME, STARTDATE, ENDDATE, PROGRESS, MANAGEREMAIL, DESCRIPTION, COMPANYID, id]);
+        const [result, fields] = await db.query(sql, [
+            NAME,
+            STARTDATE,
+            ENDDATE,
+            PROGRESS,
+            MANAGEREMAIL,
+            DESCRIPTION,
+            COMPANYID,
+            id
+        ]);
         res.status(200).send({ message: 'Project updated successfully' });
     } catch (err) {
         console.log(err);
@@ -69,7 +104,7 @@ exports.getProject = async (req, res) => {
     try {
         const [result, fields] = await db.query(sql, [id]);
         // Assuming you are expecting to return a single project, hence returning result[0]
-        if(result.length > 0) {
+        if (result.length > 0) {
             res.status(200).json(result[0]);
         } else {
             res.status(404).send({ message: 'No project found with the provided ID' });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
 import axios from 'axios';
 
 interface User {
@@ -179,146 +179,146 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       <Modal.Header closeButton>
         <Modal.Title>Edit User</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Row>
-            <Col>
-              <Form.Group controlId="formFirstName">
-                <Form.Label>First Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Please enter your first name!"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formLastName">
-                <Form.Label>Last Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Please enter your last name!"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formCompany">
-                <Form.Label>Company</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={companyId}
-                  onChange={(e) => setCompanyId(e.target.value)}
-                >
-                  {companies.map((comp) => (
-                    <option key={comp.COMPANYID} value={comp.COMPANYID}>
-                      {comp.COMPANYNAME}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-
-              <Form.Group controlId="formRole">
-                <Form.Label>Role</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={roleId}
-                  onChange={(e) => setRoleId(e.target.value)}
-                >
-                  {roles.map((role) => (
-                    <option key={role.ROLEID} value={role.ROLEID}>
-                      {role.ROLENAME}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-
-              <Form.Group controlId="formMethod">
-                <Form.Label>Login Method</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={loginMethodId}
-                  onChange={(e) => setLoginMethodId(e.target.value)}
-                >
-                  {loginMethods.map((method) => (
-                    <option key={method.METHODID} value={method.METHODID}>
-                      {method.METHODNAME}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-
-
-              <Form.Group controlId="formTag">
-                <Form.Label>Tag</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Tag"
-                  value={tag}
-                  onChange={(e) => setTag(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formPhoneNumber">
-                <Form.Label>Phone Number</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Phone Number"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formJobTitle">
-                <Form.Label>Job Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Job Title"
-                  value={jobTitle}
-                  onChange={(e) => setJobTitle(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group controlId="formIsActive">
-                <Form.Label>User Status</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={isActive}
-                  onChange={(e) => setIsActive(Number(e.target.value))}
-                >
-                  <option value={1}>Active</option>
-                  <option value={0}>Inactive</option>
-                </Form.Control>
-              </Form.Group>
-
-              <Button variant="danger" className="mt-4" onClick={handleDeactivate}>
-                Deactivate
-              </Button>
-            </Col>
-
-            <Col>
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Email"
-                  value={user.EMAIL}
-                  readOnly
-                />
-              </Form.Group>
-
-              <Button variant="danger" className="mt-4" onClick={handleDelete}>
-                Delete
-              </Button>
-            </Col>
-          </Row>
-          <Button className="w-100 mt-4" type="submit">
+      <Form onSubmit={handleSubmit}>  {/* Here is the change */}
+        <Modal.Body>
+          <h2>Details</h2>
+          <Table striped bordered hover>
+            <tbody>
+              <tr>
+                <td><strong>Email:</strong></td>
+                <td>
+                  <Form.Control
+                    type="email"
+                    placeholder="Email"
+                    value={user.EMAIL}
+                    readOnly
+                  />
+                </td>
+                <td><strong>First Name:</strong></td>
+                <td>
+                  <Form.Control
+                    type="text"
+                    placeholder="Please enter your first name!"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </td>
+                <td><strong>Last Name:</strong></td>
+                <td>
+                  <Form.Control
+                    type="text"
+                    placeholder="Please enter your last name!"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Company:</strong></td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    value={companyId}
+                    onChange={(e) => setCompanyId(e.target.value)}
+                  >
+                    {companies.map((comp) => (
+                      <option key={comp.COMPANYID} value={comp.COMPANYID}>
+                        {comp.COMPANYNAME}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </td>
+                <td><strong>Role:</strong></td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    value={roleId}
+                    onChange={(e) => setRoleId(e.target.value)}
+                  >
+                    {roles.map((role) => (
+                      <option key={role.ROLEID} value={role.ROLEID}>
+                        {role.ROLENAME}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </td>
+                <td><strong>Login Method:</strong></td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    value={loginMethodId}
+                    onChange={(e) => setLoginMethodId(e.target.value)}
+                  >
+                    {loginMethods.map((method) => (
+                      <option key={method.METHODID} value={method.METHODID}>
+                        {method.METHODNAME}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Phone Number:</strong></td>
+                <td>
+                  <Form.Control
+                    type="text"
+                    placeholder="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                  />
+                </td>
+                <td><strong>Tag:</strong></td>
+                <td>
+                  <Form.Control
+                    type="text"
+                    placeholder="Tag"
+                    value={tag}
+                    onChange={(e) => setTag(e.target.value)}
+                  />
+                </td>
+                <td><strong>User Status:</strong></td>
+                <td>
+                  <Form.Control
+                    as="select"
+                    value={isActive}
+                    onChange={(e) => setIsActive(Number(e.target.value))}
+                  >
+                    <option value={1}>Active</option>
+                    <option value={0}>Inactive</option>
+                  </Form.Control>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Job Title:</strong></td>
+                <td colSpan={5}>
+                  <Form.Control
+                    type="text"
+                    placeholder="Job Title"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleDelete}>
+            Delete
+          </Button>
+          <Button variant="secondary" onClick={onHide}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit">
             Update
           </Button>
-        </Form>
-      </Modal.Body>
+
+        </Modal.Footer>
+      </Form>
     </Modal>
+
   );
+
 };
 
 export default EditUserModal;

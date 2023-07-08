@@ -110,8 +110,6 @@ app.get('/api/tasks/:id', taskController.getTask);
 
 
 
-
-
 app.use((req, res, next) => {
     const error = new Error('Route not found');
     error.status = 404;

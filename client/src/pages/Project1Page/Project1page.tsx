@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Tabs, Tab, Table, Form } from 'react-bootstrap';
+import { Button, Tabs, Tab, Table, Form, Row, Col } from 'react-bootstrap';
 import { AiFillEdit } from 'react-icons/ai';
 import './Project1Page.css';
 import { Chart } from 'react-google-charts';
@@ -194,68 +194,51 @@ const Project1Page: React.FC = () => {
           </Tab>
           <Tab eventKey="Details" title="Details">
             {project ? (
-              <Form className="mt-3">
-                <Form.Group controlId="project">
-                  <Form.Label>Project:</Form.Label>
-                  <Form.Control type="text" value={project.NAME} readOnly />
-                </Form.Group>
-                <Form.Group controlId="manager">
-                  <Form.Label>Manager:</Form.Label>
-                  <Form.Control type="text" value={project.MANAGEREMAIL} readOnly />
-                </Form.Group>
-                <Form.Group controlId="description">
-                  <Form.Label>Description:</Form.Label>
-                  <Form.Control as="textarea" rows={4} value={project.DESCRIPTION} readOnly />
-                </Form.Group>
-                <Form.Group controlId="startDate">
-                  <Form.Label>Start Date:</Form.Label>
-                  <Form.Control type="text" value={new Date(project.STARTDATE).toLocaleDateString()} readOnly />
-                </Form.Group>
-                <Form.Group controlId="endDate">
-                  <Form.Label>End Date:</Form.Label>
-                  <Form.Control type="text" value={new Date(project.ENDDATE).toLocaleDateString()} readOnly />
-                </Form.Group>
-                <Form.Group controlId="technicians">
-                  <Form.Label>Technicians:</Form.Label>
-                  <Form.Control as="select" multiple readOnly>
-                    {project && project.TECHNICIANS && project.TECHNICIANS.split(',').map((tech, index) => (
-                      <option key={index}>{tech}</option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group controlId="viewers">
-                  <Form.Label>Viewers:</Form.Label>
-                  <Form.Control as="select" multiple readOnly>
-                    {project && project.VIEWERS && project.VIEWERS.split(',').map((viewer, index) => (
-                      <option key={index}>{viewer}</option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-
-                <Form.Group controlId="totalTasks">
-                  <Form.Label>Total Tasks:</Form.Label>
-                  <Form.Control type="text" value={project.TOTAL_TASKS} readOnly />
-                </Form.Group>
-                <Form.Group controlId="completedTasks">
-                  <Form.Label>Completed Tasks:</Form.Label>
-                  <Form.Control type="text" value={project.COMPLETED_TASKS} readOnly />
-                </Form.Group>
-
-
-                <Form.Group controlId="status">
-                  <Form.Label>Status:</Form.Label>
-                  <Form.Control as="select" defaultValue={project.STATUS} readOnly>
-                    <option value="In process">In process</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
-                  </Form.Control>
-                </Form.Group>
-                <button>Export data</button>
-              </Form>
+              <Table striped bordered hover size="sm" className="mt-3">
+                <tbody>
+                  <tr>
+                    <td><strong>Project:</strong></td>
+                    <td>{project.NAME}</td>
+                    <td><strong>Manager:</strong></td>
+                    <td>{project.MANAGEREMAIL}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Description:</strong></td>
+                    <td colSpan={Number(3)}>{project.DESCRIPTION}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Start Date:</strong></td>
+                    <td>{new Date(project.STARTDATE).toLocaleDateString()}</td>
+                    <td><strong>End Date:</strong></td>
+                    <td>{new Date(project.ENDDATE).toLocaleDateString()}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Technicians:</strong></td>
+                    <td>{project.TECHNICIANS && project.TECHNICIANS.split(',').join(", ")}</td>
+                    <td><strong>Viewers:</strong></td>
+                    <td>{project.VIEWERS && project.VIEWERS.split(',').join(", ")}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Total Tasks:</strong></td>
+                    <td>{project.TOTAL_TASKS}</td>
+                    <td><strong>Completed Tasks:</strong></td>
+                    <td>{project.COMPLETED_TASKS}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Status:</strong></td>
+                    <td>{project.STATUS}</td>
+                    <td><strong></strong></td>
+                    <td><Button variant="primary">Export data</Button></td>
+                  </tr>
+                </tbody>
+              </Table>
             ) : (
               <p>Loading...</p>
             )}
           </Tab>
+
+
+
 
           <Tab eventKey="User activity" title="User activity">
             <div className="user-activity-mode">

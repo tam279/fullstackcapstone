@@ -1,12 +1,12 @@
-// EditCompanyModal.tsx
 import React, { useState } from 'react';
 import { Form, Modal, Button } from 'react-bootstrap';
+
 interface Company {
   COMPANYID: number;
   COMPANYNAME: string;
-  ADDRESS: string; // Add ADDRESS field
-  PHONE_NUMBER: string; // Add PHONE_NUMBER field
-  WEBSITE: string; // Add WEBSITE field
+  ADDRESS: string;
+  PHONE_NUMBER: string;
+  WEBSITE: string;
 }
 
 interface EditCompanyModalProps {
@@ -15,9 +15,10 @@ interface EditCompanyModalProps {
   company: Company;
   updateCompany: (COMPANYID: number, updatedCompany: any) => void;
   deleteCompany: (COMPANYID: number) => void;
+  fetchCompanies: () => void; // Added fetchCompanies prop
 }
 
-const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ onHide, show, company, updateCompany, deleteCompany }) => {
+const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ onHide, show, company, updateCompany, deleteCompany, fetchCompanies }) => {
   const [name, setName] = useState(company?.COMPANYNAME || "");
   const [address, setAddress] = useState(company?.ADDRESS || "");
   const [phoneNumber, setPhoneNumber] = useState(company?.PHONE_NUMBER || "");
@@ -32,6 +33,7 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ onHide, show, compa
     };
     try {
       await updateCompany(company.COMPANYID, updatedCompany);
+      fetchCompanies();
       onHide();
     } catch (error) {
       console.error(error);
@@ -41,11 +43,13 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ onHide, show, compa
   const handleDelete = async () => {
     try {
       await deleteCompany(company.COMPANYID);
+      fetchCompanies();
       onHide();
     } catch (error) {
       console.error(error);
     }
   };
+
 
   return (
     <Modal show={show} onHide={onHide} size="lg">

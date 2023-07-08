@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
 
 interface NewUserModalProps {
   show: boolean;
@@ -83,51 +83,55 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
       </Modal.Header>
       <Modal.Body>
         <h2>Details</h2>
-        <Form>
-          <Row>
-            <Col>
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
+        <Table striped bordered hover>
+          <tbody>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td>
                 <Form.Control
                   type="email"
                   placeholder="Johndoes@mail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-              </Form.Group>
-              <Form.Group controlId="formFirstName">
-                <Form.Label>First Name</Form.Label>
+              </td>
+              <td><strong>First Name:</strong></td>
+              <td>
                 <Form.Control
                   type="text"
                   placeholder="Please enter your first name!"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
-              </Form.Group>
-              <Form.Group controlId="formLastName">
-                <Form.Label>Last Name</Form.Label>
+              </td>
+              <td><strong>Last Name:</strong></td>
+              <td>
                 <Form.Control
                   type="text"
                   placeholder="Please enter your last name!"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                 />
-              </Form.Group>
-              <Form.Label>Company</Form.Label>
-              <Form.Control
-                as="select"
-                value={company || ''}
-                onChange={(e) => setCompany(Number(e.target.value) || null)}
-              >
-                <option value="">Select Company</option>
-                {companies.map((company, index) => (
-                  <option key={index} value={company.COMPANYID}>
-                    {company.COMPANYNAME}
-                  </option>
-                ))}
-              </Form.Control>
-              <Form.Group controlId="formRole">
-                <Form.Label>Role</Form.Label>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Company:</strong></td>
+              <td>
+                <Form.Control
+                  as="select"
+                  value={company || ''}
+                  onChange={(e) => setCompany(Number(e.target.value) || null)}
+                >
+                  <option value="">Select Company</option>
+                  {companies.map((company, index) => (
+                    <option key={index} value={company.COMPANYID}>
+                      {company.COMPANYNAME}
+                    </option>
+                  ))}
+                </Form.Control>
+              </td>
+              <td><strong>Role:</strong></td>
+              <td>
                 <Form.Control
                   as="select"
                   value={role || ''}
@@ -139,9 +143,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   <option value={3}>IT Technicians</option>
                   <option value={4}>Viewers</option>
                 </Form.Control>
-              </Form.Group>
-              <Form.Group controlId="formLoginMethod">
-                <Form.Label>Login Method</Form.Label>
+              </td>
+              <td><strong>Login Method:</strong></td>
+              <td>
                 <Form.Control
                   as="select"
                   value={loginMethod || ''}
@@ -152,50 +156,50 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   <option value={2}>Microsoft</option>
                   <option value={3}>Our own password</option>
                 </Form.Control>
-              </Form.Group>
-            </Col>
-      
-         
-            <Col>
-              <Form.Group controlId="formPassword">
-                <Form.Label>Password</Form.Label>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Password:</strong></td>
+              <td>
                 <Form.Control
                   type="password"
                   placeholder="Enter a password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-              </Form.Group>
-              <Form.Group controlId="formTag">
-                <Form.Label>Tag</Form.Label>
+              </td>
+              <td><strong>Tag:</strong></td>
+              <td>
                 <Form.Control
                   type="text"
                   placeholder="A+ Certification, Cisco +"
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
                 />
-              </Form.Group>
-              <Form.Group controlId="formPhoneNumber">
-                <Form.Label>Phone Number</Form.Label>
+              </td>
+              <td><strong>Phone Number:</strong></td>
+              <td>
                 <Form.Control
                   type="text"
                   placeholder="Enter phone number"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 />
-              </Form.Group>
-              <Form.Group controlId="formJobTitle">
-                <Form.Label>Job Title</Form.Label>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Job Title:</strong></td>
+              <td colSpan={5}>
                 <Form.Control
                   type="text"
                   placeholder="Enter job title"
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
                 />
-              </Form.Group>
-            </Col>
-          </Row>
-        </Form>
+              </td>
+            </tr>
+          </tbody>
+        </Table>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>

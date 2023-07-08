@@ -31,8 +31,8 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       <Modal.Body>
         <Form>
           <Row>
-            <h2>Details</h2>
-            <Col>
+            <Col md={6}>
+              <h5>Details</h5>
               <Form.Group>
                 <Form.Label>Name</Form.Label>
                 <Form.Control type="text" placeholder="Enter project name" defaultValue={project.NAME} />
@@ -57,7 +57,8 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
               </Form.Group>
             </Col>
 
-            <Col>
+            <Col md={6}>
+              <h5>Associates</h5>
               <Form.Group>
                 <Form.Label>Company</Form.Label>
                 <Form.Control type="text" placeholder="Enter company name" />

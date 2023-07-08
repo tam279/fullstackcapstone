@@ -317,6 +317,7 @@ const UserManagementPage = () => {
           onHide={handleHideCompanyModal}
           company={selectedCompany}
           updateCompany={handleUpdateCompany}
+          fetchCompanies={fetchCompanyData}
           deleteCompany={handleDeleteCompany}
         />
       )}

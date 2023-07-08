@@ -2,35 +2,48 @@
 #logo.logo-custom {
   width: 80px;
   height: auto;
-  border: 2px solid white; /* Add a white border */
-  cursor: pointer; /* Change cursor to hand */
+  border: 2px solid #0d6efd;
+  /* Update border color */
+  cursor: pointer;
+  /* Change cursor to hand */
 }
 
-.navbar-custom .nav-link {
-  font-size: 40px;
-  padding: 10px 20px;
-  height: 80px;
-  color: white;
+.nav-link.text-primary {
+  font-size: 1rem;
+  /* Replace pixel sizes with rem for scalability */
+  padding: .5rem 1rem;
+  /* Replace pixel sizes with rem for scalability */
+  color: #0d6efd !important;
+  /* Important to override Bootstrap's .nav-link color */
 }
 
-.navbar-custom {
-  background-color: #2F5CAC;
+.nav-link.text-primary:hover {
+  color: #0b5ed7 !important;
+  /* Darken link on hover */
 }
 
-.navbar-custom .nav-link:last-child {
+.nav-link.text-primary:last-child {
   margin-left: auto;
+}
+
+.nav-link.active {
+  /* Add .active to enhance the current page link */
+  font-weight: bold !important;
+  /* Make the text bold */
+  color: #0b5ed7 !important;
+  /* Use a darker color */
 }
 
 /* Responsive styles */
 @media (max-width: 1200px) {
-  .navbar-custom .nav-link {
-    font-size: 30px;
+  .nav-link.text-primary {
+    font-size: .875rem;
   }
 }
 
 @media (max-width: 992px) {
-  .navbar-custom .nav-link {
-    font-size: 20px;
+  .nav-link.text-primary {
+    font-size: .75rem;
   }
 
   #logo.logo-custom {
@@ -39,10 +52,9 @@
 }
 
 @media (max-width: 768px) {
-  .navbar-custom .nav-link {
-    font-size: 16px;
-    padding: 5px 10px;
-    height: 40px;
+  .nav-link.text-primary {
+    font-size: .625rem;
+    padding: .25rem .5rem;
   }
 
   #logo.logo-custom {
@@ -51,8 +63,8 @@
 }
 
 @media (max-width: 576px) {
-  .navbar-custom .nav-link {
-    font-size: 14px;
+  .nav-link.text-primary {
+    font-size: .5rem;
   }
 
   #logo.logo-custom {
