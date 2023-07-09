@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import axios from 'axios';  // Import axios
+
+axios.defaults.withCredentials = true; // set withCredentials to true for all requests
 
 ReactDOM.render(
   <React.StrictMode>

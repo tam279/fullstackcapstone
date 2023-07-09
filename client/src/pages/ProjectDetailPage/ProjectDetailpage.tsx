@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Tabs, Tab, Table, Form, Row, Col } from 'react-bootstrap';
 import { AiFillEdit } from 'react-icons/ai';
-import './Project1Page.css';
+import './ProjectDetailPage.css';
 import { Chart } from 'react-google-charts';
 import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import CreateNewTaskModal from '../../modals/CreateNewTaskModal/CreateNewTaskModal';
-import Task5Project1Modal from '../../modals/Task5Project1Modal/Task5Project1Modal';
+import TaskDetailModal from '../../modals/TaskDetailModal/TaskDetailModal';
 import EditTaskModal from '../../modals/EditTaskModal/EditTaskModal';
 import axios from 'axios';
 
@@ -270,7 +270,7 @@ const Project1Page: React.FC = () => {
         </Tabs>
 
         <CreateNewTaskModal show={show} handleClose={handleClose} />
-        {selectedTask && <Task5Project1Modal show={task5ModalShow} handleClose={handleTask5ModalClose} taskId={selectedTask.TASKID} />}
+        {selectedTask && <TaskDetailModal show={task5ModalShow} handleClose={handleTask5ModalClose} taskId={selectedTask.TASKID} />}
         <EditTaskModal show={editModalShow} handleClose={handleEditModalClose} />
 
 

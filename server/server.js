@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -11,29 +10,14 @@ const commentController = require('./controllers/commentController');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
-const corsOptions = {
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token'],
-    credentials: true,
-    methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-    origin: '*', //or restrict to certain domains if you wish
-    preflightContinue: false
-};
-
-
-
 
 const app = express();
 //use cors middleware
-app.use(cors(corsOptions));
-//enable pre-flight
-app.options('*', cors(corsOptions));
-app.use(
-    cors({
-        origin: ['http://localhost:3000'], // replace this with your React application URL
-        methods: ['GET', 'POST', 'PUT'],
-        credentials: true,
-    })
-);
+app.use(cors({
+    origin: 'http://localhost:3000', // replace this with your React application URL
+    credentials: true, // this enables cookies to be sent with requests from the client
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'], // add 'OPTIONS' to this array
+}));
 
 app.use(bodyParser.json());
 
@@ -80,7 +64,6 @@ app.put('/api/updateCompany/:id', userController.updateCompany);
 // Delete company
 app.delete('/api/deleteCompany/:id', userController.deleteCompany);
 
-
 // Project routes
 app.get('/api/projects', projectController.getProjects);
 app.post('/api/createProject', projectController.createProject);
@@ -96,7 +79,6 @@ app.delete('/api/tasks/:id', taskController.deleteTask);
 
 app.get('/api/roles', userController.getRoles);
 
-
 // User activity routes
 app.get('/api/userActivity', userController.getUserActivity);
 app.post('/api/createUserActivity', userController.createUserActivity);
@@ -108,15 +90,12 @@ app.put('/api/comments/:id', commentController.updateComment);
 app.delete('/api/comments/:id', commentController.deleteComment);
 app.get('/api/tasks/:id', taskController.getTask);
 
-
-
 app.use((req, res, next) => {
     const error = new Error('Route not found');
     error.status = 404;
     console.log(req.url);  // Log the requested URL
     next(error);
 });
-
 
 app.use((err, req, res, next) => {
     res.status(err.status || 500).send({

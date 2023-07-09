@@ -8,8 +8,8 @@ import ContactPage from './pages/ContactPage/ContactPage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ChangePasswordPage from './pages/ChangePasswordPage/ChangePasswordPage';
-import AdminProjectPage from './pages/AdminProjectPage/AdminProjectPage';
-import Project1 from './pages/Project1Page/Project1page';
+import AdminProjectPage from './pages/ProjectListPage/ProjectListPage';
+import Project1 from './pages/ProjectDetailPage/ProjectDetailpage';
 import UserManagementPage from './pages/UserManagementPage/UserManagementPage';
 
 const App: React.FC = () => {

@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import { Button, Table, ProgressBar, Form } from 'react-bootstrap';
-import './AdminProjectPage.css';
+import './ProjectListPage.css';
 import CreateNewProjectModal from '../../modals/CreateNewProjectModal/CreateNewProjectModal';
-import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
+// import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
 import axios from 'axios';
 
 interface ProjectData {
@@ -12,11 +13,12 @@ interface ProjectData {
   NAME: string;
   STARTDATE: string;
   ENDDATE: string;
-  MANAGEREMAIL: string;
+  MANAGERNAME: string;
   DESCRIPTION: string;
   COMPANYID: number;
   ISACTIVE: number;
 }
+
 
 interface CompanyData {
   COMPANYID: number;
@@ -46,9 +48,15 @@ const AdminProjectPage = () => {
         setProjects(response.data);
       })
       .catch(error => {
-        console.error('Error:', error);
+        if (error.message === 'Network Error' && !error.response) {
+          // Show a notification to the user
+          console.error('Check your network connection');
+        } else {
+          console.error('Error:', error);
+        }
       });
   };
+
 
   // New fetch function for companies
   const fetchCompanies = () => {
@@ -93,9 +101,9 @@ const AdminProjectPage = () => {
               <th>Name</th>
               <th>Start date</th>
               <th>End date</th>
-              <th>Manager email</th>
+              <th>Manager name</th>
               <th>Description</th>
-              <th>Company ID</th>
+              <th>Company Name</th>
               <th>Is Active</th>
               <th>
                 <Button>Filter</Button>
@@ -120,7 +128,7 @@ const AdminProjectPage = () => {
                 <td>{project.STARTDATE}</td>
                 <td>{project.ENDDATE}</td>
 
-                <td>{project.MANAGEREMAIL}</td>
+                <td>{project.MANAGERNAME}</td>
                 <td>{project.DESCRIPTION}</td>
                 {
                   companies.find(company => company.COMPANYID === project.COMPANYID)?.COMPANYNAME || 'Unknown'
@@ -130,12 +138,12 @@ const AdminProjectPage = () => {
           </tbody>
         </Table>
 
-        <CreateNewProjectModal show={show} handleClose={handleClose} />
-        <EditProjectModal
+        <CreateNewProjectModal show={show} handleClose={handleClose} companies={companies} refetchProjects={fetchProjects} />
+        {/* <EditProjectModal
           show={editingProject !== null}
           handleClose={() => setEditingProject(null)}
           project={editingProject}
-        />
+        /> */}
       </div>
     </div>
   );
