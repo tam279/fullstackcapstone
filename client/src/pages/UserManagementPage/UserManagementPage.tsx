@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Row, Col, Tabs, Tab, Table } from 'react-bootstrap';
+import { Button, Container, Row, Col, Tabs, Tab, Table, InputGroup, FormControl } from 'react-bootstrap';
 import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import NewUserModal from '../../modals/CreateNewUserModal/CreateNewUserModal';
 import EditUserModal from '../../modals/EditUserModal/EditUserModal';
 import axios from 'axios';
 import NewCompanyModal from '../../modals/CreateNewCompanyModal/CreateNewCompanyModal';
-import EditCompanyModal from '../../modals/EditCompanyModal/EditCompanyModal'; // Import EditCompanyModal
+import EditCompanyModal from '../../modals/EditCompanyModal/EditCompanyModal';
+
+
 
 
 interface User {
@@ -58,6 +60,40 @@ const UserManagementPage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [roleData, setRoleData] = useState<Role[]>([]);
   const [loginMethodData, setLoginMethodData] = useState<LoginMethod[]>([]);
+
+  const [userFilter, setUserFilter] = useState("");
+  const [userSort, setUserSort] = useState<"asc" | "desc">("asc");
+
+  const [companyFilter, setCompanyFilter] = useState("");
+  const [companySort, setCompanySort] = useState<"asc" | "desc">("asc");
+
+  const filterAndSortUsers = (users: User[]) => {
+    return users
+      .filter(user => user.EMAIL.toLowerCase().includes(userFilter.toLowerCase()))
+      .sort((a, b) => {
+        if (a.EMAIL < b.EMAIL) {
+          return userSort === "asc" ? -1 : 1;
+        } else if (a.EMAIL > b.EMAIL) {
+          return userSort === "asc" ? 1 : -1;
+        } else {
+          return 0;
+        }
+      });
+  };
+
+  const filterAndSortCompanies = (companies: Company[]) => {
+    return companies
+      .filter(company => company.COMPANYNAME.toLowerCase().includes(companyFilter.toLowerCase()))
+      .sort((a, b) => {
+        if (a.COMPANYNAME < b.COMPANYNAME) {
+          return companySort === "asc" ? -1 : 1;
+        } else if (a.COMPANYNAME > b.COMPANYNAME) {
+          return companySort === "asc" ? 1 : -1;
+        } else {
+          return 0;
+        }
+      });
+  };
 
   const fetchUserData = () => {
     axios
@@ -247,6 +283,22 @@ const UserManagementPage = () => {
           </div>
           <Tabs defaultActiveKey="userlist" id="user-management-tabs" className="mb-3">
             <Tab eventKey="userlist" title="User List">
+              <InputGroup className="mb-3">
+                <InputGroup.Text id="inputGroup-sizing-default">Filter</InputGroup.Text>
+                <FormControl
+                  aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default"
+                  onChange={(e) => setUserFilter(e.target.value)}
+                />
+                <InputGroup.Text id="inputGroup-sizing-default">Sort</InputGroup.Text>
+                <select
+                  onChange={(e) => setUserSort(e.target.value as "asc" | "desc")}
+                  value={userSort}
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </InputGroup>
               <Table striped bordered hover>
                 <thead>
                   <tr>
@@ -263,11 +315,10 @@ const UserManagementPage = () => {
                     <th>Phone Number</th>
                     <th>Job Title</th>
                     <th>User status</th>
-                    <th>Filter</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {userData.map((user, index) => (
+                  {filterAndSortUsers(userData).map((user, index) => (
                     <tr key={index}>
                       <td>
                         <Button onClick={() => handleEditClick(user)}>Edit</Button>
@@ -282,17 +333,35 @@ const UserManagementPage = () => {
                       <td>{user.PHONE_NUMBER}</td>
                       <td>{user.JOB_TITLE}</td>
                       <td>{user.ISACTIVE === 1 ? 'Active' : user.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td>
-
-
-                      <td>
-                        <Button>Filter</Button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
               </Table>
             </Tab>
+
+
+
             <Tab eventKey="companies" title="Companies">
+              <InputGroup className="mb-3">
+                <InputGroup.Text >
+                  <InputGroup.Text id="inputGroup-sizing-default">Filter</InputGroup.Text>
+                </InputGroup.Text >
+                <FormControl
+                  aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default"
+                  onChange={(e) => setCompanyFilter(e.target.value)}
+                />
+                <InputGroup.Text >
+                  <InputGroup.Text id="inputGroup-sizing-default">Sort</InputGroup.Text>
+                </InputGroup.Text >
+                <select
+                  onChange={(e) => setCompanySort(e.target.value as "asc" | "desc")}
+                  value={companySort}
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </InputGroup>
               <Table striped bordered hover>
                 <thead>
                   <tr>
@@ -311,7 +380,7 @@ const UserManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {companyData.map((company, index) => (
+                  {filterAndSortCompanies(companyData).map((company, index) => (
                     <tr key={index}>
                       <td>
                         <Button onClick={() => handleEditCompanyClick(company)}>Edit</Button>
@@ -324,7 +393,7 @@ const UserManagementPage = () => {
                       <td>{company.ISACTIVE === 1 ? 'Active' : company.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td> {/* New column */}
                       <td>
                         <Button onClick={() => handleActivateCompany(company.COMPANYID)}>Activate</Button>
-                        <Button onClick={() => handleDeactivateCompany(company.COMPANYID)}>Deactivate</Button>
+                        <Button variant="warning" onClick={() => handleDeactivateCompany(company.COMPANYID)}>Deactivate</Button>
                       </td> {/* New column */}
                     </tr>
                   ))}

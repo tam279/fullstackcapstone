@@ -287,7 +287,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   />
                 </td>
                 <td><strong>User Status:</strong></td>
-                <td>
+                {/* <td>
                   <Form.Control
                     as="select"
                     value={isActive}
@@ -296,7 +296,11 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     <option value={1}>Active</option>
                     <option value={0}>Inactive</option>
                   </Form.Control>
+                </td> */}
+                <td>
+                  {isActive ? 'Active' : 'Inactive'}
                 </td>
+
               </tr>
               <tr>
                 <td><strong>Job Title:</strong></td>
