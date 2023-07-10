@@ -5,7 +5,7 @@ import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import { Button, Table, ProgressBar, Form } from 'react-bootstrap';
 import './ProjectListPage.css';
 import CreateNewProjectModal from '../../modals/CreateNewProjectModal/CreateNewProjectModal';
-// import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
+import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
 import axios from 'axios';
 
 
@@ -148,11 +148,14 @@ const ProjectListPage = () => {
         </Table>
 
         <CreateNewProjectModal show={show} handleClose={handleClose} companies={companies} refetchProjects={fetchProjects} />
-        {/* <EditProjectModal
+        <EditProjectModal
           show={editingProject !== null}
           handleClose={() => setEditingProject(null)}
-          project={editingProject}
-        /> */}
+          projectId={editingProject?.PROJECTID || 0} // Update prop name to projectId
+          refetchProjects={fetchProjects}
+          companies={companies}
+        />
+
       </div>
     </div>
   );
