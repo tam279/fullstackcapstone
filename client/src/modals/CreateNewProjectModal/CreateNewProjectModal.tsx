@@ -245,10 +245,12 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                           value={status}
                           onChange={(e) => setStatus(e.target.value)}
                         >
+                          <option value="">Select Status</option>
                           <option value="Not Started">Not Started</option>
                           <option value="In Progress">In Progress</option>
                           <option value="Completed">Completed</option>
                         </Form.Control>
+
                       </Form.Group>
 
                     </td>
