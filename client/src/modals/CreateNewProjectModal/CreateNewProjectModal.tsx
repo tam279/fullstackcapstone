@@ -1,6 +1,4 @@
-// CreateNewProjectModal.tsx
-
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, ChangeEvent } from 'react';
 import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -29,10 +27,14 @@ interface CreateNewProjectModalProps {
   refetchProjects: () => void;
 }
 
-
-const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, handleClose, companies, refetchProjects }) => {
+const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
+  show,
+  handleClose,
+  companies,
+  refetchProjects
+}) => {
   const [name, setName] = useState("");
-  const [managerName, setManagerName] = useState("Select a Manager"); // Set initial value
+  const [managerName, setManagerName] = useState("Select a Manager");
   const [technicians, setTechnicians] = useState<string[]>([]);
   const [viewers, setViewers] = useState<string[]>([]);
   const [description, setDescription] = useState("");
@@ -44,9 +46,9 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
   const [progress, setProgress] = useState(0);
   const [isActive, setIsActive] = useState("");
   const [companyID, setCompanyID] = useState("");
+  const [companyName, setCompanyName] = useState("");
 
-  const isManagerSelected = managerName !== 'Select a Manager'; // Check if manager is selected or still at initial value
-
+  const isManagerSelected = managerName !== "Select a Manager";
 
   const [users, setUsers] = useState<UserData[]>([]);
 
@@ -56,13 +58,27 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
 
   const fetchUsers = () => {
     axios
-      .get('http://localhost:5000/api/users')
-      .then(response => {
+      .get("http://localhost:5000/api/users")
+      .then((response) => {
         setUsers(response.data);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
+  };
+
+  type FormControlElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+  const handleCompanyChange = (e: ChangeEvent<FormControlElement>) => {
+    const selectedCompanyID = e.target.value;
+    const selectedCompany = companies.find(
+      (company) => company.COMPANYID === parseInt(selectedCompanyID, 10)
+    );
+
+    if (selectedCompany) {
+      setCompanyID(selectedCompanyID);
+      setCompanyName(selectedCompany.COMPANYNAME);
+    }
   };
 
 
@@ -70,21 +86,33 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const selectedManager = users.find(
+      (user) => `${user.FIRSTNAME} ${user.LASTNAME}` === managerName
+    );
+
+    if (!selectedManager) {
+      alert("Please select a manager before submitting");
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:5000/api/createProject', {
-        NAME: name,
-        DESCRIPTION: description,
-        STARTDATE: startDate,
-        ENDDATE: endDate,
-        COMPANYID: companyID,
-        MANAGERNAME: managerName,
-        TOTAL_TASKS: totalTasks,
-        COMPLETED_TASKS: completedTasks,
-        STATUS: status,
-        IS_ACTIVE: isActive
-      }, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/createProject",
+        {
+          NAME: name,
+          STARTDATE: startDate,
+          ENDDATE: endDate,
+          STATUS: status || "Not Started", // Use 'Not Started' if status is empty
+          MANAGEREMAIL: selectedManager.EMAIL,
+          TECHNICIANEMAILS: technicians,
+          VIEWEREMAILS: viewers,
+          DESCRIPTION: description,
+          COMPANYID: companyID
+        },
+        {
+          withCredentials: true
+        }
+      );
 
       handleClose();
       refetchProjects();
@@ -92,6 +120,9 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
       console.error(err);
     }
   };
+
+
+
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -114,10 +145,8 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
 
               <Form.Group>
                 <Form.Label>Manager Name</Form.Label>
-                <Form.Control as="select" value={managerName} onChange={(e) => {
-                  setManagerName(e.target.value);
-                  console.log('Selected Manager:', e.target.value);
-                }}>
+                <Form.Control as="select" value={managerName} onChange={(e) => setManagerName(e.target.value)}>
+                  <option>Select a Manager</option>
                   {users.filter(user => user.ROLENAME.toLowerCase() === "manager").map(user => (
                     <option key={user.EMAIL} value={`${user.FIRSTNAME} ${user.LASTNAME}`}>
                       {user.FIRSTNAME} {user.LASTNAME}
@@ -125,7 +154,6 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
                   ))}
                 </Form.Control>
               </Form.Group>
-
 
               <Form.Group>
                 <Form.Label>Technician Name</Form.Label>
@@ -141,12 +169,11 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
                       )
                     )
                   }
-                >
-                  {users.filter(user => user.ROLENAME.toLowerCase() === "technician").map(user => (
-                    <option key={user.EMAIL} value={user.EMAIL}>
-                      {user.FIRSTNAME} {user.LASTNAME} {/* Display the user's name */}
-                    </option>
-                  ))}
+                >                  {users.filter(user => user.ROLENAME.toLowerCase() === "technician").map(user => (
+                  <option key={user.EMAIL} value={user.EMAIL}>
+                    {user.FIRSTNAME} {user.LASTNAME}
+                  </option>
+                ))}
                 </Form.Control>
               </Form.Group>
 
@@ -167,25 +194,32 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
                 >
                   {users.filter(user => user.ROLENAME.toLowerCase() === "viewer").map(user => (
                     <option key={user.EMAIL} value={user.EMAIL}>
-                      {user.FIRSTNAME} {user.LASTNAME} {/* Display the user's name */}
+                      {user.FIRSTNAME} {user.LASTNAME}
                     </option>
                   ))}
                 </Form.Control>
               </Form.Group>
 
-
-              {/* Company */}
               <Form.Group>
                 <Form.Label>Company</Form.Label>
-                <Form.Control as="select" value={companyID} onChange={(e) => setCompanyID(e.target.value)}>
-                  {companies.map(company => (
-                    <option key={company.COMPANYID} value={company.COMPANYID}>{company.COMPANYNAME}</option>
+                <Form.Control
+                  as="select"
+                  value={companyID}
+                  onChange={handleCompanyChange}
+                >
+                  <option value="">Select a Company</option>
+                  {companies.map((company) => (
+                    <option
+                      key={company.COMPANYID}
+                      value={company.COMPANYID.toString()}
+                    >
+                      {company.COMPANYNAME}
+                    </option>
                   ))}
                 </Form.Control>
               </Form.Group>
             </Col>
             <Col>
-              {/* Group 2 - Project Details */}
               <Table responsive>
                 <tbody>
                   <tr>
@@ -206,13 +240,17 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
                     <td>
                       <Form.Group>
                         <Form.Label>Status</Form.Label>
-                        {/* Status now has 3 specific options */}
-                        <Form.Control as="select" value={status} onChange={(e) => setStatus(e.target.value)}>
+                        <Form.Control
+                          as="select"
+                          value={status}
+                          onChange={(e) => setStatus(e.target.value)}
+                        >
                           <option value="Not Started">Not Started</option>
-                          <option value="On Going">On Going</option>
+                          <option value="In Progress">In Progress</option>
                           <option value="Completed">Completed</option>
                         </Form.Control>
                       </Form.Group>
+
                     </td>
                     <td>
                       <Form.Group>
@@ -241,8 +279,8 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
                   <tr>
                     <td colSpan={2}>
                       <Form.Group>
-                        <Form.Label>Completed Tasks</Form.Label>
-                        <Form.Control type="number" placeholder="Enter number of completed tasks" value={completedTasks} onChange={(e) => setCompletedTasks(parseInt(e.target.value, 10))} />
+                        <Form.Label>Progress (%)</Form.Label>
+                        <Form.Control type="number" placeholder="Enter project progress" value={progress} onChange={(e) => setProgress(parseInt(e.target.value, 10))} />
                       </Form.Group>
                     </td>
                   </tr>
@@ -253,12 +291,12 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({ show, han
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" type="submit" disabled={!isManagerSelected}>
+          <Button variant="primary" type="submit">
             Create
           </Button>
         </Form>
       </Modal.Body>
-    </Modal >
+    </Modal>
   );
 };
 

@@ -16,6 +16,7 @@ interface ProjectData {
   ENDDATE: string;
   MANAGERNAME: string;
   DESCRIPTION: string;
+  STATUS: string;
   COMPANYID: number;
   ISACTIVE: number;
 }
@@ -78,7 +79,7 @@ const ProjectListPage = () => {
     const projectPath = `/project/${project.PROJECTID}`;
     navigate(projectPath);
   };
-  
+
 
 
   return (
@@ -108,6 +109,7 @@ const ProjectListPage = () => {
               <th>Manager name</th>
               <th>Description</th>
               <th>Company Name</th>
+              <th>Status</th>
               <th>Is Active</th>
               <th>
                 <Button>Filter</Button>
@@ -122,7 +124,7 @@ const ProjectListPage = () => {
                     Edit
                   </Button>
                 </td>
-             
+
                 <td>               <div onClick={() => handleProjectClick(project)}>{project.PROJECTID}</div>
 
                 </td>
@@ -137,7 +139,9 @@ const ProjectListPage = () => {
                 <td>{project.DESCRIPTION}</td>
                 {
                   companies.find(company => company.COMPANYID === project.COMPANYID)?.COMPANYNAME || 'Unknown'
-                }                <td>{project.ISACTIVE === 1 ? 'Active' : project.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td>
+                }
+                <td>{project.STATUS}</td>
+                <td>{project.ISACTIVE === 1 ? 'Active' : project.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td>
               </tr>
             ))}
           </tbody>

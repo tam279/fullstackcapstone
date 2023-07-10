@@ -30,39 +30,51 @@ exports.createProject = async (req, res) => {
         NAME,
         STARTDATE,
         ENDDATE,
-        PROGRESS,
-        MANAGERNAME,
+        STATUS,
+        MANAGEREMAIL,
+        TECHNICIANEMAILS,
+        VIEWEREMAILS,
         DESCRIPTION,
         COMPANYID
     } = req.body;
-    const sqlProject = "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?)";
-    const sqlProjectManagerBridge = "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
+
+    const sqlProject =
+        "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, STATUS, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?)";
+    const sqlProjectManagerBridge =
+        "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
+    const sqlProjectTechnicianBridge =
+        "INSERT INTO PROJECT_TECHNICIAN_BRIDGE (PROJECTID, TECHNICIANEMAIL) VALUES (?, ?)";
+    const sqlProjectViewerBridge =
+        "INSERT INTO VIEWER_BRIDGE (PROJECTID, VIEWEREMAIL) VALUES (?, ?)";
 
     try {
         const [projectResult] = await db.query(sqlProject, [
             NAME,
             STARTDATE,
             ENDDATE,
-            PROGRESS,
+            STATUS, // Add STATUS to the query
             DESCRIPTION,
-            COMPANYID
+            parseInt(COMPANYID)
         ]);
 
-        // ProjectID is last insert id
         const projectId = projectResult.insertId;
 
-        await db.query(sqlProjectManagerBridge, [
-            projectId,
-            MANAGERNAME // Now, MANAGERNAME is actually MANAGEREMAIL
-        ]);
+        await db.query(sqlProjectManagerBridge, [projectId, MANAGEREMAIL]);
 
-        res.status(200).send({ message: 'Project created successfully' });
+        for (let technicianEmail of TECHNICIANEMAILS) {
+            await db.query(sqlProjectTechnicianBridge, [projectId, technicianEmail]);
+        }
+
+        for (let viewerEmail of VIEWEREMAILS) {
+            await db.query(sqlProjectViewerBridge, [projectId, viewerEmail]);
+        }
+
+        res.status(200).send({ message: "Project created successfully" });
     } catch (err) {
         console.log(err);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
+        res.status(500).send({ message: "An error occurred", error: err.message });
     }
 };
-
 
 
 exports.updateProject = async (req, res) => {
@@ -72,24 +84,33 @@ exports.updateProject = async (req, res) => {
         STARTDATE,
         ENDDATE,
         PROGRESS,
+        STATUS,
         MANAGEREMAIL,
         DESCRIPTION,
         COMPANYID
     } = req.body;
-    const sql =
-        "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, MANAGEREMAIL = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
+
+    const sqlUpdateProject =
+        "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, STATUS = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
+    const sqlUpdateManagerBridge = "UPDATE PROJECT_MANAGER_BRIDGE SET MANAGEREMAIL = ? WHERE PROJECTID = ?";
 
     try {
-        const [result, fields] = await db.query(sql, [
+        await db.query(sqlUpdateProject, [
             NAME,
             STARTDATE,
             ENDDATE,
             PROGRESS,
-            MANAGEREMAIL,
+            STATUS,
             DESCRIPTION,
             COMPANYID,
             id
         ]);
+
+        await db.query(sqlUpdateManagerBridge, [
+            MANAGEREMAIL,
+            id
+        ]);
+
         res.status(200).send({ message: 'Project updated successfully' });
     } catch (err) {
         console.log(err);
@@ -99,10 +120,12 @@ exports.updateProject = async (req, res) => {
 
 exports.deleteProject = async (req, res) => {
     const id = req.params.id;
-    const sql = "DELETE FROM PROJECT WHERE PROJECTID = ?";
+    const sqlProject = "DELETE FROM PROJECT WHERE PROJECTID = ?";
+    const sqlProjectManagerBridge = "DELETE FROM PROJECT_MANAGER_BRIDGE WHERE PROJECTID = ?";
 
     try {
-        const [result, fields] = await db.query(sql, [id]);
+        await db.query(sqlProject, [id]);
+        await db.query(sqlProjectManagerBridge, [id]);
         res.status(200).send({ message: 'Project deleted successfully' });
     } catch (err) {
         console.log(err);
@@ -147,12 +170,9 @@ exports.getProject = async (req, res) => {
         project.total_tasks = tasks[0].TOTAL_TASKS;
         project.completed_tasks = tasks[0].COMPLETED_TASKS;
 
-        // Assume you will manage Priority and Status in the PROJECT table
-        // No need for separate SQL query for them
         res.status(200).json(project);
     } catch (err) {
         console.log("Error message: ", err.message);
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
-
