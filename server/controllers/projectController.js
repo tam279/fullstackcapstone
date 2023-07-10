@@ -110,21 +110,49 @@ exports.deleteProject = async (req, res) => {
     }
 };
 
-
 exports.getProject = async (req, res) => {
     const id = req.params.id;
-    const sql = "SELECT * FROM PROJECT WHERE PROJECTID = ?";
-
     try {
-        const [result, fields] = await db.query(sql, [id]);
-        // Assuming you are expecting to return a single project, hence returning result[0]
-        if (result.length > 0) {
-            res.status(200).json(result[0]);
-        } else {
-            res.status(404).send({ message: 'No project found with the provided ID' });
+        // SQL to get basic project details
+        let sql = "SELECT * FROM PROJECT WHERE PROJECTID = ?";
+        const [result] = await db.query(sql, [id]);
+        if (result.length === 0) {
+            return res.status(404).send({ message: 'No project found with the provided ID' });
         }
+        const project = result[0];
+
+        // SQL to get manager of the project
+        sql = `SELECT u.FIRSTNAME, u.LASTNAME FROM USER u INNER JOIN PROJECT_MANAGER_BRIDGE pmb 
+                ON u.EMAIL = pmb.MANAGEREMAIL WHERE pmb.PROJECTID = ?`;
+        const [manager] = await db.query(sql, [id]);
+        project.manager = manager.map(m => `${m.FIRSTNAME} ${m.LASTNAME}`);
+
+        // SQL to get technicians of the project
+        sql = `SELECT u.FIRSTNAME, u.LASTNAME FROM USER u INNER JOIN PROJECT_TECHNICIAN_BRIDGE ptb 
+                ON u.EMAIL = ptb.TECHNICIANEMAIL WHERE ptb.PROJECTID = ?`;
+        const [technicians] = await db.query(sql, [id]);
+        project.technicians = technicians.map(t => `${t.FIRSTNAME} ${t.LASTNAME}`);
+
+        // SQL to get viewers of the project
+        sql = `SELECT u.FIRSTNAME, u.LASTNAME FROM USER u INNER JOIN VIEWER_BRIDGE vb 
+                ON u.EMAIL = vb.VIEWEREMAIL WHERE vb.PROJECTID = ?`;
+        const [viewers] = await db.query(sql, [id]);
+        project.viewers = viewers.map(v => `${v.FIRSTNAME} ${v.LASTNAME}`);
+
+        // SQL to get total tasks and completed tasks
+        sql = `SELECT COUNT(*) AS TOTAL_TASKS, 
+                COUNT(CASE WHEN STATUS = 'Completed' THEN 1 END) AS COMPLETED_TASKS
+                FROM TASK WHERE PROJECTID = ?`;
+        const [tasks] = await db.query(sql, [id]);
+        project.total_tasks = tasks[0].TOTAL_TASKS;
+        project.completed_tasks = tasks[0].COMPLETED_TASKS;
+
+        // Assume you will manage Priority and Status in the PROJECT table
+        // No need for separate SQL query for them
+        res.status(200).json(project);
     } catch (err) {
         console.log("Error message: ", err.message);
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+

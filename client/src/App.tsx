@@ -12,6 +12,7 @@ import ProjectListPage from './pages/ProjectListPage/ProjectListPage';
 import ProjectDetailpage from './pages/ProjectDetailPage/ProjectDetailpage';
 import UserManagementPage from './pages/UserManagementPage/UserManagementPage';
 
+
 const App: React.FC = () => {
   return (
     <Router>
@@ -25,7 +26,7 @@ const App: React.FC = () => {
           <Route path="/ChangePasswordPage" element={<ChangePasswordPage />} />
           <Route path="/users" element={<UserManagementPage />} />
           <Route path="/projectlistpage" element={<ProjectListPage />} />
-          <Route path="/project/:id" element={<ProjectDetailpage />} />
+          <Route path="/project/:projectId" element={<ProjectDetailpage />} />
         </Routes>
       </div>
     </Router>

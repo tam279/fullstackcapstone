@@ -287,16 +287,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   />
                 </td>
                 <td><strong>User Status:</strong></td>
-                {/* <td>
-                  <Form.Control
-                    as="select"
-                    value={isActive}
-                    onChange={(e) => setIsActive(Number(e.target.value))}
-                  >
-                    <option value={1}>Active</option>
-                    <option value={0}>Inactive</option>
-                  </Form.Control>
-                </td> */}
                 <td>
                   {isActive ? 'Active' : 'Inactive'}
                 </td>

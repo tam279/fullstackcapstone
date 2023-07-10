@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SidebarProject from '../../components/SidebarProject/SidebarProject';
 import { Button, Table, ProgressBar, Form } from 'react-bootstrap';
 import './ProjectListPage.css';
 import CreateNewProjectModal from '../../modals/CreateNewProjectModal/CreateNewProjectModal';
 // import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
 import axios from 'axios';
+
 
 interface ProjectData {
   PROJECTID: number;
@@ -33,6 +34,7 @@ const ProjectListPage = () => {
   const [show, setShow] = useState(false);
   const [editingProject, setEditingProject] = useState<ProjectData | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -73,9 +75,11 @@ const ProjectListPage = () => {
   const handleShow = () => setShow(true);
 
   const handleProjectClick = (project: ProjectData) => {
-    const projectPath = `/project/${project.NAME.replace(/\s/g, '-')}`;
-    window.location.href = projectPath;
+    const projectPath = `/project/${project.PROJECTID}`;
+    navigate(projectPath);
   };
+  
+
 
   return (
     <div className="ProjectListPage">
@@ -118,12 +122,13 @@ const ProjectListPage = () => {
                     Edit
                   </Button>
                 </td>
-                <td>
-                  <Link to={`/project/${project.NAME.replace(/\s/g, '-')}`}>{project.PROJECTID}</Link>
+             
+                <td>               <div onClick={() => handleProjectClick(project)}>{project.PROJECTID}</div>
 
                 </td>
 
-                <td>             <div onClick={() => handleProjectClick(project)}>{project.NAME}</div>
+                <td>               <div>{project.NAME}</div>
+
                 </td>
                 <td>{project.STARTDATE}</td>
                 <td>{project.ENDDATE}</td>

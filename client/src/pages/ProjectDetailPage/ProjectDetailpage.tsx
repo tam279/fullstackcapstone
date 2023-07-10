@@ -8,6 +8,9 @@ import CreateNewTaskModal from '../../modals/CreateNewTaskModal/CreateNewTaskMod
 import TaskDetailModal from '../../modals/TaskDetailModal/TaskDetailModal';
 import EditTaskModal from '../../modals/EditTaskModal/EditTaskModal';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
+
+
 
 interface Task {
   TASKID: number;
@@ -25,23 +28,38 @@ interface Task {
   TAG: string;
   FILTER: string;
 }
+interface Manager {
+  FIRSTNAME: string;
+  LASTNAME: string;
+}
+
+interface Technician {
+  FIRSTNAME: string;
+  LASTNAME: string;
+}
+
+interface Viewer {
+  FIRSTNAME: string;
+  LASTNAME: string;
+}
 
 interface Project {
   PROJECTID: number;
   NAME: string;
-  MANAGEREMAIL: string;
-  TECHNICIANS: string;
-  VIEWERS: string;
   DESCRIPTION: string;
   STARTDATE: string;
   ENDDATE: string;
   STATUS: string;
-  TOTAL_TASKS: number;
-  COMPLETED_TASKS: number;
-  PROGRESS: number;
   ISACTIVE: number;
   COMPANYID: number;
+  manager: string[];
+  technicians: string[];
+  viewers: string[];
+  total_tasks: number;
+  completed_tasks: number;
 }
+
+
 
 interface UserActivity {
   ACTIVITYID: number;
@@ -54,7 +72,7 @@ interface UserActivity {
 type TabKey = 'Tasks' | 'Grantt' | 'Details' | 'User activity';
 
 const ProjectDetailPage: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { projectId } = useParams<{ projectId: string }>(); const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -82,14 +100,13 @@ const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
-      // replace '1' with the project ID you need
-      const projectId = '1';
       const response = await axios.get(`http://localhost:5000/api/project/${projectId}`);
       setProject(response.data);
     }
 
     fetchProject();
-  }, []);
+  }, [projectId]);
+
 
 
   useEffect(() => {
@@ -200,7 +217,7 @@ const ProjectDetailPage: React.FC = () => {
                     <td><strong>Project:</strong></td>
                     <td>{project.NAME}</td>
                     <td><strong>Manager:</strong></td>
-                    <td>{project.MANAGEREMAIL}</td>
+                    <td>{project && project.manager.length > 0 && `${project.manager[0]}`}</td>
                   </tr>
                   <tr>
                     <td><strong>Description:</strong></td>
@@ -214,15 +231,15 @@ const ProjectDetailPage: React.FC = () => {
                   </tr>
                   <tr>
                     <td><strong>Technicians:</strong></td>
-                    <td>{project.TECHNICIANS && project.TECHNICIANS.split(',').join(", ")}</td>
+                    <td>{project && project.technicians.join(", ")}</td>
                     <td><strong>Viewers:</strong></td>
-                    <td>{project.VIEWERS && project.VIEWERS.split(',').join(", ")}</td>
+                    <td>{project && project.viewers.join(", ")}</td>
                   </tr>
                   <tr>
                     <td><strong>Total Tasks:</strong></td>
-                    <td>{project.TOTAL_TASKS}</td>
+                    <td>{project.total_tasks}</td>
                     <td><strong>Completed Tasks:</strong></td>
-                    <td>{project.COMPLETED_TASKS}</td>
+                    <td>{project.completed_tasks}</td>
                   </tr>
                   <tr>
                     <td><strong>Status:</strong></td>
