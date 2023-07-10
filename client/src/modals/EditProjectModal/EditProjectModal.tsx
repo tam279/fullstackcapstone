@@ -123,16 +123,18 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
   const handleUpdate = async () => {
     try {
+      const PROGRESS = 0; // You might need to replace this with real progress data
+      const DESCRIPTION = ""; // You might need to replace this with real description data
+
       await axios.put(`http://localhost:5000/api/updateProject/${projectId}`, {
         NAME: name,
         STARTDATE: startDate,
         ENDDATE: endDate,
-        MANAGERNAME: managerName,
-        TECHNICIANS: technicians,
-        VIEWERS: viewers,
-        COMPANYID: companyID,
+        PROGRESS,
         STATUS: status,
-        ISACTIVE: isActive
+        DESCRIPTION,
+        COMPANYID: companyID,
+        MANAGEREMAIL: managerName, // managerName is considered as MANAGEREMAIL here.
       });
       handleClose();
       refetchProjects();
@@ -151,23 +153,19 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
     }
   };
 
+
   const handleSelectChange = (e: React.FormEvent<HTMLSelectElement>) => {
     const target = e.target as HTMLSelectElement;
     setTechnicians(Array.from(target.selectedOptions, option => option.value));
   }
 
+
   const handleMultipleSelectChange = (setState: React.Dispatch<React.SetStateAction<string[]>>) => (
-    e: ChangeEvent<HTMLSelectElement>
+    e: ChangeEvent<unknown>
   ) => {
-    const target = e.target;
+    const target = e.target as HTMLSelectElement;
     setState(Array.from(target.selectedOptions, (option) => option.value));
   };
-
-
-
-
-
-
 
 
   return (

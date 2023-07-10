@@ -87,12 +87,22 @@ exports.updateProject = async (req, res) => {
         STATUS,
         MANAGEREMAIL,
         DESCRIPTION,
-        COMPANYID
+        COMPANYID,
+        TECHNICIANEMAILS,
+        VIEWEREMAILS
     } = req.body;
 
     const sqlUpdateProject =
         "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, STATUS = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
-    const sqlUpdateManagerBridge = "UPDATE PROJECT_MANAGER_BRIDGE SET MANAGEREMAIL = ? WHERE PROJECTID = ?";
+    const sqlDeleteManagerBridge = "DELETE FROM PROJECT_MANAGER_BRIDGE WHERE PROJECTID = ?";
+    const sqlInsertManagerBridge =
+        "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
+    const sqlDeleteTechnicianBridge = "DELETE FROM PROJECT_TECHNICIAN_BRIDGE WHERE PROJECTID = ?";
+    const sqlInsertTechnicianBridge =
+        "INSERT INTO PROJECT_TECHNICIAN_BRIDGE (PROJECTID, TECHNICIANEMAIL) VALUES (?, ?)";
+    const sqlDeleteViewerBridge = "DELETE FROM VIEWER_BRIDGE WHERE PROJECTID = ?";
+    const sqlInsertViewerBridge =
+        "INSERT INTO VIEWER_BRIDGE (PROJECTID, VIEWEREMAIL) VALUES (?, ?)";
 
     try {
         await db.query(sqlUpdateProject, [
@@ -106,10 +116,21 @@ exports.updateProject = async (req, res) => {
             id
         ]);
 
-        await db.query(sqlUpdateManagerBridge, [
-            MANAGEREMAIL,
-            id
-        ]);
+        // Update Manager
+        await db.query(sqlDeleteManagerBridge, [id]);
+        await db.query(sqlInsertManagerBridge, [id, MANAGEREMAIL]);
+
+        // Update Technicians
+        await db.query(sqlDeleteTechnicianBridge, [id]);
+        for (let technicianEmail of TECHNICIANEMAILS) {
+            await db.query(sqlInsertTechnicianBridge, [id, technicianEmail]);
+        }
+
+        // Update Viewers
+        await db.query(sqlDeleteViewerBridge, [id]);
+        for (let viewerEmail of VIEWEREMAILS) {
+            await db.query(sqlInsertViewerBridge, [id, viewerEmail]);
+        }
 
         res.status(200).send({ message: 'Project updated successfully' });
     } catch (err) {
@@ -118,21 +139,30 @@ exports.updateProject = async (req, res) => {
     }
 };
 
+
+
 exports.deleteProject = async (req, res) => {
     const id = req.params.id;
     const sqlProject = "DELETE FROM PROJECT WHERE PROJECTID = ?";
     const sqlProjectManagerBridge = "DELETE FROM PROJECT_MANAGER_BRIDGE WHERE PROJECTID = ?";
+    const sqlProjectTechnicianBridge = "DELETE FROM PROJECT_TECHNICIAN_BRIDGE WHERE PROJECTID = ?";
+    const sqlProjectViewerBridge = "DELETE FROM VIEWER_BRIDGE WHERE PROJECTID = ?";
 
     try {
-        await db.query(sqlProject, [id]);
+        // Delete from bridge tables first
         await db.query(sqlProjectManagerBridge, [id]);
+        await db.query(sqlProjectTechnicianBridge, [id]);
+        await db.query(sqlProjectViewerBridge, [id]);
+
+        // Then delete from Project table
+        await db.query(sqlProject, [id]);
+
         res.status(200).send({ message: 'Project deleted successfully' });
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
-
 exports.getProject = async (req, res) => {
     const id = req.params.id;
     try {
