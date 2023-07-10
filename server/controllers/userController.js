@@ -2,13 +2,7 @@
 
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
-
-const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'pmsdatabase',
-});
+const db = require('../db/database');
 
 
 

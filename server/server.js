@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+require('dotenv').config();
 const userController = require('./controllers/userController');
 const projectController = require('./controllers/projectController');
 const taskController = require('./controllers/taskController');
@@ -42,7 +43,7 @@ app.use(
 
 app.use('/favicon.ico', express.static(path.join(__dirname, 'favicon.ico')));
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
     res.send('Server is up and running!');

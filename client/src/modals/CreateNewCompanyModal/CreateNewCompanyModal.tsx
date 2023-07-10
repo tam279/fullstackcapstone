@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import config from '../../config';
 
 interface NewCompanyModalProps {
   show: boolean;
@@ -16,7 +17,7 @@ const NewCompanyModal: FC<NewCompanyModalProps & { onSuccess: () => void }> = ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/createCompany', { companyName: name, address, phoneNumber, website });
+      await axios.post(`${config.backend}/api/createCompany`, { companyName: name, address, phoneNumber, website });
       onHide();
       onSuccess(); // After successful creation, call the onSuccess function
     } catch (error) {

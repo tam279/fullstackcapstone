@@ -9,6 +9,7 @@ import TaskDetailModal from '../../modals/TaskDetailModal/TaskDetailModal';
 import EditTaskModal from '../../modals/EditTaskModal/EditTaskModal';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import config from '../../config';
 
 
 
@@ -91,7 +92,7 @@ const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const response = await axios.get('http://localhost:5000/api/tasks');
+      const response = await axios.get(`${config.backend}/api/tasks`);
       setTasks(response.data);
     }
 
@@ -100,7 +101,7 @@ const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
-      const response = await axios.get(`http://localhost:5000/api/project/${projectId}`);
+      const response = await axios.get(`${config.backend}/api/project/${projectId}`);
       setProject(response.data);
     }
 
@@ -111,7 +112,7 @@ const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchUserActivity = async () => {
-      const response = await axios.get('http://localhost:5000/api/userActivity');
+      const response = await axios.get(`${config.backend}/api/userActivity`);
       setUserActivity(response.data);
     };
 

@@ -7,7 +7,7 @@ import './ProjectListPage.css';
 import CreateNewProjectModal from '../../modals/CreateNewProjectModal/CreateNewProjectModal';
 import EditProjectModal from '../../modals/EditProjectModal/EditProjectModal';
 import axios from 'axios';
-
+import config from '../../config';
 
 interface ProjectData {
   PROJECTID: number;
@@ -46,7 +46,7 @@ const ProjectListPage = () => {
 
   const fetchProjects = () => {
     axios
-      .get('http://localhost:5000/api/projects')
+      .get(`${config.backend}/api/projects`)
       .then(response => {
         setProjects(response.data);
       })
@@ -64,7 +64,7 @@ const ProjectListPage = () => {
   // New fetch function for companies
   const fetchCompanies = () => {
     axios
-      .get('http://localhost:5000/api/companies')
+      .get(`${config.backend}/api/companies`)
       .then(response => {
         setCompanies(response.data);
       })

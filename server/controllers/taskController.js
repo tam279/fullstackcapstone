@@ -1,12 +1,6 @@
 // taskController.js . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\server\controllers\taskController.js
 const mysql = require('mysql2/promise');
-
-const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'pmsdatabase',
-});
+const db = require('../db/database');
 
 exports.getTasks = async (req, res) => {
     const sql = "SELECT * FROM TASK";

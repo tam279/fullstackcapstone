@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { Modal, Button, Form, Row, Col, FormControl } from 'react-bootstrap';
 import axios from 'axios';
-
+import config from '../../config';
 interface User {
   EMAIL: string;
   FIRSTNAME: string;
@@ -67,7 +67,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
   const fetchProject = async () => {
     try {
       console.log("fetchProject called with projectId:", projectId);
-      const response = await axios.get(`http://localhost:5000/api/project/${projectId}`);
+      const response = await axios.get(`${config.backend}/api/project/${projectId}`);
       const projectData = response.data;
       console.log("projectData:", projectData);
       setProject(projectData);
@@ -112,7 +112,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users');
+      const response = await axios.get(`${config.backend}/api/users`);
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -145,7 +145,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/deleteProject/${projectId}`);
+      await axios.delete(`${config.backend}/api/deleteProject/${projectId}`);
       handleClose();
       refetchProjects();
     } catch (error) {

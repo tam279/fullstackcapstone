@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Modal, Button, Form, InputGroup, FormControl, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
+import config from '../../config';
 
 interface TaskDetailModal {
     show: boolean;
@@ -41,10 +42,10 @@ const TaskDetailModal: FC<TaskDetailModal> = ({ show, handleClose, taskId }) => 
     useEffect(() => {
         const fetchTaskAndComments = async () => {
             try {
-                const taskResponse = await axios.get<Task>(`http://localhost:5000/api/tasks/${taskId}`);
+                const taskResponse = await axios.get<Task>(`${config.backend}/api/tasks/${taskId}`);
                 setTask(taskResponse.data);
 
-                const commentsResponse = await axios.get<Comment[]>(`http://localhost:5000/api/comments?taskId=${taskId}`);
+                const commentsResponse = await axios.get<Comment[]>(`${config.backend}/api/comments?taskId=${taskId}`);
                 setComments(commentsResponse.data);
             } catch (err) {
                 console.error(err);
@@ -58,7 +59,7 @@ const TaskDetailModal: FC<TaskDetailModal> = ({ show, handleClose, taskId }) => 
 
     const handleCommentSubmit = async () => {
         try {
-            const response = await axios.post<Comment>(`http://localhost:5000/api/comments`, {
+            const response = await axios.post<Comment>(`${config.backend}/api/comments`, {
                 comment: newComment,
                 taskId,
                 // Any other fields the API needs...
@@ -85,7 +86,7 @@ const TaskDetailModal: FC<TaskDetailModal> = ({ show, handleClose, taskId }) => 
                 newStatus = 'Not Started';
             }
 
-            const response = await axios.put<Task>(`http://localhost:5000/api/tasks/${taskId}`, {
+            const response = await axios.put<Task>(`${config.backend}/api/tasks/${taskId}`, {
                 ...task,
                 STATUS: newStatus,
             });

@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect, ChangeEvent } from 'react';
 import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
 import axios from 'axios';
-
+import config from '../../config';
 interface UserData {
   EMAIL: string;
   FIRSTNAME: string;
@@ -58,7 +58,7 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
 
   const fetchUsers = () => {
     axios
-      .get("http://localhost:5000/api/users")
+      .get(`${config.backend}/api/users`)
       .then((response) => {
         setUsers(response.data);
       })

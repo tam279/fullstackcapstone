@@ -6,7 +6,7 @@ import EditUserModal from '../../modals/EditUserModal/EditUserModal';
 import axios from 'axios';
 import NewCompanyModal from '../../modals/CreateNewCompanyModal/CreateNewCompanyModal';
 import EditCompanyModal from '../../modals/EditCompanyModal/EditCompanyModal';
-
+import config from '../../config';
 
 
 
@@ -97,7 +97,7 @@ const UserManagementPage = () => {
 
   const fetchUserData = () => {
     axios
-      .get('http://localhost:5000/api/users')
+      .get(`${config.backend}/api/users`)
       .then(response => {
         setUserData(response.data);
       })
@@ -115,7 +115,7 @@ const UserManagementPage = () => {
 
   const fetchCompanyData = () => {
     axios
-      .get('http://localhost:5000/api/companies')
+      .get(`${config.backend}/api/companies`)
       .then(response => {
         setCompanyData(response.data);
       })
@@ -126,7 +126,7 @@ const UserManagementPage = () => {
 
   const fetchRoleData = () => {
     axios
-      .get('http://localhost:5000/api/roles')
+      .get(`${config.backend}/api/roles`)
       .then(response => {
         setRoleData(response.data);
       })
@@ -162,7 +162,7 @@ const UserManagementPage = () => {
 
   const handleUpdateUser = (email: string, updatedUser: User) => {
     axios
-      .put(`http://localhost:5000/api/updateUser/${email}`, updatedUser)
+      .put(`${config.backend}/api/updateUser/${email}`, updatedUser)
       .then(response => {
         console.log(response.data);
         handleHideModal(); // to close the modal

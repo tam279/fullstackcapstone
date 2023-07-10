@@ -1,13 +1,7 @@
 // projectController.js
 
 const mysql = require('mysql2/promise');
-
-const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'pmsdatabase',
-});
+const db = require('../db/database');
 
 exports.getProjects = async (req, res) => {
     const sql = `

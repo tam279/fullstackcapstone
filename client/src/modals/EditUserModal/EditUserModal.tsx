@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
 import axios from 'axios';
+import config from '../../config';
 
 interface User {
   EMAIL: string;
@@ -145,7 +146,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     };
 
     try {
-      await axios.put(`http://localhost:5000/api/updateUser/${user.EMAIL}`, updatedUser);
+      await axios.put(`${config.backend}/api/updateUser/${user.EMAIL}`, updatedUser);
       fetchUsers();
       onHide();
     } catch (error) {
@@ -155,7 +156,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleActivate = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/activateUser/${user.EMAIL}`);
+      await axios.put(`${config.backend}/api/activateUser/${user.EMAIL}`);
       fetchUsers();
       onHide();
     } catch (error) {
@@ -165,7 +166,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleDeactivate = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/deactivateUser/${user.EMAIL}`);
+      await axios.put(`${config.backend}/api/deactivateUser/${user.EMAIL}`);
       fetchUsers();
       onHide();
     } catch (error) {
@@ -175,7 +176,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/deleteUser/${user.EMAIL}`);
+      await axios.delete(`${config.backend}/api/deleteUser/${user.EMAIL}`);
       fetchUsers();
       onHide();
     } catch (error) {

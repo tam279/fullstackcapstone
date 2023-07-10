@@ -1,5 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
+import config from '../../config';
 
 interface NewUserModalProps {
   show: boolean;
@@ -28,7 +29,7 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/companies')
+    fetch(`${config.backend}/api/companies`)
       .then(response => response.json())
       .then(data => setCompanies(data))
       .catch(error => console.error('Error:', error));
@@ -48,7 +49,7 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
       jobTitle: jobTitle,
     };
 
-    fetch('http://localhost:5000/api/createUser', {
+    fetch(`${config.backend}/api/createUser`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
