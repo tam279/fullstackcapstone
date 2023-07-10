@@ -36,7 +36,7 @@ const SidebarProject: React.FC = () => {
   };
 
   const handleProjectClick = () => {
-    navigate('/adminprojectpage');
+    navigate('/projectlistpage');
   };
 
   return (

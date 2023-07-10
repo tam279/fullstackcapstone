@@ -8,7 +8,7 @@ const ChangePasswordPage = () => {
   const navigate = useNavigate();  // create a navigate function
 
   const handleSkip = () => {
-    navigate('/adminprojectpage'); // navigate to AdminProjectPage when Skip is clicked
+    navigate('/projectlistpage'); // navigate to AdminProjectPage when Skip is clicked
   };
 
   const handleConfirm = () => {
@@ -40,10 +40,6 @@ const ChangePasswordPage = () => {
               <div className="mb-3">
                 <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                 <input type="password" className="form-control" id="confirmPassword" />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="profileIcon" className="form-label">Profile Icon</label>
-                <input type="file" className="form-control" id="profileIcon" onChange={handleUpload} />
               </div>
               <button type="button" className="btn btn-secondary mr-3" onClick={handleSkip}>Skip</button>
               <button type="button" className="btn btn-primary" onClick={handleConfirm}>Confirm</button>

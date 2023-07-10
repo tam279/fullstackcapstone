@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { Modal, Button, Form, InputGroup, FormControl, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-interface Task5Project1ModalProps {
+interface TaskDetailModal {
     show: boolean;
     handleClose: () => void;
     taskId: number;
@@ -33,7 +33,7 @@ interface Comment {
     EMAIL: string;
 }
 
-const Task5Project1Modal: FC<Task5Project1ModalProps> = ({ show, handleClose, taskId }) => {
+const TaskDetailModal: FC<TaskDetailModal> = ({ show, handleClose, taskId }) => {
     const [task, setTask] = useState<Task | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState<string>('');
@@ -145,7 +145,13 @@ const Task5Project1Modal: FC<Task5Project1ModalProps> = ({ show, handleClose, ta
                         <InputGroup>
                             <FormControl as="textarea" placeholder="Enter comment" value={newComment} onChange={e => setNewComment(e.target.value)} />
                         </InputGroup>
+                        <Form.Group>
+                            <Form.Label>Files</Form.Label>
+                            <Form.Control type="file" />
+                        </Form.Group>
+
                         <Button onClick={handleCommentSubmit}>Send</Button>
+
                     </Col>
                 </Row>
             </Modal.Body>
@@ -163,4 +169,4 @@ const Task5Project1Modal: FC<Task5Project1ModalProps> = ({ show, handleClose, ta
     );
 };
 
-export default Task5Project1Modal;
+export default TaskDetailModal;

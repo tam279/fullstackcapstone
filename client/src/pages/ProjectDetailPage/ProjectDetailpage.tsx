@@ -53,7 +53,7 @@ interface UserActivity {
 
 type TabKey = 'Tasks' | 'Grantt' | 'Details' | 'User activity';
 
-const Project1Page: React.FC = () => {
+const ProjectDetailPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
@@ -139,7 +139,7 @@ const Project1Page: React.FC = () => {
       <div className="content-container-project1">
         <div className="header">
           <div className="title">
-            <h1>Project 1</h1>
+            <h1>Project </h1>
           </div>
 
         </div>
@@ -280,4 +280,4 @@ const Project1Page: React.FC = () => {
 };
 
 
-export default Project1Page;
+export default ProjectDetailPage;

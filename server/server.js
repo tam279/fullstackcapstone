@@ -55,6 +55,9 @@ app.put('/api/updateUser/:email', userController.updateUser);
 app.delete('/api/deleteUser/:email', userController.deleteUser);
 app.put('/api/deactivateUser/:email', userController.deactivateUser);
 app.get('/api/loginMethods', userController.getLoginMethods);
+app.put('/api/activateUser/:email', userController.activateUser);
+app.put('/api/activateCompany/:id', userController.activateCompany);
+app.put('/api/deactivateCompany/:id', userController.deactivateCompany);
 
 app.get('/api/companies', userController.getCompanies);
 app.post('/api/createCompany', userController.createCompany);
@@ -71,6 +74,7 @@ app.put('/api/updateProject/:id', projectController.updateProject);
 app.delete('/api/deleteProject/:id', projectController.deleteProject);
 app.get('/api/project/:id', projectController.getProject);
 
+
 // Task routes
 app.get('/api/tasks', taskController.getTasks);
 app.post('/api/tasks', taskController.createTask);
@@ -82,6 +86,8 @@ app.get('/api/roles', userController.getRoles);
 // User activity routes
 app.get('/api/userActivity', userController.getUserActivity);
 app.post('/api/createUserActivity', userController.createUserActivity);
+app.get('/api/userActivity/:projectId', userController.getUserActivityByProjectId);
+
 
 // Comment routes
 app.get('/api/comments', commentController.getComments);

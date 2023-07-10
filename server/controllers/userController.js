@@ -21,6 +21,7 @@ exports.getUsers = async (req, res) => {
                 USER.LASTNAME, 
                 USER.TAG, 
                 COMPANY.COMPANYNAME, 
+                COMPANY.ISACTIVE AS COMPANY_STATUS,
                 ROLE.ROLENAME, 
                 LOGIN_METHOD.METHODNAME, 
                 USER.PHONE_NUMBER, 
@@ -50,6 +51,7 @@ exports.getUsers = async (req, res) => {
 };
 
 
+
 exports.getLoginMethods = async (req, res, next) => {
     try {
         const [loginMethods] = await db.query('SELECT * FROM LOGIN_METHOD');
@@ -61,7 +63,7 @@ exports.getLoginMethods = async (req, res, next) => {
 
 exports.getCompanies = async (req, res) => {
     try {
-        const query = 'SELECT * FROM COMPANY';
+        const query = 'SELECT COMPANYID, COMPANYNAME, ADDRESS, PHONE_NUMBER, WEBSITE, ISACTIVE FROM COMPANY';
 
         const [results] = await db.query(query);
 
@@ -71,6 +73,7 @@ exports.getCompanies = async (req, res) => {
         return res.status(500).send({ error: error.message });
     }
 };
+
 
 
 
@@ -184,6 +187,66 @@ exports.deactivateUser = async (req, res) => {
     }
 };
 
+exports.activateUser = async (req, res) => {
+    try {
+        const { email } = req.params;
+
+        const query = `
+            UPDATE USER
+            SET ISACTIVE = 1
+            WHERE EMAIL = ?
+        `;
+
+        await db.query(query, [email]);
+
+        console.log('User activated');
+        res.status(200).send({ message: 'User activated' });
+    } catch (error) {
+        console.log('Error: ', error);
+        return res.status(500).send({ error: error.message });
+    }
+};
+
+exports.activateCompany = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const query = `
+            UPDATE COMPANY
+            SET ISACTIVE = 1
+            WHERE COMPANYID = ?
+        `;
+
+        await db.query(query, [id]);
+
+        console.log('Company activated');
+        res.status(200).send({ message: 'Company activated' });
+    } catch (error) {
+        console.log('Error: ', error);
+        return res.status(500).send({ error: error.message });
+    }
+};
+
+exports.deactivateCompany = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const query = `
+            UPDATE COMPANY
+            SET ISACTIVE = 0
+            WHERE COMPANYID = ?
+        `;
+
+        await db.query(query, [id]);
+
+        console.log('Company deactivated');
+        res.status(200).send({ message: 'Company deactivated' });
+    } catch (error) {
+        console.log('Error: ', error);
+        return res.status(500).send({ error: error.message });
+    }
+};
+
 
 
 exports.getRoles = async (req, res) => {
@@ -206,8 +269,8 @@ exports.createCompany = async (req, res) => {
         const { companyName, address, phoneNumber, website } = req.body;
 
         const query = `
-            INSERT INTO COMPANY (COMPANYNAME, ADDRESS, PHONE_NUMBER, WEBSITE)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO COMPANY (COMPANYNAME, ADDRESS, PHONE_NUMBER, WEBSITE, ISACTIVE)
+            VALUES (?, ?, ?, ?, 1)
         `;
 
         await db.query(query, [companyName, address, phoneNumber, website]);
@@ -219,6 +282,7 @@ exports.createCompany = async (req, res) => {
         return res.status(500).send({ error: error.message });
     }
 };
+
 
 
 
@@ -273,3 +337,37 @@ exports.createUserActivity = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+exports.getUserActivityByProjectId = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const query = `
+            SELECT 
+                USER_ACTIVITY.EMAIL,
+                USER_ACTIVITY.DESCRIPTION,
+                USER_ACTIVITY.TIMESTAMP,
+                USER.FIRSTNAME,
+                USER.LASTNAME
+            FROM 
+                USER_ACTIVITY
+            INNER JOIN 
+                USER ON USER_ACTIVITY.EMAIL = USER.EMAIL
+            WHERE
+                USER_ACTIVITY.PROJECTID = ?
+            ORDER BY 
+                USER_ACTIVITY.TIMESTAMP DESC
+        `;
+
+        const [results] = await db.query(query, [projectId]);
+
+        if (results.length === 0) {
+            return res.status(404).send({ message: 'No user activities found for this project' });
+        }
+
+        res.status(200).send(results);
+    } catch (error) {
+        console.error('Error: ', error);
+        return res.status(500).send({ error: error.message });
+    }
+};
+

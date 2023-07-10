@@ -45,7 +45,8 @@ interface EditUserModalProps {
   user: User;
   updateUser: (email: string, updatedUser: User) => void;
   deleteUser: (email: string) => void;
-  deactivateUser: (email: string) => void;
+  deactivateUser: (email: string) => void; // Added deactivateUser prop
+  activateUser: (email: string) => void; // Added activateUser prop
   fetchUsers: () => void;
   companies: Company[];
   roles: Role[];
@@ -152,6 +153,15 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   };
 
+  const handleActivate = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/activateUser/${user.EMAIL}`);
+      fetchUsers();
+      onHide();
+    } catch (error) {
+      console.error('Error activating user', error);
+    }
+  };
 
   const handleDeactivate = async () => {
     try {
@@ -306,13 +316,18 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           <Button variant="danger" onClick={handleDelete}>
             Delete
           </Button>
+          <Button variant="warning" onClick={handleDeactivate}>
+            Deactivate
+          </Button>
+          <Button variant="success" onClick={handleActivate}>
+            Activate
+          </Button>
           <Button variant="secondary" onClick={onHide}>
             Cancel
           </Button>
           <Button variant="primary" type="submit">
             Update
           </Button>
-
         </Modal.Footer>
       </Form>
     </Modal>

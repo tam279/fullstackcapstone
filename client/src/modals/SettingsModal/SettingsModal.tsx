@@ -37,10 +37,6 @@ const SettingsModal: FC<SettingsModalProps> = ({ show, onHide }) => {
               <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
               <input type="password" className="form-control" id="confirmPassword" />
             </div>
-            <div className="mb-3 input-field">
-              <label htmlFor="profileIcon" className="form-label">Profile Icon</label>
-              <input type="file" className="form-control" id="profileIcon" onChange={handleUpload} />
-            </div>
           </form>
         </div>
       </Modal.Body>

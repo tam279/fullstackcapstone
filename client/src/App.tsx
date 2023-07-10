@@ -8,8 +8,8 @@ import ContactPage from './pages/ContactPage/ContactPage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ChangePasswordPage from './pages/ChangePasswordPage/ChangePasswordPage';
-import AdminProjectPage from './pages/ProjectListPage/ProjectListPage';
-import Project1 from './pages/ProjectDetailPage/ProjectDetailpage';
+import ProjectListPage from './pages/ProjectListPage/ProjectListPage';
+import ProjectDetailpage from './pages/ProjectDetailPage/ProjectDetailpage';
 import UserManagementPage from './pages/UserManagementPage/UserManagementPage';
 
 const App: React.FC = () => {
@@ -24,8 +24,8 @@ const App: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/ChangePasswordPage" element={<ChangePasswordPage />} />
           <Route path="/users" element={<UserManagementPage />} />
-          <Route path="/adminprojectpage" element={<AdminProjectPage />} />
-          <Route path="/project/Project-1" element={<Project1 />} />
+          <Route path="/projectlistpage" element={<ProjectListPage />} />
+          <Route path="/project/:id" element={<ProjectDetailpage />} />
         </Routes>
       </div>
     </Router>

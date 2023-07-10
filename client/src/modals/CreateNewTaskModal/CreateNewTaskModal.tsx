@@ -15,7 +15,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({ show, handleClose }) => {
       <Modal.Body>
         <Form>
           <Row>
-          <h2>Details</h2>
+            <h2>Details</h2>
             <Col>
 
               <Form.Group>
@@ -36,7 +36,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({ show, handleClose }) => {
                 </Form.Control>
               </Form.Group>
 
-             
+
 
               <Form.Group>
                 <Form.Label>Description</Form.Label>
@@ -45,7 +45,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({ show, handleClose }) => {
             </Col>
 
             <Col>
-            <Form.Group>
+              <Form.Group>
                 <Form.Label>Priority Level</Form.Label>
                 <Form.Control as="select">
                   <option>High</option>
@@ -73,12 +73,13 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({ show, handleClose }) => {
                 <Form.Label>Dependencies</Form.Label>
                 <Form.Control as="textarea" rows={3} placeholder="Task dependencies..." />
               </Form.Group>
-     
+
             </Col>
           </Row>
         </Form>
       </Modal.Body>
       <Modal.Footer>
+
         <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>

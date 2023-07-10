@@ -27,7 +27,7 @@ interface CompanyData {
 }
 
 
-const AdminProjectPage = () => {
+const ProjectListPage = () => {
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [companies, setCompanies] = useState<CompanyData[]>([]); // New state for companies
   const [show, setShow] = useState(false);
@@ -78,7 +78,7 @@ const AdminProjectPage = () => {
   };
 
   return (
-    <div className="AdminProjectPage">
+    <div className="ProjectListPage">
       <div className="sidebar-container">
         <SidebarProject />
       </div>
@@ -149,4 +149,4 @@ const AdminProjectPage = () => {
   );
 };
 
-export default AdminProjectPage;
+export default ProjectListPage;

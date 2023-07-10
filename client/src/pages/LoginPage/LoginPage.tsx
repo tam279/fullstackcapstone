@@ -49,12 +49,13 @@ const LoginPage = () => {
 
               <button type="submit" className="btn btn-primary">Log in</button>
             </form>
-            
+
             <div className="text-center mt-3">
               <p>Or log in with:</p>
               <button className="btn btn-secondary me-2">Microsoft</button>
               <button className="btn btn-secondary">Google</button>
             </div>
+            {/* Implement forgot your password */}
           </div>
         </div>
       </div>

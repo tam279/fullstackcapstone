@@ -33,7 +33,9 @@ interface Company {
   ADDRESS: string; // Add ADDRESS field
   PHONE_NUMBER: string; // Add PHONE_NUMBER field
   WEBSITE: string; // Add WEBSITE field
+  ISACTIVE: number; // Add ISACTIVE field
 }
+
 
 interface Role {
   ROLEID: number;
@@ -148,7 +150,17 @@ const UserManagementPage = () => {
       });
   };
 
-
+  const handleActivateUser = (email: string) => {
+    axios
+      .put(`http://localhost:5000/api/activateUser/${email}`)
+      .then(response => {
+        console.log(response.data);
+        fetchUserData(); // to refresh the user data
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
   const handleDeactivateUser = (email: string) => {
     axios
       .put(`http://localhost:5000/api/deactivateUser/${email}`)
@@ -198,6 +210,31 @@ const UserManagementPage = () => {
         console.error('Error:', error);
       });
   };
+
+  const handleActivateCompany = (companyId: number) => {
+    axios
+      .put(`http://localhost:5000/api/activateCompany/${companyId}`)
+      .then(response => {
+        console.log(response.data);
+        fetchCompanyData(); // to refresh the company data
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
+
+  const handleDeactivateCompany = (companyId: number) => {
+    axios
+      .put(`http://localhost:5000/api/deactivateCompany/${companyId}`)
+      .then(response => {
+        console.log(response.data);
+        fetchCompanyData(); // to refresh the company data
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
+
   return (
     <Container fluid>
       <Row>
@@ -267,11 +304,10 @@ const UserManagementPage = () => {
                     <th>Company ID</th>
                     <th>Company Name</th>
                     <th>Address</th>
-                    {/* Add Address column */}
                     <th>Phone Number</th>
-                    {/* Add Phone Number column */}
                     <th>Website</th>
-                    {/* Add Website column */}
+                    <th>Company status</th> {/* New column */}
+                    <th>Actions</th> {/* New column */}
                   </tr>
                 </thead>
                 <tbody>
@@ -283,11 +319,13 @@ const UserManagementPage = () => {
                       <td>{company.COMPANYID}</td>
                       <td>{company.COMPANYNAME}</td>
                       <td>{company.ADDRESS}</td>
-                      {/* Display Address */}
                       <td>{company.PHONE_NUMBER}</td>
-                      {/* Display Phone Number */}
                       <td>{company.WEBSITE}</td>
-                      {/* Display Website */}
+                      <td>{company.ISACTIVE === 1 ? 'Active' : company.ISACTIVE === 0 ? 'Inactive' : 'Unknown'}</td> {/* New column */}
+                      <td>
+                        <Button onClick={() => handleActivateCompany(company.COMPANYID)}>Activate</Button>
+                        <Button onClick={() => handleDeactivateCompany(company.COMPANYID)}>Deactivate</Button>
+                      </td> {/* New column */}
                     </tr>
                   ))}
                 </tbody>
@@ -309,6 +347,7 @@ const UserManagementPage = () => {
           companies={companyData}
           roles={roleData}
           loginMethods={loginMethodData}
+          activateUser={handleActivateUser}
         />
       )}
       {selectedCompany && (
