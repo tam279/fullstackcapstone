@@ -55,6 +55,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
   const [allTechnicians, setAllTechnicians] = useState<string[]>([]);
   const [allViewers, setAllViewers] = useState<string[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [description, setDescription] = useState<string>("");
 
 
   useEffect(() => {
@@ -96,10 +97,14 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       setCompanyID(projectData.COMPANYID);
       setStatus(projectData.STATUS);
       setIsActive(projectData.ISACTIVE.toString());
+
+      // Add this line to set the description state
+      setDescription(projectData.DESCRIPTION);
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
 
   // Add another useEffect to observe the change of managerName
   useEffect(() => {
@@ -120,21 +125,21 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
   };
 
 
-
   const handleUpdate = async () => {
     try {
       const PROGRESS = 0; // You might need to replace this with real progress data
-      const DESCRIPTION = ""; // You might need to replace this with real description data
-
-      await axios.put(`http://localhost:5000/api/updateProject/${projectId}`, {
+      await axios.put(`${config.backend}/api/updateProject/${projectId}`, {
         NAME: name,
         STARTDATE: startDate,
         ENDDATE: endDate,
         PROGRESS,
         STATUS: status,
-        DESCRIPTION,
+        DESCRIPTION: description,
         COMPANYID: companyID,
+        ISACTIVE: parseInt(isActive, 10), // Add this line to send ISACTIVE value
         MANAGEREMAIL: managerName, // managerName is considered as MANAGEREMAIL here.
+        TECHNICIANEMAILS: technicians, // add technicians' emails here
+        VIEWEREMAILS: viewers, // add viewers' emails here if needed
       });
       handleClose();
       refetchProjects();
@@ -142,6 +147,9 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       console.error("Error:", error);
     }
   };
+
+
+
 
   const handleDelete = async () => {
     try {
@@ -167,6 +175,26 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
     setState(Array.from(target.selectedOptions, (option) => option.value));
   };
 
+  const handleActivate = async () => {
+    try {
+      await axios.put(`${config.backend}/api/activateProject/${projectId}`);
+      handleClose();
+      refetchProjects();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const handleDeactivate = async () => {
+    try {
+      await axios.put(`${config.backend}/api/deactivateProject/${projectId}`);
+      handleClose();
+      refetchProjects();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -190,8 +218,9 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
                     {
                       users.filter(user => user.ROLENAME === 'Manager').map(manager =>
                         <option key={manager.EMAIL} value={manager.EMAIL}>
-                          {manager.EMAIL}
+                          {manager.FIRSTNAME} {manager.LASTNAME}
                         </option>
+
                       )
                     }
                   </Form.Control>
@@ -273,6 +302,11 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
                     <option value="0">Inactive</option>
                   </Form.Control>
                 </Form.Group>
+
+                <Form.Group>
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
+                </Form.Group>
               </Col>
             </Row>
           </Form>
@@ -289,6 +323,12 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
         </Button>
         <Button variant="danger" onClick={handleDelete}>
           Delete
+        </Button>
+        <Button variant="success" onClick={handleActivate}>
+          Activate
+        </Button>
+        <Button variant="warning" onClick={handleDeactivate}>
+          Deactivate
         </Button>
       </Modal.Footer>
     </Modal>

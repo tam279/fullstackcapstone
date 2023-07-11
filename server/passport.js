@@ -11,10 +11,10 @@ const db = mysql.createPool({
 });
 
 passport.use(new LocalStrategy(
-    async function (username, password, done) {
+    async function (email, password, done) {
         try {
             const query = 'SELECT * FROM USER WHERE EMAIL = ?';
-            const [results] = await db.query(query, [username]);
+            const [results] = await db.query(query, [email]);
 
             if (!results || results.length === 0) {
                 return done(null, false, { message: 'Incorrect username.' });

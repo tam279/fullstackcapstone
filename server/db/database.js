@@ -1,6 +1,6 @@
 // database.js . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\server\db\database.js
 
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const db = mysql.createPool({

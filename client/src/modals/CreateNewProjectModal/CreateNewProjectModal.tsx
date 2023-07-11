@@ -124,6 +124,7 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
 
 
 
+
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -226,13 +227,13 @@ const CreateNewProjectModal: React.FC<CreateNewProjectModalProps> = ({
                     <td>
                       <Form.Group>
                         <Form.Label>Start Date</Form.Label>
-                        <Form.Control type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                        <Form.Control type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                       </Form.Group>
                     </td>
                     <td>
                       <Form.Group>
                         <Form.Label>End Date</Form.Label>
-                        <Form.Control type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                        <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
                       </Form.Group>
                     </td>
                   </tr>

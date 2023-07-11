@@ -32,6 +32,10 @@ exports.createProject = async (req, res) => {
         COMPANYID
     } = req.body;
 
+    // Format STARTDATE and ENDDATE to MySQL Date format
+    const formattedStartDate = new Date(STARTDATE).toISOString().slice(0, 10);
+    const formattedEndDate = new Date(ENDDATE).toISOString().slice(0, 10);
+
     const sqlProject =
         "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, STATUS, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?)";
     const sqlProjectManagerBridge =
@@ -44,9 +48,9 @@ exports.createProject = async (req, res) => {
     try {
         const [projectResult] = await db.query(sqlProject, [
             NAME,
-            STARTDATE,
-            ENDDATE,
-            STATUS, // Add STATUS to the query
+            formattedStartDate,
+            formattedEndDate,
+            STATUS,
             DESCRIPTION,
             parseInt(COMPANYID)
         ]);
@@ -70,7 +74,6 @@ exports.createProject = async (req, res) => {
     }
 };
 
-
 exports.updateProject = async (req, res) => {
     const id = req.params.id;
     const {
@@ -85,6 +88,19 @@ exports.updateProject = async (req, res) => {
         TECHNICIANEMAILS,
         VIEWEREMAILS
     } = req.body;
+
+    // Format STARTDATE and ENDDATE to MySQL Date format
+    const formattedStartDate = new Date(STARTDATE).toISOString().slice(0, 10);
+    const formattedEndDate = new Date(ENDDATE).toISOString().slice(0, 10);
+
+
+    const checkEmailSql = "SELECT * FROM USER WHERE EMAIL = ?";
+    const [emailResult] = await db.query(checkEmailSql, [MANAGEREMAIL]);
+
+    if (emailResult.length === 0) {
+        return res.status(400).send({ message: 'MANAGEREMAIL not found in User table' });
+    }
+
 
     const sqlUpdateProject =
         "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, STATUS = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
@@ -101,8 +117,8 @@ exports.updateProject = async (req, res) => {
     try {
         await db.query(sqlUpdateProject, [
             NAME,
-            STARTDATE,
-            ENDDATE,
+            formattedStartDate,
+            formattedEndDate,
             PROGRESS,
             STATUS,
             DESCRIPTION,
@@ -195,6 +211,43 @@ exports.getProject = async (req, res) => {
         project.completed_tasks = tasks[0].COMPLETED_TASKS;
 
         res.status(200).json(project);
+    } catch (err) {
+        console.log("Error message: ", err.message);
+        res.status(500).send({ message: 'An error occurred', error: err.message });
+    }
+};
+
+
+exports.activateProject = async (req, res) => {
+    const id = req.params.id;
+    const sql = "UPDATE PROJECT SET ISACTIVE = '1' WHERE PROJECTID = ?";
+
+    try {
+        const [result] = await db.query(sql, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'No project found with the provided ID' });
+        }
+
+        res.status(200).send({ message: 'Project activated successfully' });
+    } catch (err) {
+        console.log("Error message: ", err.message);
+        res.status(500).send({ message: 'An error occurred', error: err.message });
+    }
+};
+
+exports.deactivateProject = async (req, res) => {
+    const id = req.params.id;
+    const sql = "UPDATE PROJECT SET ISACTIVE = '0' WHERE PROJECTID = ?";
+
+    try {
+        const [result] = await db.query(sql, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ message: 'No project found with the provided ID' });
+        }
+
+        res.status(200).send({ message: 'Project deactivated successfully' });
     } catch (err) {
         console.log("Error message: ", err.message);
         res.status(500).send({ message: 'An error occurred', error: err.message });
