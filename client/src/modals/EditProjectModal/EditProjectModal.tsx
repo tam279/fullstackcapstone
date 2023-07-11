@@ -233,7 +233,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
                     {
                       users.filter(user => user.ROLENAME === 'Technician').map(technician =>
                         <option key={technician.EMAIL} value={technician.EMAIL}>
-                          {technician.EMAIL}
+                         {technician.FIRSTNAME} {technician.LASTNAME}
                         </option>
                       )
                     }
@@ -246,7 +246,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
                     {
                       users.filter(user => user.ROLENAME === 'Viewer').map(viewer =>
                         <option key={viewer.EMAIL} value={viewer.EMAIL}>
-                          {viewer.EMAIL}
+                          {viewer.FIRSTNAME} {viewer.LASTNAME}
                         </option>
                       )
                     }
