@@ -53,9 +53,9 @@ interface Project {
   STATUS: string;
   ISACTIVE: number;
   COMPANYID: number;
-  manager: string[];
-  technicians: string[];
-  viewers: string[];
+  manager: any[];
+  technicians: any[];
+  viewers: any[];
   total_tasks: number;
   completed_tasks: number;
 }
@@ -218,7 +218,7 @@ const ProjectDetailPage: React.FC = () => {
                     <td><strong>Project:</strong></td>
                     <td>{project.NAME}</td>
                     <td><strong>Manager:</strong></td>
-                    <td>{project && project.manager.length > 0 && `${project.manager[0]}`}</td>
+                    <td>{project && project.manager.length > 0 && `${project.manager[0].NAME}`}</td>
                   </tr>
                   <tr>
                     <td><strong>Description:</strong></td>
@@ -232,9 +232,9 @@ const ProjectDetailPage: React.FC = () => {
                   </tr>
                   <tr>
                     <td><strong>Technicians:</strong></td>
-                    <td>{project && project.technicians.join(", ")}</td>
+                    <td>{project && project.technicians.map(tech => tech.NAME).join(", ")}</td>
                     <td><strong>Viewers:</strong></td>
-                    <td>{project && project.viewers.join(", ")}</td>
+                    <td>{project && project.viewers.map(tech => tech.NAME).join(", ")}</td>
                   </tr>
                   <tr>
                     <td><strong>Total Tasks:</strong></td>
