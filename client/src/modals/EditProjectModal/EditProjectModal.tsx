@@ -130,7 +130,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       const PROGRESS = 0; // You might need to replace this with real progress data
       const DESCRIPTION = ""; // You might need to replace this with real description data
 
-      await axios.put(`http://localhost:5000/api/updateProject/${projectId}`, {
+      await axios.put(`${config.backend}/api/updateProject/${projectId}`, {
         NAME: name,
         STARTDATE: startDate,
         ENDDATE: endDate,
