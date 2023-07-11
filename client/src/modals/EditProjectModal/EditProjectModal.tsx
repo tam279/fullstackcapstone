@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
 import { Modal, Button, Form, Row, Col, FormControl } from 'react-bootstrap';
 import axios from 'axios';
-import config from '../../config';
+import  config from '../../config';
 interface User {
   EMAIL: string;
   FIRSTNAME: string;
@@ -84,13 +84,13 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
       // Check if the data is an array and it's not empty before setting it
       if (Array.isArray(projectData.manager) && projectData.manager.length > 0) {
-        setManagerName(projectData.manager[0]);
+        setManagerName(projectData.manager[0].MANAGEREMAIL);
       }
       if (Array.isArray(projectData.technicians) && projectData.technicians.length > 0) {
-        setTechnicians(projectData.technicians);
+        setTechnicians(projectData.technicians.map((technician: any) => technician.TECHNICIANEMAIL));
       }
       if (Array.isArray(projectData.viewers) && projectData.viewers.length > 0) {
-        setViewers(projectData.viewers);
+        setViewers(projectData.viewers.map((viewer: any) => viewer.VIEWEREMAIL));
       }
 
       setCompanyID(projectData.COMPANYID);
@@ -126,7 +126,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       const PROGRESS = 0; // You might need to replace this with real progress data
       const DESCRIPTION = ""; // You might need to replace this with real description data
 
-      await axios.put(`http://localhost:5000/api/updateProject/${projectId}`, {
+      await axios.put(`${config.backend}/api/updateProject/${projectId}`, {
         NAME: name,
         STARTDATE: startDate,
         ENDDATE: endDate,
@@ -134,6 +134,8 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
         STATUS: status,
         DESCRIPTION,
         COMPANYID: companyID,
+        TECHNICIANEMAILS: technicians,
+        VIEWEREMAILS: viewers,
         MANAGEREMAIL: managerName, // managerName is considered as MANAGEREMAIL here.
       });
       handleClose();

@@ -169,22 +169,22 @@ exports.getProject = async (req, res) => {
         const project = result[0];
 
         // SQL to get manager of the project
-        sql = `SELECT u.FIRSTNAME, u.LASTNAME FROM USER u INNER JOIN PROJECT_MANAGER_BRIDGE pmb 
+        sql = `SELECT CONCAT(u.FIRSTNAME, ' ' ,u.LASTNAME) NAME, pmb.MANAGEREMAIL FROM USER u INNER JOIN PROJECT_MANAGER_BRIDGE pmb 
                 ON u.EMAIL = pmb.MANAGEREMAIL WHERE pmb.PROJECTID = ?`;
         const [manager] = await db.query(sql, [id]);
-        project.manager = manager.map(m => `${m.FIRSTNAME} ${m.LASTNAME}`);
+        project.manager = manager;
 
         // SQL to get technicians of the project
-        sql = `SELECT u.FIRSTNAME, u.LASTNAME FROM USER u INNER JOIN PROJECT_TECHNICIAN_BRIDGE ptb 
+        sql = `SELECT CONCAT(u.FIRSTNAME, ' ' ,u.LASTNAME) NAME, ptb.TECHNICIANEMAIL FROM USER u INNER JOIN PROJECT_TECHNICIAN_BRIDGE ptb 
                 ON u.EMAIL = ptb.TECHNICIANEMAIL WHERE ptb.PROJECTID = ?`;
         const [technicians] = await db.query(sql, [id]);
-        project.technicians = technicians.map(t => `${t.FIRSTNAME} ${t.LASTNAME}`);
+        project.technicians = technicians;
 
         // SQL to get viewers of the project
-        sql = `SELECT u.FIRSTNAME, u.LASTNAME FROM USER u INNER JOIN VIEWER_BRIDGE vb 
+        sql = `SELECT CONCAT(u.FIRSTNAME, ' ' ,u.LASTNAME) NAME ,vb.VIEWEREMAIL FROM USER u INNER JOIN VIEWER_BRIDGE vb 
                 ON u.EMAIL = vb.VIEWEREMAIL WHERE vb.PROJECTID = ?`;
         const [viewers] = await db.query(sql, [id]);
-        project.viewers = viewers.map(v => `${v.FIRSTNAME} ${v.LASTNAME}`);
+        project.viewers = viewers;
 
         // SQL to get total tasks and completed tasks
         sql = `SELECT COUNT(*) AS TOTAL_TASKS, 
