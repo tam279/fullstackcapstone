@@ -13,4 +13,4 @@ Content-Type: application/json
 
 ### Authed Request
 GET http://localhost:5000/api/authed
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MjRlMWNiMS01NjUzLTQwMWItYTM0ZC0zODgyNGI4ODVhNWQiLCJpYXQiOjE2ODkxMTI1OTR9.H790U2PJ430FqtJmrOZ4sMr326x-FuG9AcrK_q468mk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsImlhdCI6MTY4OTE4MTg3NX0.W-4HgPs7ms9MT5AHH3pQ9c-0HXS0oAcv82eDfkvtRkA

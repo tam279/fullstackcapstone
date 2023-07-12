@@ -118,7 +118,32 @@ app.post(
   }
 );
 
+app.get(
+  "/api/authed",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    // Check if user is defined
+    if (req.user?.email) {
+      // Handle the request and send the response
+      res.json({
+        message: "Protected resource accessed by user: " + req.user.email,
+      });
+    } else {
+      res.status(401).json({ message: "Unauthorized" });
+    }
+  }
+);
+
 //auth end
+//email service
+const { sendEmail } = require("./service/mail");
+
+app.get("/api/sendmail", (req, res) => {
+  sendEmail();
+  const message = "Email attempted.";
+  res.json({ message }); // Send the response as JSON
+});
+//email end
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");

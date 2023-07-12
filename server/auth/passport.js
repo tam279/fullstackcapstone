@@ -11,7 +11,11 @@ passport.use(
     { usernameField: "email" },
     async (email, password, done) => {
       try {
-        const user = { email: "test@email.com", password: "$2b$10$lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm" };
+        const user = {
+          email: "test@email.com",
+          password:
+            "$2b$10$lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm",
+        };
 
         if (!user) {
           return done(null, false);
@@ -26,7 +30,7 @@ passport.use(
 
           if (isMatch) {
             console.log("good password");
-            const token = jwt.sign({ sub: user.id }, "your-secret-key"); // Replace with your own secret key
+            const token = jwt.sign({ sub: user.email }, "your-secret-key"); // Replace with your own secret key
 
             const authenticatedUser = {
               user,
@@ -58,7 +62,11 @@ passport.use(
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
       console.log(payload.sub);
-      const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+      const user = {
+        email: "test@email.com",
+        password:
+          "$2b$10$lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm",
+      };
 
       if (!user) {
         console.log("no user found");
