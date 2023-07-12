@@ -28,6 +28,7 @@ interface Task {
   TECHNICIAN: string;
   TAG: string;
   FILTER: string;
+  TECHNICIAN_NAMES: string;
 }
 interface Manager {
   FIRSTNAME: string;
@@ -178,7 +179,7 @@ const ProjectDetailPage: React.FC = () => {
                 <tr>
                   <th>          <Button variant="primary" onClick={handleShow}>+ New Task</Button> </th>
                   <th>Priority</th>
-                  <th>Technician email</th>
+                  <th>Technician name</th>
                   <th>Duration</th>
                   <th>Tag</th>
 
@@ -186,25 +187,26 @@ const ProjectDetailPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {tasks.map((task) => (
-                  <tr key={task.TASKID} onClick={() => handleTask5Click(task)}>
-                    <td>
-                      <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
-                      {task.NAME}
-                    </td>
-                    <td>
-                      <Form.Control as="select">
-                        <option>{task.PRIORITY}</option>
-                        {/* Add more options here if needed */}
-                      </Form.Control>
-                    </td>
-                    <td>{task.TECHNICIAN}</td>
-                    <td>{task.DURATION} hours</td>
-                    <td>{task.TAG}</td>
-                    <td>{task.FILTER}</td>
-                  </tr>
-                ))}
-              </tbody>
+  {tasks.map((task) => (
+    <tr key={task.TASKID} onClick={() => handleTask5Click(task)}>
+      <td>
+        <Button variant="link" onClick={handleEditModalShow}><AiFillEdit size={20} /></Button>
+        {task.NAME}
+      </td>
+      <td>
+        <Form.Control as="select">
+          <option>{task.PRIORITY}</option>
+          {/* Add more options here if needed */}
+        </Form.Control>
+      </td>
+      <td>{task.TECHNICIAN_NAMES}</td> {/* display the technicians' names */}
+      <td>{task.DURATION} hours</td>
+      <td>{task.TAG}</td>
+      <td>{task.FILTER}</td>
+    </tr>
+  ))}
+</tbody>
+
             </Table>
           </Tab>
           <Tab eventKey="Grantt" title="Grantt">

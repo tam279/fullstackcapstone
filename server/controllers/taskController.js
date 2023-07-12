@@ -3,7 +3,13 @@ const mysql = require('mysql2/promise');
 const db = require('../db/database');
 
 exports.getTasks = async (req, res) => {
-    const sql = "SELECT * FROM TASK";
+    const sql = `
+        SELECT TASK.*, GROUP_CONCAT(USER.FIRSTNAME, ' ', USER.LASTNAME) AS TECHNICIAN_NAMES
+        FROM TASK
+        LEFT JOIN TASK_TECHNICIAN_BRIDGE ON TASK.TASKID = TASK_TECHNICIAN_BRIDGE.TASKID
+        LEFT JOIN USER ON TASK_TECHNICIAN_BRIDGE.EMAIL = USER.EMAIL
+        GROUP BY TASK.TASKID
+    `;
 
     try {
         const [result, fields] = await db.query(sql);
@@ -13,6 +19,7 @@ exports.getTasks = async (req, res) => {
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+
 
 exports.createTask = async (req, res) => {
     const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID } = req.body;
