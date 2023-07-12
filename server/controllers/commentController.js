@@ -15,7 +15,8 @@ exports.getComments = async (req, res) => {
 };
 
 exports.createComment = async (req, res) => {
-    const { COMMENT, DATE, TASKID, EMAIL } = req.body;
+    const { COMMENT, TASKID, EMAIL } = req.body;
+    const DATE = new Date(); // Set current date and time
     const sql = "INSERT INTO COMMENT (COMMENT, DATE, TASKID, EMAIL) VALUES (?, ?, ?, ?)";
 
     try {
@@ -26,6 +27,7 @@ exports.createComment = async (req, res) => {
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+
 
 exports.updateComment = async (req, res) => {
     const id = req.params.id;

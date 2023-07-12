@@ -93,11 +93,14 @@ const ProjectDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       const response = await axios.get(`${config.backend}/api/tasks`);
-      setTasks(response.data);
-    }
-
+      const filteredTasks = response.data.filter((task: Task) => task.PROJECTID === parseInt(projectId || '', 10));
+      setTasks(filteredTasks);
+    };
+  
     fetchTasks();
-  }, []);
+  }, [projectId]);
+  
+  
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -109,15 +112,18 @@ const ProjectDetailPage: React.FC = () => {
   }, [projectId]);
 
 
-
   useEffect(() => {
     const fetchUserActivity = async () => {
       const response = await axios.get(`${config.backend}/api/userActivity`);
-      setUserActivity(response.data);
+      const filteredActivity = response.data.filter((activity: UserActivity) => activity.PROJECTID === parseInt(projectId || '', 10));
+      setUserActivity(filteredActivity);
     };
-
+  
     fetchUserActivity();
-  }, []);
+  }, [projectId]);
+  
+
+  
   const data = [
     [
       { type: 'string', label: 'Task ID' },
