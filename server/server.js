@@ -107,6 +107,15 @@ app.post(
 );
 
 //auth end
+//email service
+const { sendEmail } = require('./service/mail');
+
+app.get("/api/sendmail", (req, res) => {
+  sendEmail();
+  const message = "Email attempted.";
+  res.json({ message }); // Send the response as JSON
+});
+//email end
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");
