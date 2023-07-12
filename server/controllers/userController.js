@@ -365,3 +365,32 @@ exports.getUserActivityByProjectId = async (req, res) => {
     }
 };
 
+
+
+
+
+
+
+// Ian need for User Login
+// exports.getUserByEmail = async (email) => {
+//     if (typeof email !== 'string' || email === '') {
+//         throw new Error('Invalid email parameter');
+//     }
+    
+//     const query = `
+//       SELECT *
+//       FROM USER
+//       WHERE EMAIL = ?;
+//     `;
+    
+//     const [results] = await db.query(query, [email]);
+    
+//     if (results.length === 0) {
+//       throw new Error('User not found');
+//     }
+    
+//     return results[0];
+// };
+
+  
+  

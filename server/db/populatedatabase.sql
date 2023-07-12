@@ -238,3 +238,11 @@ INSERT INTO USER_ACTIVITY (
     'Technician One updated Task 1 progress to 75%',
     1
 );
+
+
+UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'admin@companyone.com');
+UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'manager@companyone.com');
+UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'technician@companytwo.com');
+UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'viewer@companythree.com');
+
+

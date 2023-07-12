@@ -42,6 +42,18 @@ app.get("/", (req, res) => {
 app.get("/api/users", userController.getUsers);
 app.post("/api/createUser", userController.createUser);
 
+// This is 
+// app.get("/api/user/:email", async (req, res) => {
+//   try {
+//     const email = req.params.email;
+//     const user = await userController.getUserByEmail(email);
+//     res.status(200).json(user);
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
 app.put("/api/updateUser/:email", userController.updateUser);
 app.delete("/api/deleteUser/:email", userController.deleteUser);
 app.put("/api/deactivateUser/:email", userController.deactivateUser);
