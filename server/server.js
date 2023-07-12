@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 app.get("/api/users", userController.getUsers);
 app.post("/api/createUser", userController.createUser);
 
-// This is 
+// This is
 // app.get("/api/user/:email", async (req, res) => {
 //   try {
 //     const email = req.params.email;
@@ -144,6 +144,14 @@ app.get("/api/sendmail", (req, res) => {
   res.json({ message }); // Send the response as JSON
 });
 //email end
+
+//prisma test
+const { prisma, testdb } = require("./prisma/prisma");
+app.get("/prismatest", async (req, res) => {
+  testdb();
+  res.send(await prisma.pROJECT.findMany());
+});
+//end prisma
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");

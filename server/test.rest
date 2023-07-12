@@ -1,3 +1,6 @@
+### Prisma test
+GET http://localhost:5000/prismatest
+
 ### Email Request
 GET http://localhost:5000/api/sendmail HTTP/1.1
 
