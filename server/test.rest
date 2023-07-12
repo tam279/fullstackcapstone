@@ -1,0 +1,16 @@
+### Email Request
+GET http://localhost:5000/api/sendmail HTTP/1.1
+
+
+### Login Request
+POST http://localhost:5000/api/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "user1@example.com",
+  "password": "password"
+}
+
+### Authed Request
+GET http://localhost:5000/api/authed
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MjRlMWNiMS01NjUzLTQwMWItYTM0ZC0zODgyNGI4ODVhNWQiLCJpYXQiOjE2ODkxMTI1OTR9.H790U2PJ430FqtJmrOZ4sMr326x-FuG9AcrK_q468mk
