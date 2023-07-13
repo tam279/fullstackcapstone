@@ -8,6 +8,14 @@ interface LogoutModalProps {
 }
 
 const LogoutModal: FC<LogoutModalProps> = ({ show, onHide, logout }) => {
+  const handleLogout = () => {
+    // Call the logout function to perform the logout logic
+    logout();
+
+    // Remove the token from localStorage or any other secure storage
+    localStorage.removeItem('jwtToken');
+  };
+
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
@@ -18,7 +26,7 @@ const LogoutModal: FC<LogoutModalProps> = ({ show, onHide, logout }) => {
         <Button variant="secondary" onClick={onHide}>
           No
         </Button>
-        <Button variant="primary" onClick={logout}>
+        <Button variant="primary" onClick={handleLogout}>
           Yes
         </Button>
       </Modal.Footer>
