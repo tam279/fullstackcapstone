@@ -1,3 +1,6 @@
+### Prisma test
+GET http://localhost:5000/prismatest
+
 ### Email Request
 GET http://localhost:5000/api/sendmail HTTP/1.1
 
@@ -7,10 +10,10 @@ POST http://localhost:5000/api/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "user1@example.com",
+  "email": "manager@company1.com",
   "password": "password"
 }
 
 ### Authed Request
 GET http://localhost:5000/api/authed
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsImlhdCI6MTY4OTE4MTg3NX0.W-4HgPs7ms9MT5AHH3pQ9c-0HXS0oAcv82eDfkvtRkA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYW5hZ2VyQGNvbXBhbnkxLmNvbSIsImlhdCI6MTY4OTIyNDk5N30.W5GuZWhh3woOr87dUSk5VRz7Gy78Zt1R93OhRHC8tRE

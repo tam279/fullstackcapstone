@@ -44,7 +44,7 @@ app.post("/api/createUser", userController.createUser);
 app.get("/api/project/:projectId/technicians", userController.getProjectTechnicians);
 
 
-// This is 
+// This is
 // app.get("/api/user/:email", async (req, res) => {
 //   try {
 //     const email = req.params.email;
@@ -101,40 +101,30 @@ app.delete("/api/comments/:id", commentController.deleteComment);
 app.get("/api/tasks/:id", taskController.getTask);
 
 //auth
+//auth dependencies
+const auth = require("./auth/api-auth");
 const passport = require("./auth/passport");
-
 app.use(passport.initialize());
-
+//auth ddependencies end
+//passport authenticate skips next middleware if auth failed and sends unauthorized message to the client
+//auth endpoints
+//login endpoint that returns a jwt token and user object, it returns unauthorized message to client if auth failed
 app.post(
+  //endpoint link
   "/api/login",
+  //passport middleware
   passport.authenticate("local", { session: false }),
-  (req, res) => {
-    // Access the user and token properties from the authentication process
-    const { user, token } = req;
-    // Authentication successful
-    // Return the token and user data to the client
-    // Authentication successful
-    res.status(200).json({ message: "Login successful", token, user });
-  }
+  //hande business logic after authentication
+  auth.handleLogin
 );
-
+//jwt sample endpoint request but include bearer jwt token to pass auth utherwise it will return aunautorized to the client
 app.get(
   "/api/authed",
   passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    // Check if user is defined
-    if (req.user?.email) {
-      // Handle the request and send the response
-      res.json({
-        message: "Protected resource accessed by user: " + req.user.email,
-      });
-    } else {
-      res.status(401).json({ message: "Unauthorized" });
-    }
-  }
+  auth.handleJWT
 );
-
 //auth end
+
 //email service
 const { sendEmail } = require("./service/mail");
 
@@ -144,6 +134,22 @@ app.get("/api/sendmail", (req, res) => {
   res.json({ message }); // Send the response as JSON
 });
 //email end
+
+//prisma test
+const { prisma, testdb } = require("./prisma/prisma");
+app.get("/prismatest", async (req, res) => {
+  testdb();
+  res.send(
+    await prisma.uSER.findMany({
+      include: {
+        PROJECT_MANAGER_BRIDGE: true,
+        PROJECT_TECHNICIAN_BRIDGE: true,
+        VIEWER_BRIDGE: true,
+      },
+    })
+  );
+});
+//end prisma
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");

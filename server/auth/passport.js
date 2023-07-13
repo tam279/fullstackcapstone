@@ -4,6 +4,7 @@ const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { prisma } = require("./../prisma/prisma");
 
 // Configure Local Strategy
 passport.use(
@@ -11,47 +12,43 @@ passport.use(
     { usernameField: "email" },
     async (email, password, done) => {
       try {
-        const user = {
-          email: "test@email.com",
-          password:
-            "$2b$10$lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm",
-        };
-
+        // Query the user based on the provided email
+        const user = await prisma.uSER.findUnique({ where: { EMAIL: email } });
+        console.log(user);
         if (!user) {
+          // User not found, authentication failed
           return done(null, false);
         }
-
-        console.log(await bcrypt.hash(password, 10));
-
-        bcrypt.compare(password, user.password, (err, isMatch) => {
+        // Verify the password
+        bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
           if (err) {
+            // Handle error
             return console.error(err);
           }
 
           if (isMatch) {
-            console.log("good password");
-            const token = jwt.sign({ sub: user.email }, "your-secret-key"); // Replace with your own secret key
+            // Authentication successful, pass the user to the next middleware
+            // Generate JWT token
+            const token = jwt.sign({ sub: user.EMAIL }, "your-secret-key"); // Replace with your own secret key
 
-            const authenticatedUser = {
-              user,
-              token,
-            };
+            // Add the token to the user
+            user.token = token;
 
-            return done(null, authenticatedUser);
-            console.log("Password is correct");
+            // Pass the user to the next middleware
+            return done(null, user);
           } else {
-            console.log("bad password");
+            // Passwords do not match
+            // Invalid password, authentication failed
             return done(null, false);
-            console.log("Password is incorrect");
           }
         });
       } catch (error) {
+        // Handle any errors that occurred during authentication
         return done(error);
       }
     }
   )
 );
-
 // Configure JWT Strategy
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -62,20 +59,19 @@ passport.use(
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
       console.log(payload.sub);
-      const user = {
-        email: "test@email.com",
-        password:
-          "$2b$10$lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm",
-      };
+      // Query the user based on the payload information from the JWT token
+      const user = await prisma.uSER.findUnique({
+        where: { EMAIL: payload.sub },
+      });
 
       if (!user) {
-        console.log("no user found");
+        // User not found, authentication failed
         return done(null, false);
       }
-
-      console.log("user is authed");
+      // Pass the user to the next middleware
       return done(null, user);
     } catch (error) {
+      // Handle any errors that occurred during authentication
       return done(error);
     }
   })
