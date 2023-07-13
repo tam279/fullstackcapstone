@@ -123,10 +123,10 @@ app.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     // Check if user is defined
-    if (req.user?.email) {
+    if (req.user?.EMAIL) {
       // Handle the request and send the response
       res.json({
-        message: "Protected resource accessed by user: " + req.user.email,
+        message: "Protected resource accessed by user: " + req.user.EMAIL,
       });
     } else {
       res.status(401).json({ message: "Unauthorized" });
@@ -149,7 +149,13 @@ app.get("/api/sendmail", (req, res) => {
 const { prisma, testdb } = require("./prisma/prisma");
 app.get("/prismatest", async (req, res) => {
   testdb();
-  res.send(await prisma.pROJECT.findMany());
+  res.send(await prisma.uSER.findMany({
+    include: {
+      PROJECT_MANAGER_BRIDGE: true,
+      PROJECT_TECHNICIAN_BRIDGE: true,
+      VIEWER_BRIDGE: true,
+    },
+  }));
 });
 //end prisma
 
