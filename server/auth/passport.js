@@ -36,13 +36,10 @@ passport.use(
 
             // Pass the user to the next middleware
             return done(null, user);
-            console.log("Password is correct");
           } else {
             // Passwords do not match
-            console.log("bad password");
             // Invalid password, authentication failed
             return done(null, false);
-            console.log("Password is incorrect");
           }
         });
       } catch (error) {
@@ -68,11 +65,9 @@ passport.use(
       });
 
       if (!user) {
-        console.log("no user found");
         // User not found, authentication failed
         return done(null, false);
       }
-      console.log("user is authed");
       // Pass the user to the next middleware
       return done(null, user);
     } catch (error) {
