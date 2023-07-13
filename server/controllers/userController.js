@@ -366,7 +366,34 @@ exports.getUserActivityByProjectId = async (req, res) => {
 };
 
 
+exports.getProjectTechnicians = async (req, res) => {
+    try {
+        const projectId = req.params.projectId;
+        const query = `
+            SELECT 
+                USER.EMAIL, 
+                USER.FIRSTNAME, 
+                USER.LASTNAME
+            FROM 
+                USER
+            INNER JOIN 
+                PROJECT_TECHNICIAN_BRIDGE ON USER.EMAIL = PROJECT_TECHNICIAN_BRIDGE.TECHNICIANEMAIL
+            WHERE 
+                PROJECT_TECHNICIAN_BRIDGE.PROJECTID = ?
+        `;
 
+        const [results] = await db.query(query, [projectId]);
+
+        if (results.length === 0) {
+            return res.status(404).send({ message: 'No technicians found for this project' });
+        }
+
+        res.status(200).send(results);
+    } catch (error) {
+        console.error('Error: ', error);
+        return res.status(500).send({ error: error.message });
+    }
+};
 
 
 

@@ -253,3 +253,4 @@ exports.deactivateProject = async (req, res) => {
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+

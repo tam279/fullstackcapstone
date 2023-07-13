@@ -4,7 +4,7 @@ const db = require('../db/database');
 
 exports.getTasks = async (req, res) => {
     const sql = `
-        SELECT TASK.*, GROUP_CONCAT(USER.FIRSTNAME, ' ', USER.LASTNAME) AS TECHNICIAN_NAMES
+        SELECT TASK.*, TASK.PROJECTID, GROUP_CONCAT(USER.FIRSTNAME, ' ', USER.LASTNAME) AS TECHNICIAN_NAMES
         FROM TASK
         LEFT JOIN TASK_TECHNICIAN_BRIDGE ON TASK.TASKID = TASK_TECHNICIAN_BRIDGE.TASKID
         LEFT JOIN USER ON TASK_TECHNICIAN_BRIDGE.EMAIL = USER.EMAIL
@@ -21,18 +21,40 @@ exports.getTasks = async (req, res) => {
 };
 
 
+
 exports.createTask = async (req, res) => {
-    const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID } = req.body;
-    const sql = "INSERT INTO TASK (NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, TECHNICIAN_EMAIL } = req.body;
+
+    // Calculate the duration in milliseconds
+    const durationMs = new Date(ENDDATE) - new Date(STARTDATE);
+
+    // Convert duration to total minutes
+    const duration = Math.floor(durationMs / (1000 * 60));
+
+    const sql = "INSERT INTO TASK (NAME, STARTDATE, ENDDATE, DURATION, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const sqlBridge = "INSERT INTO TASK_TECHNICIAN_BRIDGE (EMAIL, TASKID) VALUES (?, ?)";
 
     try {
-        const [result, fields] = await db.query(sql, [NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID]);
+        const [result] = await db.query(sql, [NAME, STARTDATE, ENDDATE, duration, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID]);
+
+        // Get the ID of the last inserted task
+        const lastInsertedTaskId = result.insertId;
+
+        if (TECHNICIAN_EMAIL && TECHNICIAN_EMAIL.length > 0) {
+            for (let i = 0; i < TECHNICIAN_EMAIL.length; i++) {
+                // Create a bridge between the task and each technician
+                await db.query(sqlBridge, [TECHNICIAN_EMAIL[i], lastInsertedTaskId]);
+            }
+        }
+
         res.status(200).send({ message: 'Task created successfully' });
     } catch (err) {
         console.log(err);
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+
+
 
 exports.updateTask = async (req, res) => {
     const id = req.params.id;

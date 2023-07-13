@@ -130,12 +130,21 @@ const TaskDetailModal: FC<TaskDetailModal> = ({ show, handleClose, taskId }) => 
                                 <option>Low</option>
                             </Form.Control>
                         </Form.Group>
-                    </Col>
-                    <Col>
+                        <Form.Group controlId="exampleForm.ControlSelect1">
+                            <Form.Label>Current Status</Form.Label>
+                            <Form.Control as="select" defaultValue={task.STATUS} disabled>
+                                <option>Not Started</option>
+                                <option>On going</option>
+                                <option>Completed</option>
+                            </Form.Control>
+                        </Form.Group>
                         <Form.Group controlId="exampleForm.ControlTextarea1">
                             <Form.Label>Description</Form.Label>
                             <Form.Control as="textarea" rows={3} defaultValue={task.DESCRIPTION} disabled />
                         </Form.Group>
+                    </Col>
+                    <Col>
+                      
                         <h4>Comments:</h4>
                         {comments.map((comment: Comment, i: number) => (
                             <div key={i}>

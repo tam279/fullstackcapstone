@@ -239,11 +239,20 @@ INSERT INTO USER_ACTIVITY (
     1
 );
 
+-- Insert into TASK_TECHNICIAN_BRIDGE
+INSERT INTO TASK_TECHNICIAN_BRIDGE (
+    EMAIL,
+    TASKID
+) VALUES (
+    'tech@company1.com',
+    1
+),
+(
+    'tech@company1.com',
+    2
+);
 
-UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'admin@companyone.com');
-UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'manager@companyone.com');
-UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'technician@companytwo.com');
-UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'viewer@companythree.com');
-
-
-
+-- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'admin@companyone.com');
+-- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'manager@companyone.com');
+-- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'technician@companytwo.com');
+-- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'viewer@companythree.com');

@@ -41,6 +41,8 @@ app.get("/", (req, res) => {
 
 app.get("/api/users", userController.getUsers);
 app.post("/api/createUser", userController.createUser);
+app.get("/api/project/:projectId/technicians", userController.getProjectTechnicians);
+
 
 // This is 
 // app.get("/api/user/:email", async (req, res) => {
@@ -77,21 +79,19 @@ app.put("/api/updateProject/:id", projectController.updateProject);
 app.delete("/api/deleteProject/:id", projectController.deleteProject);
 app.get("/api/project/:id", projectController.getProject);
 
+
 // Task routes
 app.get("/api/tasks", taskController.getTasks);
-app.post("/api/tasks", taskController.createTask);
-app.put("/api/tasks/:id", taskController.updateTask);
-app.delete("/api/tasks/:id", taskController.deleteTask);
+app.post("/api/createTasks", taskController.createTask);
+app.put("/api/updateTasks/:id", taskController.updateTask);
+app.delete("/api/deleteTasks/:id", taskController.deleteTask);
 
 app.get("/api/roles", userController.getRoles);
 
 // User activity routes
 app.get("/api/userActivity", userController.getUserActivity);
 app.post("/api/createUserActivity", userController.createUserActivity);
-app.get(
-  "/api/userActivity/:projectId",
-  userController.getUserActivityByProjectId
-);
+app.get("/api/userActivity/:projectId", userController.getUserActivityByProjectId);
 
 // Comment routes
 app.get("/api/comments", commentController.getComments);
