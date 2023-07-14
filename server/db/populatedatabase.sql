@@ -23,6 +23,7 @@ INSERT INTO COMPANY (
     'www.company2.com'
 );
 
+-- Insert into ROLE
 INSERT INTO ROLE (
     ROLENAME
 ) VALUES (
@@ -35,13 +36,14 @@ INSERT INTO ROLE (
     'Viewer'
 );
 
+-- Insert into LOGIN_METHOD
 INSERT INTO LOGIN_METHOD (
     METHODNAME
 ) VALUES (
     'Google'
 ),
 (
-    'Mircosoft'
+    'Microsoft'
 ),
 (
     'Our custom password'
@@ -184,7 +186,7 @@ INSERT INTO TASK (
     PROJECTID,
     DURATION,
     TAG,
-    FILTER
+    DEPENDENCY
 ) VALUES (
     'Task 1',
     '2023-01-01 00:00:00',
@@ -197,7 +199,7 @@ INSERT INTO TASK (
     1,
     30,
     'Tag 1',
-    'Filter 1'
+    NULL
 ),
 (
     'Task 2',
@@ -211,7 +213,7 @@ INSERT INTO TASK (
     1,
     28,
     'Tag 2',
-    'Filter 2'
+    1 -- Assuming Task 2 depends on Task 1, provide the correct Task ID here
 );
 
 -- Insert into USER_ACTIVITY
@@ -225,14 +227,8 @@ INSERT INTO USER_ACTIVITY (
     '2023-07-01 10:00:00',
     'Manager One created Project 1',
     1
-);
-
-INSERT INTO USER_ACTIVITY (
-    EMAIL,
-    TIMESTAMP,
-    DESCRIPTION,
-    PROJECTID
-) VALUES (
+),
+(
     'tech@company1.com',
     '2023-07-02 14:30:00',
     'Technician One updated Task 1 progress to 75%',
@@ -250,6 +246,15 @@ INSERT INTO TASK_TECHNICIAN_BRIDGE (
 (
     'tech@company1.com',
     2
+);
+
+-- Task 2 depends on Task 1
+INSERT INTO DEPENDENCY_BRIDGE (
+    TASKID,
+    DEPENDSON_TASKID
+) VALUES (
+    2,
+    1
 );
 
 -- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'admin@companyone.com');

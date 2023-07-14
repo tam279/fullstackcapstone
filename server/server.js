@@ -85,6 +85,9 @@ app.get("/api/tasks", taskController.getTasks);
 app.post("/api/createTasks", taskController.createTask);
 app.put("/api/updateTasks/:id", taskController.updateTask);
 app.delete("/api/deleteTasks/:id", taskController.deleteTask);
+app.get("/api/tasks/:id", taskController.getTask);
+
+
 
 app.get("/api/roles", userController.getRoles);
 
@@ -98,7 +101,6 @@ app.get("/api/comments", commentController.getComments);
 app.post("/api/comments", commentController.createComment);
 app.put("/api/comments/:id", commentController.updateComment);
 app.delete("/api/comments/:id", commentController.deleteComment);
-app.get("/api/tasks/:id", taskController.getTask);
 
 //auth
 //auth dependencies

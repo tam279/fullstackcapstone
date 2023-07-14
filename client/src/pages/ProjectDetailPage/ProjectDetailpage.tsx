@@ -27,6 +27,7 @@ interface Task {
   TAG: string;
   FILTER: string;
   TECHNICIAN_NAMES: string;
+  DEPENDENCY_NAME: string;
 }
 interface Manager {
   FIRSTNAME: string;
@@ -77,8 +78,6 @@ const ProjectDetailPage: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const [editModalShow, setEditModalShow] = useState(false);
-  const handleEditModalClose = () => setEditModalShow(false);
-  const handleEditModalShow = () => setEditModalShow(true);
 
   const [status, setStatus] = useState("");
 
@@ -87,6 +86,7 @@ const ProjectDetailPage: React.FC = () => {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [editTaskId, setEditTaskId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -109,12 +109,6 @@ const ProjectDetailPage: React.FC = () => {
 
     // Fetch tasks initially
     fetchTasks();
-
-    // Fetch tasks periodically every 5 seconds (adjust the interval as needed)
-    const intervalId = setInterval(fetchTasks, 5000);
-
-    // Clean up the interval when the component is unmounted
-    return () => clearInterval(intervalId);
   }, [projectId]);
 
   useEffect(() => {
@@ -177,6 +171,11 @@ const ProjectDetailPage: React.FC = () => {
       return;
     originalWarn(...args);
   };
+  const handleEditModalClose = () => {
+    setEditModalShow(false);
+    setEditTaskId(null);
+  };
+  const handleEditModalShow = () => setEditModalShow(true);
 
   console.log("Tasks:", tasks);
   console.log("Project:", project);
@@ -206,44 +205,54 @@ const ProjectDetailPage: React.FC = () => {
               <thead>
                 <tr>
                   <th>
-                    {" "}
                     <Button variant="primary" onClick={handleShow}>
                       + New Task
-                    </Button>{" "}
+                    </Button>
                   </th>
+                  <th>Task ID</th> {/* Add this line */}
                   <th>Priority</th>
                   <th>Technician name</th>
                   <th>Duration</th>
                   <th>Status</th>
-                  {/* <th>Tag</th> */}
-
+                  <th>Dependency</th>
                   <th>
                     <button>Filter</button>
-                    {/* a reminder to add filter option here */}
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 {tasks.map((task) => (
                   <tr key={task.TASKID} onClick={() => handleTask5Click(task)}>
                     <td>
-                      <Button variant="link" onClick={handleEditModalShow}>
+                      <Button
+                        variant="link"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleEditModalShow();
+                          setEditTaskId(task.TASKID);
+                        }}
+                      >
                         <AiFillEdit size={20} />
                       </Button>
                       {task.NAME}
                     </td>
+                    <td>{task.TASKID}</td> {/* Add this line */}
                     <td>
                       <Form.Control as="select">
                         <option>{task.PRIORITY}</option>
-                        {/* Add more options here if needed */}
                       </Form.Control>
                     </td>
-                    <td>{task.TECHNICIAN_NAMES}</td>{" "}
-                    {/* display the technicians' names */}
+                    <td>{task.TECHNICIAN_NAMES}</td>
                     <td>{task.DURATION} hours</td>
                     <td>{task.STATUS}</td>
-                    {/* <td>{task.TAG}</td> */}
-                    {/* <td>{task.FILTER}</td> */}
+                    <td>
+                      {task.DEPENDENCY_NAME ? (
+                        <span>{task.DEPENDENCY_NAME}</span>
+                      ) : (
+                        <span>No Dependency</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -389,6 +398,7 @@ const ProjectDetailPage: React.FC = () => {
         <EditTaskModal
           show={editModalShow}
           handleClose={handleEditModalClose}
+          taskId={editTaskId ?? undefined}
         />
       </div>
     </div>

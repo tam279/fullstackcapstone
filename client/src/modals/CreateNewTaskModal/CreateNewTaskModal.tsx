@@ -62,6 +62,11 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
         ...formValues,
         technicians: selectedOptions,
       });
+    } else if (event.target.name === "dependencies") {
+      setFormValues({
+        ...formValues,
+        dependencies: event.target.value,
+      });
     } else if (event.target.name === "PRIORITY") {
       setFormValues({
         ...formValues,
@@ -101,8 +106,9 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
         TECHNICIAN_EMAIL: formValues.technicians,
         NAME: formValues.name,
         PRIORITY: formValues.PRIORITY,
-        TAG: formValues.tags, // Add this line
-        STATUS: formValues.status, // add this line
+        TAG: formValues.tags,
+        STATUS: formValues.status,
+        DEPENDENCY: formValues.dependencies, // Add this line
       };
 
       await axios.post(`${config.backend}/api/createTasks`, taskData);
@@ -208,23 +214,14 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
                   onChange={handleFormChange}
                 />
               </Form.Group>
-
-              {/* <Form.Group>
-                <Form.Label>Tags</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter tags"
-                  name="tags"
-                  onChange={handleFormChange}
-                />
-              </Form.Group> */}
-
               <Form.Group>
                 <Form.Label>Dependencies</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
-                  placeholder="Task dependencies..."
+                  placeholder="Task dependencies. Enter the task ID..."
+                  name="dependencies"
+                  onChange={handleFormChange}
                 />
               </Form.Group>
             </Col>
