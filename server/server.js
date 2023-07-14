@@ -39,6 +39,31 @@ app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });
 
+//auth
+//auth dependencies
+const auth = require("./auth/api-auth");
+const passport = require("./auth/passport");
+app.use(passport.initialize());
+//auth ddependencies end
+//passport authenticate skips all middleware after it if auth failed and sends unauthorized message to the client
+//auth endpoints
+//login endpoint that returns a jwt token and user object, it returns unauthorized message to client if auth failed
+app.post(
+  //endpoint link
+  "/api/login",
+  //passport middleware
+  passport.authenticate("local", { session: false }),
+  //hande business logic after authentication
+  auth.handleLogin
+);
+//jwt sample endpoint request,need include bearer jwt token to pass auth utherwise it will return aunautorized to the client
+app.get(
+  "/api/authed",
+  passport.authenticate("jwt", { session: false }),
+  auth.handleJWT
+);
+//auth end
+
 app.get("/api/users", userController.getUsers);
 app.post("/api/createUser", userController.createUser);
 app.get("/api/project/:projectId/technicians", userController.getProjectTechnicians);
@@ -72,13 +97,17 @@ app.put("/api/updateCompany/:id", userController.updateCompany);
 // Delete company
 app.delete("/api/deleteCompany/:id", userController.deleteCompany);
 
-// Project routes
-app.get("/api/projects", projectController.getProjects);
+// projects
+app.get(
+  "/api/projects",
+  passport.authenticate("jwt", { session: false }),
+  projectController.getProjects
+);
 app.post("/api/createProject", projectController.createProject);
 app.put("/api/updateProject/:id", projectController.updateProject);
 app.delete("/api/deleteProject/:id", projectController.deleteProject);
 app.get("/api/project/:id", projectController.getProject);
-
+//projects end
 
 // Task routes
 app.get("/api/tasks", taskController.getTasks);
@@ -101,31 +130,6 @@ app.get("/api/comments", commentController.getComments);
 app.post("/api/comments", commentController.createComment);
 app.put("/api/comments/:id", commentController.updateComment);
 app.delete("/api/comments/:id", commentController.deleteComment);
-
-//auth
-//auth dependencies
-const auth = require("./auth/api-auth");
-const passport = require("./auth/passport");
-app.use(passport.initialize());
-//auth ddependencies end
-//passport authenticate skips next middleware if auth failed and sends unauthorized message to the client
-//auth endpoints
-//login endpoint that returns a jwt token and user object, it returns unauthorized message to client if auth failed
-app.post(
-  //endpoint link
-  "/api/login",
-  //passport middleware
-  passport.authenticate("local", { session: false }),
-  //hande business logic after authentication
-  auth.handleLogin
-);
-//jwt sample endpoint request but include bearer jwt token to pass auth utherwise it will return aunautorized to the client
-app.get(
-  "/api/authed",
-  passport.authenticate("jwt", { session: false }),
-  auth.handleJWT
-);
-//auth end
 
 //email service
 const { sendEmail } = require("./service/mail");
@@ -151,6 +155,10 @@ app.get("/prismatest", async (req, res) => {
     })
   );
 });
+(async () => {
+  const result = await prisma.pROJECT.findMany();
+  // console.log(result);
+})();
 //end prisma
 
 app.use((req, res, next) => {
