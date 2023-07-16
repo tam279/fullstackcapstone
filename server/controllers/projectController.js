@@ -3,6 +3,11 @@
 const mysql = require('mysql2/promise');
 const db = require('../db/database');
 
+const ACTION_TYPES = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+};
 exports.getProjects = async (req, res) => {
     const sql = `
         SELECT PROJECT.*, CONCAT(USER.FIRSTNAME, ' ', USER.LASTNAME) AS MANAGERNAME
@@ -20,59 +25,64 @@ exports.getProjects = async (req, res) => {
 };
 
 exports.createProject = async (req, res) => {
-    const {
-        NAME,
-        STARTDATE,
-        ENDDATE,
-        STATUS,
-        MANAGEREMAIL,
-        TECHNICIANEMAILS,
-        VIEWEREMAILS,
-        DESCRIPTION,
-        COMPANYID
-    } = req.body;
+  const {
+    NAME,
+    STARTDATE,
+    ENDDATE,
+    STATUS,
+    MANAGEREMAIL,
+    TECHNICIANEMAILS,
+    VIEWEREMAILS,
+    DESCRIPTION,
+    COMPANYID
+  } = req.body;
 
-    // Format STARTDATE and ENDDATE to MySQL Date format
-    const formattedStartDate = new Date(STARTDATE).toISOString().slice(0, 10);
-    const formattedEndDate = new Date(ENDDATE).toISOString().slice(0, 10);
+  // Format STARTDATE and ENDDATE to MySQL Date format
+  const formattedStartDate = new Date(STARTDATE).toISOString().slice(0, 10);
+  const formattedEndDate = new Date(ENDDATE).toISOString().slice(0, 10);
 
-    const sqlProject =
-        "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, STATUS, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?)";
-    const sqlProjectManagerBridge =
-        "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
-    const sqlProjectTechnicianBridge =
-        "INSERT INTO PROJECT_TECHNICIAN_BRIDGE (PROJECTID, TECHNICIANEMAIL) VALUES (?, ?)";
-    const sqlProjectViewerBridge =
-        "INSERT INTO VIEWER_BRIDGE (PROJECTID, VIEWEREMAIL) VALUES (?, ?)";
+  const sqlProject =
+    "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, STATUS, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?)";
+  const sqlProjectManagerBridge =
+    "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
+  const sqlProjectTechnicianBridge =
+    "INSERT INTO PROJECT_TECHNICIAN_BRIDGE (PROJECTID, TECHNICIANEMAIL) VALUES (?, ?)";
+  const sqlProjectViewerBridge =
+    "INSERT INTO VIEWER_BRIDGE (PROJECTID, VIEWEREMAIL) VALUES (?, ?)";
 
-    try {
-        const [projectResult] = await db.query(sqlProject, [
-            NAME,
-            formattedStartDate,
-            formattedEndDate,
-            STATUS,
-            DESCRIPTION,
-            parseInt(COMPANYID)
-        ]);
+  try {
+    const [projectResult] = await db.query(sqlProject, [
+      NAME,
+      formattedStartDate,
+      formattedEndDate,
+      STATUS,
+      DESCRIPTION,
+      parseInt(COMPANYID)
+    ]);
 
-        const projectId = projectResult.insertId;
+    const projectId = projectResult.insertId;
 
-        await db.query(sqlProjectManagerBridge, [projectId, MANAGEREMAIL]);
+    await db.query(sqlProjectManagerBridge, [projectId, MANAGEREMAIL]);
 
-        for (let technicianEmail of TECHNICIANEMAILS) {
-            await db.query(sqlProjectTechnicianBridge, [projectId, technicianEmail]);
-        }
-
-        for (let viewerEmail of VIEWEREMAILS) {
-            await db.query(sqlProjectViewerBridge, [projectId, viewerEmail]);
-        }
-
-        res.status(200).send({ message: "Project created successfully" });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: "An error occurred", error: err.message });
+    for (let technicianEmail of TECHNICIANEMAILS) {
+      await db.query(sqlProjectTechnicianBridge, [projectId, technicianEmail]);
     }
+
+    for (let viewerEmail of VIEWEREMAILS) {
+      await db.query(sqlProjectViewerBridge, [projectId, viewerEmail]);
+    }
+
+    res.status(200).send({ message: "Project created successfully" });
+    const activitySql =
+      "INSERT INTO USER_ACTIVITY (USER_EMAIL, ACTION_TYPE, TARGET_TYPE, TARGET_ID, TIMESTAMP) VALUES (?, ?, ?, ?, NOW())";
+    await db.query(activitySql, [req.user?.email, ACTION_TYPES.CREATE, 'PROJECT', projectId]);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "An error occurred", error: err.message });
+  }
 };
+
+
 
 exports.updateProject = async (req, res) => {
     const id = req.params.id;

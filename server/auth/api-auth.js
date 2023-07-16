@@ -3,9 +3,9 @@
 const handleLogin = (req, res) => {
   // Authentication successful
   // Access the user and token properties from the authentication process
-  const {user} = req;
+  const { user } = req;
   // Access token
-  const {token} = user;
+  const { token } = user;
   // Remove the token property from the user object
   const { token: _, ...userData } = user;
   // Return the token and user data to the client
@@ -19,7 +19,7 @@ const handleLogin = (req, res) => {
 const handleJWT = (req, res) => {
   // User is authenticated, proceed to the next middleware or route handler
   res.json({
-    message: "Protected resource accessed by user: " + req.user.EMAIL,
+    message: "Protected resource accessed by user: " + req.user.email,
     user: req.user,
   });
 };
@@ -28,3 +28,4 @@ module.exports = {
   handleLogin,
   handleJWT,
 };
+

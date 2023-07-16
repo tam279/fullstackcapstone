@@ -1,7 +1,8 @@
-import React, { ChangeEvent, FC, FormEvent, useEffect, useState } from 'react';
-import { Modal, Button, Form, Row, Col, FormControl } from 'react-bootstrap';
-import axios from 'axios';
-import  config from '../../config';
+import React, { ChangeEvent, FC, FormEvent, useEffect, useState } from "react";
+import { Modal, Button, Form, Row, Col, FormControl } from "react-bootstrap";
+
+import axios from "axios";
+import config from "../../config";
 interface User {
   EMAIL: string;
   FIRSTNAME: string;
@@ -40,7 +41,13 @@ interface EditProjectModalProps {
   companies: CompanyData[];
 }
 
-const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projectId, refetchProjects, companies }) => {
+const EditProjectModal: FC<EditProjectModalProps> = ({
+  show,
+  handleClose,
+  projectId,
+  refetchProjects,
+  companies,
+}) => {
   const [project, setProject] = useState<ProjectData | null>(null);
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -57,18 +64,16 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
   const [users, setUsers] = useState<User[]>([]);
   const [description, setDescription] = useState<string>("");
 
-
   useEffect(() => {
     fetchProject();
   }, [projectId]);
 
-
-
-
   const fetchProject = async () => {
     try {
       console.log("fetchProject called with projectId:", projectId);
-      const response = await axios.get(`${config.backend}/api/project/${projectId}`);
+      const response = await axios.get(
+        `${config.backend}/api/project/${projectId}`
+      );
       const projectData = response.data;
       console.log("projectData:", projectData);
       setProject(projectData);
@@ -76,22 +81,45 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
       // Ensure date is in the format 'YYYY-MM-DD'
       const startDate = new Date(projectData.STARTDATE);
-      setStartDate(`${startDate.getFullYear()}-${("0" + (startDate.getMonth() + 1)).slice(-2)}-${("0" + startDate.getDate()).slice(-2)}`);
+      setStartDate(
+        `${startDate.getFullYear()}-${("0" + (startDate.getMonth() + 1)).slice(
+          -2
+        )}-${("0" + startDate.getDate()).slice(-2)}`
+      );
       console.log("startDate:", startDate);
 
       // Same for endDate
       const endDate = new Date(projectData.ENDDATE);
-      setEndDate(`${endDate.getFullYear()}-${("0" + (endDate.getMonth() + 1)).slice(-2)}-${("0" + endDate.getDate()).slice(-2)}`);
+      setEndDate(
+        `${endDate.getFullYear()}-${("0" + (endDate.getMonth() + 1)).slice(
+          -2
+        )}-${("0" + endDate.getDate()).slice(-2)}`
+      );
 
       // Check if the data is an array and it's not empty before setting it
-      if (Array.isArray(projectData.manager) && projectData.manager.length > 0) {
+      if (
+        Array.isArray(projectData.manager) &&
+        projectData.manager.length > 0
+      ) {
         setManagerName(projectData.manager[0].MANAGEREMAIL);
       }
-      if (Array.isArray(projectData.technicians) && projectData.technicians.length > 0) {
-        setTechnicians(projectData.technicians.map((technician: any) => technician.TECHNICIANEMAIL));
+      if (
+        Array.isArray(projectData.technicians) &&
+        projectData.technicians.length > 0
+      ) {
+        setTechnicians(
+          projectData.technicians.map(
+            (technician: any) => technician.TECHNICIANEMAIL
+          )
+        );
       }
-      if (Array.isArray(projectData.viewers) && projectData.viewers.length > 0) {
-        setViewers(projectData.viewers.map((viewer: any) => viewer.VIEWEREMAIL));
+      if (
+        Array.isArray(projectData.viewers) &&
+        projectData.viewers.length > 0
+      ) {
+        setViewers(
+          projectData.viewers.map((viewer: any) => viewer.VIEWEREMAIL)
+        );
       }
 
       setCompanyID(projectData.COMPANYID);
@@ -104,7 +132,6 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       console.error("Error:", error);
     }
   };
-
 
   // Add another useEffect to observe the change of managerName
   useEffect(() => {
@@ -120,10 +147,9 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
       const response = await axios.get(`${config.backend}/api/users`);
       setUsers(response.data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     }
   };
-
 
   const handleUpdate = async () => {
     try {
@@ -149,9 +175,6 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
     }
   };
 
-
-
-
   const handleDelete = async () => {
     try {
       await axios.delete(`${config.backend}/api/deleteProject/${projectId}`);
@@ -162,19 +185,19 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
     }
   };
 
-
   const handleSelectChange = (e: React.FormEvent<HTMLSelectElement>) => {
     const target = e.target as HTMLSelectElement;
-    setTechnicians(Array.from(target.selectedOptions, option => option.value));
-  }
-
-
-  const handleMultipleSelectChange = (setState: React.Dispatch<React.SetStateAction<string[]>>) => (
-    e: ChangeEvent<unknown>
-  ) => {
-    const target = e.target as HTMLSelectElement;
-    setState(Array.from(target.selectedOptions, (option) => option.value));
+    setTechnicians(
+      Array.from(target.selectedOptions, (option) => option.value)
+    );
   };
+
+  const handleMultipleSelectChange =
+    (setState: React.Dispatch<React.SetStateAction<string[]>>) =>
+    (e: ChangeEvent<unknown>) => {
+      const target = e.target as HTMLSelectElement;
+      setState(Array.from(target.selectedOptions, (option) => option.value));
+    };
 
   const handleActivate = async () => {
     try {
@@ -196,7 +219,6 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
     }
   };
 
-
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -209,56 +231,77 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
               <Col>
                 <Form.Group>
                   <Form.Label>Name</Form.Label>
-                  <Form.Control type="text" placeholder="Enter project name" value={name} onChange={(e) => setName(e.target.value)} />
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter project name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </Form.Group>
 
                 <Form.Group>
                   <Form.Label>Manager Name</Form.Label>
-                  <Form.Control as="select" value={managerName} onChange={(e) => setManagerName(e.target.value)}>
+                  <Form.Control
+                    as="select"
+                    value={managerName}
+                    onChange={(e) => setManagerName(e.target.value)}
+                  >
                     <option>Select a Manager</option>
-                    {
-                      users.filter(user => user.ROLENAME === 'Manager').map(manager =>
+                    {users
+                      .filter((user) => user.ROLENAME === "Manager")
+                      .map((manager) => (
                         <option key={manager.EMAIL} value={manager.EMAIL}>
                           {manager.FIRSTNAME} {manager.LASTNAME}
                         </option>
-
-                      )
-                    }
+                      ))}
                   </Form.Control>
                 </Form.Group>
 
                 <Form.Group>
                   <Form.Label>Technician Name</Form.Label>
-                  <Form.Control as="select" multiple value={technicians} onChange={handleMultipleSelectChange(setTechnicians)}>
-                    {
-                      users.filter(user => user.ROLENAME === 'Technician').map(technician =>
+                  <Form.Control
+                    as="select"
+                    multiple
+                    value={technicians}
+                    onChange={handleMultipleSelectChange(setTechnicians)}
+                  >
+                    {users
+                      .filter((user) => user.ROLENAME === "Technician")
+                      .map((technician) => (
                         <option key={technician.EMAIL} value={technician.EMAIL}>
-                         {technician.FIRSTNAME} {technician.LASTNAME}
+                          {technician.FIRSTNAME} {technician.LASTNAME}
                         </option>
-                      )
-                    }
+                      ))}
                   </Form.Control>
                 </Form.Group>
 
                 <Form.Group>
                   <Form.Label>Viewer Name</Form.Label>
-                  <Form.Control as="select" multiple value={viewers} onChange={handleMultipleSelectChange(setViewers)}>
-                    {
-                      users.filter(user => user.ROLENAME === 'Viewer').map(viewer =>
+                  <Form.Control
+                    as="select"
+                    multiple
+                    value={viewers}
+                    onChange={handleMultipleSelectChange(setViewers)}
+                  >
+                    {users
+                      .filter((user) => user.ROLENAME === "Viewer")
+                      .map((viewer) => (
                         <option key={viewer.EMAIL} value={viewer.EMAIL}>
                           {viewer.FIRSTNAME} {viewer.LASTNAME}
                         </option>
-                      )
-                    }
+                      ))}
                   </Form.Control>
                 </Form.Group>
-
               </Col>
 
               <Col>
                 <Form.Group>
                   <Form.Label>Company</Form.Label>
-                  <Form.Control as="select" value={companyID} onChange={(e) => setCompanyID(Number(e.target.value))}>
+                  <Form.Control
+                    as="select"
+                    value={companyID}
+                    onChange={(e) => setCompanyID(Number(e.target.value))}
+                  >
                     <option value="">Select a Company</option>
                     {companies.map((company) => (
                       <option
@@ -280,15 +323,22 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
                   />
                 </Form.Group>
 
-
                 <Form.Group>
                   <Form.Label>End Date</Form.Label>
-                  <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                  <Form.Control
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
                 </Form.Group>
 
                 <Form.Group>
                   <Form.Label>Status</Form.Label>
-                  <Form.Control as="select" value={status} onChange={(e) => setStatus(e.target.value as string)}>
+                  <Form.Control
+                    as="select"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as string)}
+                  >
                     <option value="">Select Status</option>
                     <option value="Not Started">Not Started</option>
                     <option value="In Progress">In Progress</option>
@@ -298,15 +348,29 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
 
                 <Form.Group>
                   <Form.Label>Is Active</Form.Label>
-                  <Form.Control as="select" value={isActive} onChange={(e) => setIsActive(e.target.value as string)}>
+                  <Form.Control
+                    as="select"
+                    value={isActive}
+                    onChange={(e) => setIsActive(e.target.value as string)}
+                  >
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
                   </Form.Control>
+                  <Button variant="success" onClick={handleActivate}>
+                    Activate
+                  </Button>
+                  <Button variant="warning" onClick={handleDeactivate}>
+                    Deactivate
+                  </Button>
                 </Form.Group>
 
                 <Form.Group>
                   <Form.Label>Description</Form.Label>
-                  <Form.Control type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
+                  <Form.Control
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                 </Form.Group>
               </Col>
             </Row>
@@ -316,21 +380,21 @@ const EditProjectModal: FC<EditProjectModalProps> = ({ show, handleClose, projec
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleUpdate}>
-          Update
-        </Button>
-        <Button variant="danger" onClick={handleDelete}>
-          Delete
-        </Button>
-        <Button variant="success" onClick={handleActivate}>
-          Activate
-        </Button>
-        <Button variant="warning" onClick={handleDeactivate}>
-          Deactivate
-        </Button>
+        <Row className="w-100">
+          <Col xs={4}>
+            <Button variant="danger" onClick={handleDelete}>
+              Delete
+            </Button>
+          </Col>
+          <Col xs={8} className="d-flex justify-content-end">
+            <Button variant="primary" onClick={handleUpdate}>
+              Update
+            </Button>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+          </Col>
+        </Row>
       </Modal.Footer>
     </Modal>
   );

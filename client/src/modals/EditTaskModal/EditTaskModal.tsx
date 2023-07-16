@@ -212,195 +212,164 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
       <Modal.Body>
         {task && (
           <Form onSubmit={handleFormSubmit}>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Name
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  type="text"
-                  name="NAME"
-                  value={formValues.NAME}
-                  onChange={handleFormChange}
-                  required
-                />
+            <Row>
+              {/* Left Column */}
+              <Col xs={12} md={6}>
+                <Form.Group>
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="NAME"
+                    value={formValues.NAME}
+                    onChange={handleFormChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Technicians</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="TECHNICIANS"
+                    value={formValues.TECHNICIANS}
+                    onChange={handleFormChange}
+                    multiple
+                  >
+                    {users.map((user) => (
+                      <option key={user.EMAIL} value={user.EMAIL}>
+                        {`${user.FIRSTNAME} ${user.LASTNAME}`}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Status</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="STATUS"
+                    value={formValues.STATUS}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Delayed">Delayed</option>
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Tag</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="TAG"
+                    value={formValues.TAG}
+                    onChange={handleFormChange}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Dependencies</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="DEPENDENCY"
+                    value={formValues.DEPENDENCY}
+                    onChange={handleFormChange}
+                  />
+                </Form.Group>
               </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Start Date
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  type="datetime-local"
-                  name="STARTDATE"
-                  value={formValues.STARTDATE}
-                  onChange={handleFormChange}
-                  required
-                />
+
+              {/* Right Column */}
+              <Col xs={12} md={6}>
+                <Row>
+                  <Col>
+        
+                    <Form.Group>
+                      <Form.Label>Start Date</Form.Label>
+                      <Form.Control
+                        type="datetime-local"
+                        name="STARTDATE"
+                        value={formValues.STARTDATE}
+                        onChange={handleFormChange}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group>
+                      <Form.Label>End Date</Form.Label>
+                      <Form.Control
+                        type="datetime-local"
+                        name="ENDDATE"
+                        value={formValues.ENDDATE}
+                        onChange={handleFormChange}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Form.Group>
+                  <Form.Label>Priority</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="PRIORITY"
+                    value={formValues.PRIORITY}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="">Select Priority</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Active</Form.Label>
+                  <Form.Check
+                    type="checkbox"
+                    name="ISACTIVE"
+                    checked={formValues.ISACTIVE}
+                    onChange={handleFormChange}
+                  />
+                  {!formValues.ISACTIVE ? (
+                    <Button variant="success" onClick={handleActivateTask}>
+                      Activate Task
+                    </Button>
+                  ) : (
+                    <Button variant="warning" onClick={handleDeactivateTask}>
+                      Deactivate Task
+                    </Button>
+                  )}
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    name="DESCRIPTION"
+                    value={formValues.DESCRIPTION}
+                    onChange={handleFormChange}
+                  />
+                </Form.Group>
               </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Technicians
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  as="select"
-                  name="TECHNICIANS"
-                  value={formValues.TECHNICIANS}
-                  onChange={handleFormChange}
-                  multiple
-                >
-                  {users.map((user) => (
-                    <option key={user.EMAIL} value={user.EMAIL}>
-                      {`${user.FIRSTNAME} ${user.LASTNAME}`}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Description
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="DESCRIPTION"
-                  value={formValues.DESCRIPTION}
-                  onChange={handleFormChange}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Priority
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  as="select"
-                  name="PRIORITY"
-                  value={formValues.PRIORITY}
-                  onChange={handleFormChange}
-                  required
-                >
-                  <option value="">Select Priority</option>
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
-                </Form.Control>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                End Date
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  type="datetime-local"
-                  name="ENDDATE"
-                  value={formValues.ENDDATE}
-                  onChange={handleFormChange}
-                  required
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Tag
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  type="text"
-                  name="TAG"
-                  value={formValues.TAG}
-                  onChange={handleFormChange}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Filter
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  type="text"
-                  name="FILTER"
-                  value={formValues.FILTER}
-                  onChange={handleFormChange}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Status
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  as="select"
-                  name="STATUS"
-                  value={formValues.STATUS}
-                  onChange={handleFormChange}
-                  required
-                >
-                  <option value="">Select Status</option>
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Delayed">Delayed</option>
-                </Form.Control>
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Dependencies
-              </Form.Label>
-              <Col sm="10">
-                <Form.Control
-                  type="text"
-                  name="DEPENDENCY"
-                  value={formValues.DEPENDENCY}
-                  onChange={handleFormChange}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">
-                Active
-              </Form.Label>
-              <Col sm="10">
-                <Form.Check
-                  type="checkbox"
-                  name="ISACTIVE"
-                  checked={formValues.ISACTIVE}
-                  onChange={handleFormChange}
-                />
-              </Col>
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Update Task
-            </Button>{" "}
-            <Button variant="danger" onClick={handleDeleteTask}>
-              Delete Task
-            </Button>{" "}
-            {!formValues.ISACTIVE ? (
-              <Button variant="success" onClick={handleActivateTask}>
-                Activate Task
-              </Button>
-            ) : (
-              <Button variant="warning" onClick={handleDeactivateTask}>
-                Deactivate Task
-              </Button>
-            )}
+            </Row>
           </Form>
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
+        <Row className="w-100">
+          <Col xs={12} className="d-flex justify-content-start">
+            <Button variant="danger" onClick={handleDeleteTask}>
+              Delete Task
+            </Button>
+          </Col>
+          <Col xs={12} className="d-flex justify-content-end">
+            <Button variant="primary" type="submit">
+              Update Task
+            </Button>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+          </Col>
+        </Row>
       </Modal.Footer>
     </Modal>
   );

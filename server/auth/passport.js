@@ -20,7 +20,6 @@ passport.use(
           return done(null, false);
         }
 
-
         console.log(bcrypt.hashSync(password, 10));
         // Verify the password
         bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
@@ -52,6 +51,7 @@ passport.use(
     }
   )
 );
+
 // Configure JWT Strategy
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
