@@ -26,7 +26,7 @@ interface FormValues {
   TAG: string;
   FILTER: string;
   STATUS: string;
-  DEPENDENCIES: string;
+  DEPENDENCY: any;
   ISACTIVE: boolean;
 }
 
@@ -48,7 +48,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     TAG: "",
     FILTER: "",
     STATUS: "",
-    DEPENDENCIES: "",
+    DEPENDENCY: "",
     ISACTIVE: false,
   });
 
@@ -90,7 +90,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
           TAG: taskData.TAG,
           FILTER: taskData.FILTER,
           STATUS: taskData.STATUS,
-          DEPENDENCIES: taskData.DEPENDENCIES || "", // Set the current dependency value
+          DEPENDENCY: taskData.DEPENDENCY || "", // Set the current dependency value
           ISACTIVE: taskData.ISACTIVE || false, // initialize ISACTIVE if it's not provided by API
         });
         setTask(res.data);
@@ -137,7 +137,8 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
       // create a copy of formValues
       const updatedFormValues: FormValues = {
         ...formValues,
-        TECHNICIAN_EMAIL: formValues.TECHNICIANS, // Add TECHNICIAN_EMAIL property
+        TECHNICIAN_EMAIL: formValues.TECHNICIANS,
+        DEPENDENCY: formValues.DEPENDENCY,
       };
       delete (updatedFormValues as any).TECHNICIANS;
 
@@ -359,8 +360,8 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
               <Col sm="10">
                 <Form.Control
                   type="text"
-                  name="DEPENDENCIES"
-                  value={formValues.DEPENDENCIES}
+                  name="DEPENDENCY"
+                  value={formValues.DEPENDENCY}
                   onChange={handleFormChange}
                 />
               </Col>

@@ -88,6 +88,23 @@ const ProjectDetailPage: React.FC = () => {
   const handleShow = () => setShow(true);
   const [editTaskId, setEditTaskId] = useState<number | null>(null);
 
+  const [updatedTask, setUpdatedTask] = useState<Task | null>(null);
+
+  const updateTask = async (task: Task) => {
+    try {
+      const response = await axios.put(
+        `${config.backend}/api/tasks/${task.TASKID}`,
+        task
+      );
+      if (response.status === 200) {
+        setUpdatedTask(task);
+      } else {
+        console.error("Update task failed:", response);
+      }
+    } catch (err) {
+      console.error("Error updating task:", err);
+    }
+  };
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -95,9 +112,14 @@ const ProjectDetailPage: React.FC = () => {
         console.log("Tasks Response:", response.data);
 
         if (projectId) {
-          const filteredTasks = response.data.filter(
+          let filteredTasks = response.data.filter(
             (task: Task) => task.PROJECTID === Number(projectId)
           );
+          if (updatedTask) {
+            filteredTasks = filteredTasks.map((task: { TASKID: number }) =>
+              task.TASKID === updatedTask.TASKID ? updatedTask : task
+            );
+          }
           setTasks(filteredTasks);
         } else {
           setTasks(response.data);
@@ -109,7 +131,7 @@ const ProjectDetailPage: React.FC = () => {
 
     // Fetch tasks initially
     fetchTasks();
-  }, [projectId]);
+  }, [projectId, updatedTask]);
 
   useEffect(() => {
     const fetchProject = async () => {

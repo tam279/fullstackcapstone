@@ -66,20 +66,36 @@ exports.updateTask = async (req, res) => {
     const id = req.params.id;
     const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, TECHNICIAN_EMAIL, DEPENDENCY } = req.body;
     
-    const sqlTask = "UPDATE TASK SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, DESCRIPTION = ?, STATUS = ?, PRIORITY = ?, PROJECTID = ?, DEPENDENCY = ? WHERE TASKID = ?";
+    let sqlTask = "UPDATE TASK SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, DESCRIPTION = ?, STATUS = ?, PRIORITY = ?, PROJECTID = ?, DEPENDENCY = ? WHERE TASKID = ?";
     const sqlDeleteBridge = "DELETE FROM TASK_TECHNICIAN_BRIDGE WHERE TASKID = ?";
     const sqlInsertBridge = "INSERT INTO TASK_TECHNICIAN_BRIDGE (EMAIL, TASKID) VALUES (?, ?)";
     
     try {
-        const [resultTask] = await db.query(sqlTask, [NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, DEPENDENCY, id]);
+        const updateValues = [NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, DEPENDENCY, id];
         
-        // Delete existing technicians for the task
-        const [resultDeleteBridge] = await db.query(sqlDeleteBridge, [id]);
+        // Remove undefined values from updateValues array before executing the query
+        for (let i = 0; i < updateValues.length; i++) {
+            if (updateValues[i] === undefined) {
+                // Remove the item at the ith index of updateValues
+                updateValues.splice(i, 1);
+                // Also remove the corresponding placeholder from sqlTask
+                let placeholders = sqlTask.split(',');
+                placeholders.splice(i, 1);
+                sqlTask = placeholders.join(',');
+            }
+        }
+        
+        const [resultTask] = await db.query(sqlTask, updateValues);
+        
+        if (TECHNICIAN_EMAIL) {
+            // Delete existing technicians for the task
+            const [resultDeleteBridge] = await db.query(sqlDeleteBridge, [id]);
 
-        if (TECHNICIAN_EMAIL && TECHNICIAN_EMAIL.length > 0) {
-            for (let i = 0; i < TECHNICIAN_EMAIL.length; i++) {
-                // Add new technicians for the task
-                const [resultInsertBridge] = await db.query(sqlInsertBridge, [TECHNICIAN_EMAIL[i], id]);
+            if (TECHNICIAN_EMAIL.length > 0) {
+                for (let i = 0; i < TECHNICIAN_EMAIL.length; i++) {
+                    // Add new technicians for the task
+                    const [resultInsertBridge] = await db.query(sqlInsertBridge, [TECHNICIAN_EMAIL[i], id]);
+                }
             }
         }
         
@@ -89,6 +105,7 @@ exports.updateTask = async (req, res) => {
         res.status(500).send({ message: 'An error occurred', error: err.message });
     }
 };
+
 
 
 exports.deleteTask = async (req, res) => {
