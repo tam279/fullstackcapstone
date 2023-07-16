@@ -213,7 +213,7 @@ INSERT INTO TASK (
     1,
     28,
     'Tag 2',
-    1 -- Assuming Task 2 depends on Task 1, provide the correct Task ID here
+    'Task 1'
 );
 
 -- Insert into USER_ACTIVITY
@@ -248,16 +248,34 @@ INSERT INTO TASK_TECHNICIAN_BRIDGE (
     2
 );
 
--- Task 2 depends on Task 1
-INSERT INTO DEPENDENCY_BRIDGE (
-    TASKID,
-    DEPENDSON_TASKID
-) VALUES (
-    2,
-    1
-);
+UPDATE `PMSDATABASE`.`USER`
+SET
+    `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm'
+WHERE
+    (
+        `EMAIL` = 'admin@companyone.com'
+    );
 
--- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'admin@companyone.com');
--- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'manager@companyone.com');
--- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'technician@companytwo.com');
--- UPDATE `pmsdatabase`.`user` SET `PASSWORD` = 'lpB6FxNA2Lm33TVyI5pEuuQVMulZjyyrN4Yx8Mm9ySrAD374GdOtm' WHERE (`EMAIL` = 'viewer@companythree.com');
+UPDATE `PMSDATABASE`.`USER`
+SET
+    `PASSWORD` = '$2b$10$vCESa/Qy08n16btWwTt6kOQwd3TUOYlAue3M0grCOkkxQ.4m8EMbO'
+WHERE
+    (
+        `EMAIL` = 'manager@company1.com'
+    );
+
+UPDATE `PMSDATABASE`.`USER`
+SET
+    `PASSWORD` = '$2b$10$vCESa/Qy08n16btWwTt6kOQwd3TUOYlAue3M0grCOkkxQ.4m8EMbO'
+WHERE
+    (
+        `EMAIL` = 'tech@company1.com'
+    );
+
+UPDATE `PMSDATABASE`.`USER`
+SET
+    `PASSWORD` = '$2b$10$vCESa/Qy08n16btWwTt6kOQwd3TUOYlAue3M0grCOkkxQ.4m8EMbO'
+WHERE
+    (
+        `EMAIL` = 'viewer@company1.com'
+    );

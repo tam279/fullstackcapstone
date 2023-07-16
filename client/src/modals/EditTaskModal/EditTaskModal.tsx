@@ -15,6 +15,21 @@ interface User {
   LASTNAME: string;
 }
 
+interface FormValues {
+  NAME: string;
+  STARTDATE: string;
+  TECHNICIANS: string[];
+  TECHNICIAN_EMAIL: string[]; // Add TECHNICIAN_EMAIL property
+  DESCRIPTION: string;
+  PRIORITY: string;
+  ENDDATE: string;
+  TAG: string;
+  FILTER: string;
+  STATUS: string;
+  DEPENDENCIES: string;
+  ISACTIVE: boolean;
+}
+
 const EditTaskModal: FC<EditTaskModalProps> = ({
   show,
   handleClose,
@@ -26,7 +41,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
   const [formValues, setFormValues] = useState({
     NAME: "",
     STARTDATE: "",
-    TECHNICIANS: [],
+    TECHNICIANS: [] as string[], // Update the type of TECHNICIANS to string[]
     DESCRIPTION: "",
     PRIORITY: "",
     ENDDATE: "",
@@ -34,6 +49,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     FILTER: "",
     STATUS: "",
     DEPENDENCIES: "",
+    ISACTIVE: false,
   });
 
   useEffect(() => {
@@ -75,6 +91,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
           FILTER: taskData.FILTER,
           STATUS: taskData.STATUS,
           DEPENDENCIES: taskData.DEPENDENCIES || "", // Set the current dependency value
+          ISACTIVE: taskData.ISACTIVE || false, // initialize ISACTIVE if it's not provided by API
         });
         setTask(res.data);
         const fetchUsers = async () => {
@@ -104,23 +121,85 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = event.target;
+    const { name, value, type } = event.target;
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
-      [name]: value,
+      [name]:
+        type === "checkbox"
+          ? (event.target as HTMLInputElement).checked
+          : value,
     }));
   };
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
+      // create a copy of formValues
+      const updatedFormValues: FormValues = {
+        ...formValues,
+        TECHNICIAN_EMAIL: formValues.TECHNICIANS, // Add TECHNICIAN_EMAIL property
+      };
+      delete (updatedFormValues as any).TECHNICIANS;
+
+      updatedFormValues.TECHNICIAN_EMAIL = updatedFormValues.TECHNICIANS;
+      delete (updatedFormValues as any).TECHNICIANS;
+
+      // Calculate the progress based on the formula (EndDate - today) / (EndDate - StartDate)
+      const endDate = new Date(updatedFormValues.ENDDATE);
+      const startDate = new Date(updatedFormValues.STARTDATE);
+      const today = new Date();
+      const totalDuration = endDate.getTime() - startDate.getTime();
+      const remainingDuration = endDate.getTime() - today.getTime();
+      const progress = (remainingDuration / totalDuration) * 100;
+
+      // Set the progress value in updatedFormValues
+      (updatedFormValues as any).PROGRESS = progress.toFixed(2);
+
       await axios.put(
         `${config.backend}/api/updateTasks/${taskId}`,
-        formValues
+        updatedFormValues
       );
       handleClose();
     } catch (error) {
       console.error("Error updating task:", error);
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    try {
+      const response = await axios.delete(
+        `${config.backend}/api/tasks/${taskId}`
+      );
+      if (response.status === 200) {
+        handleClose(); // Close the modal
+        // Optional: add code here to refresh the list of tasks in the parent component
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleActivateTask = async () => {
+    try {
+      await axios.put(`${config.backend}/api/tasks/${taskId}/activate`);
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        ISACTIVE: true,
+      }));
+    } catch (error) {
+      console.error("Error activating task:", error);
+    }
+  };
+
+  const handleDeactivateTask = async () => {
+    try {
+      await axios.put(`${config.backend}/api/tasks/${taskId}/deactivate`);
+      setFormValues((prevFormValues) => ({
+        ...prevFormValues,
+        ISACTIVE: false,
+      }));
+    } catch (error) {
+      console.error("Error deactivating task:", error);
     }
   };
 
@@ -132,123 +211,194 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
       <Modal.Body>
         {task && (
           <Form onSubmit={handleFormSubmit}>
-            <Row>
-              <h2>Details</h2>
-              <Col>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Name
+              </Form.Label>
+              <Col sm="10">
                 <Form.Control
                   type="text"
                   name="NAME"
-                  placeholder="Enter task name"
                   value={formValues.NAME}
                   onChange={handleFormChange}
+                  required
                 />
-
-                <Form.Group>
-                  <Form.Label>Start Date</Form.Label>
-                  <Form.Control
-                    type="datetime-local"
-                    name="STARTDATE"
-                    value={formValues.STARTDATE}
-                    onChange={handleFormChange}
-                  />
-                </Form.Group>
-
-                <Form.Group>
-                  <Form.Label>Technician</Form.Label>
-                  <Form.Control
-                    as="select"
-                    multiple
-                    name="TECHNICIANS"
-                    value={formValues.TECHNICIANS}
-                    onChange={handleFormChange}
-                  >
-                    {users.map((user, index) => (
-                      <option key={index} value={user.EMAIL}>
-                        {user.FIRSTNAME + " " + user.LASTNAME}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-
-                <Form.Group>
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="DESCRIPTION"
-                    placeholder="Task description..."
-                    value={formValues.DESCRIPTION}
-                    onChange={handleFormChange}
-                  />
-                </Form.Group>
               </Col>
-
-              <Col>
-                <Form.Group>
-                  <Form.Label>Priority Level</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={formValues.PRIORITY}
-                    onChange={handleFormChange}
-                    name="PRIORITY"
-                  >
-                    <option value="">Select Priority Level</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </Form.Control>
-                </Form.Group>
-
-                <Form.Group>
-                  <Form.Label>Status</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={formValues.STATUS}
-                    onChange={handleFormChange}
-                    name="STATUS"
-                  >
-                    <option value="">Select Status</option>
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                  </Form.Control>
-                </Form.Group>
-
-                <Form.Group>
-                  <Form.Label>End Date</Form.Label>
-                  <Form.Control
-                    type="datetime-local"
-                    name="ENDDATE"
-                    value={formValues.ENDDATE}
-                    onChange={handleFormChange}
-                  />
-                </Form.Group>
-
-          
-                {task && task.DEPENDENCY_NAME && (
-                  <Form.Group>
-                    <Form.Label>Current Dependency</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={task.DEPENDENCY_NAME}
-                      disabled
-                    />
-                  </Form.Group>
-                )}
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Start Date
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  type="datetime-local"
+                  name="STARTDATE"
+                  value={formValues.STARTDATE}
+                  onChange={handleFormChange}
+                  required
+                />
               </Col>
-            </Row>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Technicians
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  as="select"
+                  name="TECHNICIANS"
+                  value={formValues.TECHNICIANS}
+                  onChange={handleFormChange}
+                  multiple
+                >
+                  {users.map((user) => (
+                    <option key={user.EMAIL} value={user.EMAIL}>
+                      {`${user.FIRSTNAME} ${user.LASTNAME}`}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Description
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  name="DESCRIPTION"
+                  value={formValues.DESCRIPTION}
+                  onChange={handleFormChange}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Priority
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  as="select"
+                  name="PRIORITY"
+                  value={formValues.PRIORITY}
+                  onChange={handleFormChange}
+                  required
+                >
+                  <option value="">Select Priority</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </Form.Control>
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                End Date
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  type="datetime-local"
+                  name="ENDDATE"
+                  value={formValues.ENDDATE}
+                  onChange={handleFormChange}
+                  required
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Tag
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  type="text"
+                  name="TAG"
+                  value={formValues.TAG}
+                  onChange={handleFormChange}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Filter
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  type="text"
+                  name="FILTER"
+                  value={formValues.FILTER}
+                  onChange={handleFormChange}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Status
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  as="select"
+                  name="STATUS"
+                  value={formValues.STATUS}
+                  onChange={handleFormChange}
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Delayed">Delayed</option>
+                </Form.Control>
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Dependencies
+              </Form.Label>
+              <Col sm="10">
+                <Form.Control
+                  type="text"
+                  name="DEPENDENCIES"
+                  value={formValues.DEPENDENCIES}
+                  onChange={handleFormChange}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">
+                Active
+              </Form.Label>
+              <Col sm="10">
+                <Form.Check
+                  type="checkbox"
+                  name="ISACTIVE"
+                  checked={formValues.ISACTIVE}
+                  onChange={handleFormChange}
+                />
+              </Col>
+            </Form.Group>
+            <Button variant="primary" type="submit">
+              Update Task
+            </Button>{" "}
+            <Button variant="danger" onClick={handleDeleteTask}>
+              Delete Task
+            </Button>{" "}
+            {!formValues.ISACTIVE ? (
+              <Button variant="success" onClick={handleActivateTask}>
+                Activate Task
+              </Button>
+            ) : (
+              <Button variant="warning" onClick={handleDeactivateTask}>
+                Deactivate Task
+              </Button>
+            )}
           </Form>
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="danger" onClick={handleClose}>
-          Delete
-        </Button>
         <Button variant="secondary" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleFormSubmit}>
-          Update
+          Close
         </Button>
       </Modal.Footer>
     </Modal>

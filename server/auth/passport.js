@@ -13,12 +13,15 @@ passport.use(
     async (email, password, done) => {
       try {
         // Query the user based on the provided email
-        const user = await prisma.uSER.findUnique({ where: { EMAIL: email } });
+        const user = await prisma.user.findUnique({ where: { EMAIL: email } });
         console.log(user);
         if (!user) {
           // User not found, authentication failed
           return done(null, false);
         }
+
+
+        console.log(bcrypt.hashSync(password, 10));
         // Verify the password
         bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
           if (err) {
@@ -60,7 +63,7 @@ passport.use(
     try {
       console.log(payload.sub);
       // Query the user based on the payload information from the JWT token
-      const user = await prisma.uSER.findUnique({
+      const user = await prisma.user.findUnique({
         where: { EMAIL: payload.sub },
       });
 

@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import config from "../../config";
 
 interface Task {
+  DEPENDENCY: any;
   TASKID: number;
   NAME: string;
   STARTDATE: string;
@@ -27,7 +28,6 @@ interface Task {
   TAG: string;
   FILTER: string;
   TECHNICIAN_NAMES: string;
-  DEPENDENCY_NAME: string;
 }
 interface Manager {
   FIRSTNAME: string;
@@ -247,8 +247,8 @@ const ProjectDetailPage: React.FC = () => {
                     <td>{task.DURATION} hours</td>
                     <td>{task.STATUS}</td>
                     <td>
-                      {task.DEPENDENCY_NAME ? (
-                        <span>{task.DEPENDENCY_NAME}</span>
+                      {task.DEPENDENCY ? (
+                        <span>{task.DEPENDENCY}</span>
                       ) : (
                         <span>No Dependency</span>
                       )}

@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  engineType = "binary" 
+  provider   = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
@@ -8,31 +8,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model COMMENT {
-  COMMENTID           Int                   @id @default(autoincrement())
-  COMMENT             String?               @db.VarChar(255)
-  DATE                DateTime?             @db.Date
-  TASKID              Int?
-  EMAIL               String?               @db.VarChar(255)
-  TASK                TASK?                 @relation(fields: [TASKID], references: [TASKID], onDelete: NoAction, onUpdate: NoAction, map: "COMMENT_ibfk_1")
-  USER                USER?                 @relation(fields: [EMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "COMMENT_ibfk_2")
-  COMMENT_FILE_BRIDGE COMMENT_FILE_BRIDGE[]
+model comment {
+  COMMENTID Int       @id @default(autoincrement())
+  COMMENT   String?   @db.VarChar(255)
+  DATE      DateTime? @db.Date
+  TASKID    Int?
+  EMAIL     String?   @db.VarChar(255)
 
   @@index([EMAIL], map: "EMAIL")
   @@index([TASKID], map: "TASKID")
 }
 
-model COMMENT_FILE_BRIDGE {
+model comment_file_bridge {
   COMMENTID Int
   FILEID    Int
-  COMMENT   COMMENT @relation(fields: [COMMENTID], references: [COMMENTID], onDelete: NoAction, onUpdate: NoAction, map: "COMMENT_FILE_BRIDGE_ibfk_1")
-  FILE      FILE    @relation(fields: [FILEID], references: [FILEID], onDelete: NoAction, onUpdate: NoAction, map: "COMMENT_FILE_BRIDGE_ibfk_2")
 
   @@id([COMMENTID, FILEID])
   @@index([FILEID], map: "FILEID")
 }
 
-model COMPANY {
+model company {
   COMPANYID    Int       @id @default(autoincrement())
   COMPANYNAME  String?   @db.VarChar(255)
   CREATED_AT   DateTime? @db.Timestamp(0)
@@ -40,223 +35,189 @@ model COMPANY {
   ADDRESS      String?   @db.VarChar(255)
   PHONE_NUMBER String?   @db.VarChar(20)
   WEBSITE      String?   @db.VarChar(255)
-  PROJECT      PROJECT[]
-  USER         USER[]
 }
 
-model DEPENDENCY_BRIDGE {
-  TASKID                                        Int
-  DEPENDSON_TASKID                              Int
-  TASK_DEPENDENCY_BRIDGE_TASKIDToTASK           TASK @relation("DEPENDENCY_BRIDGE_TASKIDToTASK", fields: [TASKID], references: [TASKID], onDelete: NoAction, onUpdate: NoAction, map: "DEPENDENCY_BRIDGE_ibfk_1")
-  TASK_DEPENDENCY_BRIDGE_DEPENDSON_TASKIDToTASK TASK @relation("DEPENDENCY_BRIDGE_DEPENDSON_TASKIDToTASK", fields: [DEPENDSON_TASKID], references: [TASKID], onDelete: NoAction, onUpdate: NoAction, map: "DEPENDENCY_BRIDGE_ibfk_2")
-
-  @@id([TASKID, DEPENDSON_TASKID])
-  @@index([DEPENDSON_TASKID], map: "DEPENDSON_TASKID")
+model file {
+  FILEID       Int     @id @default(autoincrement())
+  FILENAME     String? @db.VarChar(255)
+  FILELOCATION String? @db.VarChar(255)
 }
 
-model FILE {
-  FILEID              Int                   @id @default(autoincrement())
-  FILENAME            String?               @db.VarChar(255)
-  FILELOCATION        String?               @db.VarChar(255)
-  COMMENT_FILE_BRIDGE COMMENT_FILE_BRIDGE[]
-  TASK_FILE_BRIDGE    TASK_FILE_BRIDGE[]
-}
-
-model LOGIN_METHOD {
+model login_method {
   METHODID   Int     @id @default(autoincrement())
   METHODNAME String? @db.VarChar(255)
-  USER       USER[]
 }
 
-model PASSWORD_RESET_TOKENS {
+model password_reset_tokens {
   EMAIL       String?   @db.VarChar(255)
   TOKEN       String    @id @db.VarChar(255)
   EXPIRY_DATE DateTime? @db.Timestamp(0)
-  USER        USER?     @relation(fields: [EMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "PASSWORD_RESET_TOKENS_ibfk_1")
 
   @@index([EMAIL], map: "EMAIL")
 }
 
-model PROJECT {
-  PROJECTID                 Int                         @id @default(autoincrement())
-  NAME                      String?                     @db.VarChar(255)
-  DESCRIPTION               String?                     @db.VarChar(255)
-  STARTDATE                 DateTime?                   @db.Date
-  ENDDATE                   DateTime?                   @db.Date
-  STATUS                    String?                     @default("Not Started") @db.VarChar(50)
-  TOTAL_TASKS               Int?                        @default(0)
-  COMPLETED_TASKS           Int?                        @default(0)
-  PROGRESS                  Int?                        @default(0)
-  ISACTIVE                  Int?                        @default(1)
-  COMPANYID                 Int?
-  COMPANY                   COMPANY?                    @relation(fields: [COMPANYID], references: [COMPANYID], onDelete: NoAction, onUpdate: NoAction, map: "PROJECT_ibfk_1")
-  PROJECTTAGBRIDGE          PROJECTTAGBRIDGE[]
-  PROJECT_MANAGER_BRIDGE    PROJECT_MANAGER_BRIDGE[]
-  PROJECT_TECHNICIAN_BRIDGE PROJECT_TECHNICIAN_BRIDGE[]
-  TASK                      TASK[]
-  USER_ACTIVITY             USER_ACTIVITY[]
-  VIEWER_BRIDGE             VIEWER_BRIDGE[]
+model project {
+  PROJECTID       Int       @id @default(autoincrement())
+  NAME            String?   @db.VarChar(255)
+  DESCRIPTION     String?   @db.VarChar(255)
+  STARTDATE       DateTime? @db.Date
+  ENDDATE         DateTime? @db.Date
+  STATUS          String?   @default("Not Started") @db.VarChar(50)
+  TOTAL_TASKS     Int?      @default(0)
+  COMPLETED_TASKS Int?      @default(0)
+  PROGRESS        Int?      @default(0)
+  ISACTIVE        Int?      @default(1)
+  COMPANYID       Int?
 
   @@index([COMPANYID], map: "COMPANYID")
 }
 
-model PROJECTTAGBRIDGE {
-  TAGID     Int
-  PROJECTID Int
-  TAG       TAG     @relation(fields: [TAGID], references: [TAGID], onDelete: NoAction, onUpdate: NoAction, map: "PROJECTTAGBRIDGE_ibfk_1")
-  PROJECT   PROJECT @relation(fields: [PROJECTID], references: [PROJECTID], onDelete: NoAction, onUpdate: NoAction, map: "PROJECTTAGBRIDGE_ibfk_2")
-
-  @@id([TAGID, PROJECTID])
-  @@index([PROJECTID], map: "PROJECTID")
-}
-
-model PROJECT_MANAGER_BRIDGE {
+model project_manager_bridge {
   PROJECTID    Int
-  MANAGEREMAIL String  @db.VarChar(255)
-  PROJECT      PROJECT @relation(fields: [PROJECTID], references: [PROJECTID], onDelete: NoAction, onUpdate: NoAction, map: "PROJECT_MANAGER_BRIDGE_ibfk_1")
-  USER         USER    @relation(fields: [MANAGEREMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "PROJECT_MANAGER_BRIDGE_ibfk_2")
+  MANAGEREMAIL String @db.VarChar(255)
 
   @@id([PROJECTID, MANAGEREMAIL])
   @@index([MANAGEREMAIL], map: "MANAGEREMAIL")
 }
 
-model PROJECT_TECHNICIAN_BRIDGE {
+model project_technician_bridge {
   PROJECTID       Int
-  TECHNICIANEMAIL String  @db.VarChar(255)
-  PROJECT         PROJECT @relation(fields: [PROJECTID], references: [PROJECTID], onDelete: NoAction, onUpdate: NoAction, map: "PROJECT_TECHNICIAN_BRIDGE_ibfk_1")
-  USER            USER    @relation(fields: [TECHNICIANEMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "PROJECT_TECHNICIAN_BRIDGE_ibfk_2")
+  TECHNICIANEMAIL String @db.VarChar(255)
 
   @@id([PROJECTID, TECHNICIANEMAIL])
   @@index([TECHNICIANEMAIL], map: "TECHNICIANEMAIL")
 }
 
-model ROLE {
+model project_viewer_bridge {
+  PROJECTID   Int
+  VIEWEREMAIL String @db.VarChar(255)
+
+  @@id([PROJECTID, VIEWEREMAIL])
+  @@index([VIEWEREMAIL], map: "VIEWEREMAIL")
+}
+
+model projecttagbridge {
+  TAGID     Int
+  PROJECTID Int
+
+  @@id([TAGID, PROJECTID])
+  @@index([PROJECTID], map: "PROJECTID")
+}
+
+model role {
   ROLEID   Int     @id @default(autoincrement())
   ROLENAME String? @db.VarChar(255)
-  USER     USER[]
 }
 
-model TAG {
-  TAGID            Int                @id @default(autoincrement())
-  TAGNAME          String?            @db.VarChar(255)
-  PROJECTTAGBRIDGE PROJECTTAGBRIDGE[]
-  USERTAGBRIDGE    USERTAGBRIDGE[]
+model tag {
+  TAGID   Int     @id @default(autoincrement())
+  TAGNAME String? @db.VarChar(255)
 }
 
-model TASK {
-  TASKID                                                     Int                      @id @default(autoincrement())
-  NAME                                                       String?                  @db.VarChar(255)
-  STARTDATE                                                  DateTime?                @db.DateTime(0)
-  ENDDATE                                                    DateTime?                @db.DateTime(0)
-  PROGRESS                                                   Int?                     @default(0)
-  DESCRIPTION                                                String?                  @db.VarChar(255)
-  STATUS                                                     String?                  @db.VarChar(50)
-  PRIORITY                                                   String?                  @db.VarChar(50)
-  ISACTIVE                                                   Int?                     @default(1)
-  PROJECTID                                                  Int?
-  DURATION                                                   Int?
-  TAG                                                        String?                  @db.VarChar(255)
-  FILTER                                                     String?                  @db.VarChar(255)
-  COMMENT                                                    COMMENT[]
-  DEPENDENCY_BRIDGE_DEPENDENCY_BRIDGE_TASKIDToTASK           DEPENDENCY_BRIDGE[]      @relation("DEPENDENCY_BRIDGE_TASKIDToTASK")
-  DEPENDENCY_BRIDGE_DEPENDENCY_BRIDGE_DEPENDSON_TASKIDToTASK DEPENDENCY_BRIDGE[]      @relation("DEPENDENCY_BRIDGE_DEPENDSON_TASKIDToTASK")
-  PROJECT                                                    PROJECT?                 @relation(fields: [PROJECTID], references: [PROJECTID], onDelete: NoAction, onUpdate: NoAction, map: "TASK_ibfk_1")
-  TASK_FILE_BRIDGE                                           TASK_FILE_BRIDGE[]
-  TASK_TECHNICIAN_BRIDGE                                     TASK_TECHNICIAN_BRIDGE[]
-  TASK_USER_BRIDGE                                           TASK_USER_BRIDGE[]
+model task {
+  TASKID           Int       @id @default(autoincrement())
+  NAME             String?   @db.VarChar(255)
+  STARTDATE        DateTime? @db.DateTime(0)
+  ENDDATE          DateTime? @db.DateTime(0)
+  PROGRESS         Int?      @default(0)
+  DESCRIPTION      String?   @db.VarChar(255)
+  STATUS           String?   @db.VarChar(50)
+  PRIORITY         String?   @db.VarChar(50)
+  ISACTIVE         Int?      @default(1)
+  PROJECTID        Int?
+  DURATION         String?   @db.VarChar(50)
+  TAG              String?   @db.VarChar(255)
+  DEPENDENCY       Int?
+  projectPROJECTID Int?
+  DEPENDENCIES     task[]    @relation("Dependencies")
+  DEPENDENTTASK    task[]    @relation("Dependencies")
 
   @@index([PROJECTID], map: "PROJECTID")
 }
 
-model TASK_FILE_BRIDGE {
+model task_file_bridge {
   FILEID Int
   TASKID Int
-  FILE   FILE @relation(fields: [FILEID], references: [FILEID], onDelete: NoAction, onUpdate: NoAction, map: "TASK_FILE_BRIDGE_ibfk_1")
-  TASK   TASK @relation(fields: [TASKID], references: [TASKID], onDelete: NoAction, onUpdate: NoAction, map: "TASK_FILE_BRIDGE_ibfk_2")
 
   @@id([FILEID, TASKID])
   @@index([TASKID], map: "TASKID")
 }
 
-model TASK_TECHNICIAN_BRIDGE {
+model task_technician_bridge {
   EMAIL  String @db.VarChar(255)
   TASKID Int
-  USER   USER   @relation(fields: [EMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "TASK_TECHNICIAN_BRIDGE_ibfk_1")
-  TASK   TASK   @relation(fields: [TASKID], references: [TASKID], onDelete: NoAction, onUpdate: NoAction, map: "TASK_TECHNICIAN_BRIDGE_ibfk_2")
 
   @@id([EMAIL, TASKID])
   @@index([TASKID], map: "TASKID")
 }
 
-model TASK_USER_BRIDGE {
+model task_user_bridge {
   EMAIL  String @db.VarChar(255)
   TASKID Int
-  USER   USER   @relation(fields: [EMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "TASK_USER_BRIDGE_ibfk_1")
-  TASK   TASK   @relation(fields: [TASKID], references: [TASKID], onDelete: NoAction, onUpdate: NoAction, map: "TASK_USER_BRIDGE_ibfk_2")
 
   @@id([EMAIL, TASKID])
   @@index([TASKID], map: "TASKID")
 }
 
-model USER {
-  EMAIL                     String                      @id @unique(map: "EMAIL") @db.VarChar(255)
-  PASSWORD                  String?                     @db.VarChar(255)
-  FIRSTNAME                 String?                     @db.VarChar(255)
-  LASTNAME                  String?                     @db.VarChar(255)
-  ISACTIVE                  Int?                        @default(1)
-  IS_EMAIL_VERIFIED         Int?                        @default(0)
-  TAG                       String?                     @db.VarChar(255)
-  COMPANYID                 Int?
-  ROLEID                    Int?
-  METHODID                  Int?
-  PHONE_NUMBER              String?                     @db.VarChar(20)
-  JOB_TITLE                 String?                     @db.VarChar(255)
-  COMMENT                   COMMENT[]
-  PASSWORD_RESET_TOKENS     PASSWORD_RESET_TOKENS[]
-  PROJECT_MANAGER_BRIDGE    PROJECT_MANAGER_BRIDGE[]
-  PROJECT_TECHNICIAN_BRIDGE PROJECT_TECHNICIAN_BRIDGE[]
-  TASK_TECHNICIAN_BRIDGE    TASK_TECHNICIAN_BRIDGE[]
-  TASK_USER_BRIDGE          TASK_USER_BRIDGE[]
-  COMPANY                   COMPANY?                    @relation(fields: [COMPANYID], references: [COMPANYID], onDelete: NoAction, onUpdate: NoAction, map: "USER_ibfk_1")
-  ROLE                      ROLE?                       @relation(fields: [ROLEID], references: [ROLEID], onDelete: NoAction, onUpdate: NoAction, map: "USER_ibfk_2")
-  LOGIN_METHOD              LOGIN_METHOD?               @relation(fields: [METHODID], references: [METHODID], onDelete: NoAction, onUpdate: NoAction, map: "USER_ibfk_3")
-  USERTAGBRIDGE             USERTAGBRIDGE[]
-  USER_ACTIVITY             USER_ACTIVITY[]
-  VIEWER_BRIDGE             VIEWER_BRIDGE[]
+model user {
+  EMAIL             String  @id @unique(map: "EMAIL") @db.VarChar(255)
+  PASSWORD          String? @db.VarChar(255)
+  FIRSTNAME         String? @db.VarChar(255)
+  LASTNAME          String? @db.VarChar(255)
+  ISACTIVE          Int?    @default(1)
+  IS_EMAIL_VERIFIED Int?    @default(0)
+  TAG               String? @db.VarChar(255)
+  COMPANYID         Int?
+  ROLEID            Int?
+  METHODID          Int?
+  PHONE_NUMBER      String? @db.VarChar(20)
+  JOB_TITLE         String? @db.VarChar(255)
 
   @@index([COMPANYID], map: "COMPANYID")
   @@index([METHODID], map: "METHODID")
   @@index([ROLEID], map: "ROLEID")
 }
 
-model USERTAGBRIDGE {
-  TAGID Int
-  EMAIL String @db.VarChar(255)
-  TAG   TAG    @relation(fields: [TAGID], references: [TAGID], onDelete: NoAction, onUpdate: NoAction, map: "USERTAGBRIDGE_ibfk_1")
-  USER  USER   @relation(fields: [EMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "USERTAGBRIDGE_ibfk_2")
-
-  @@id([TAGID, EMAIL])
-  @@index([EMAIL], map: "EMAIL")
-}
-
-model USER_ACTIVITY {
+model user_activity {
   ACTIVITYID  Int       @id @default(autoincrement())
   EMAIL       String?   @db.VarChar(255)
   TIMESTAMP   DateTime? @default(now()) @db.Timestamp(0)
   DESCRIPTION String?   @db.VarChar(255)
   PROJECTID   Int?
-  USER        USER?     @relation(fields: [EMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "USER_ACTIVITY_ibfk_1")
-  PROJECT     PROJECT?  @relation(fields: [PROJECTID], references: [PROJECTID], onDelete: NoAction, onUpdate: NoAction, map: "USER_ACTIVITY_ibfk_2")
 
   @@index([EMAIL], map: "EMAIL")
   @@index([PROJECTID], map: "PROJECTID")
 }
 
-model VIEWER_BRIDGE {
+model user_project_bridge {
+  USER_EMAIL String   @db.VarChar(255)
+  PROJECTID  Int
+  IS_MANAGER Boolean? @default(false)
+
+  @@id([USER_EMAIL, PROJECTID])
+  @@index([PROJECTID], map: "PROJECTID")
+}
+
+model user_task_bridge {
+  USER_EMAIL    String   @db.VarChar(255)
+  TASKID        Int
+  IS_TECHNICIAN Boolean? @default(false)
+
+  @@id([USER_EMAIL, TASKID])
+  @@index([TASKID], map: "TASKID")
+}
+
+model usertagbridge {
+  TAGID Int
+  EMAIL String @db.VarChar(255)
+
+  @@id([TAGID, EMAIL])
+  @@index([EMAIL], map: "EMAIL")
+}
+
+model viewer_bridge {
   PROJECTID   Int
-  VIEWEREMAIL String  @db.VarChar(255)
-  PROJECT     PROJECT @relation(fields: [PROJECTID], references: [PROJECTID], onDelete: NoAction, onUpdate: NoAction, map: "VIEWER_BRIDGE_ibfk_1")
-  USER        USER    @relation(fields: [VIEWEREMAIL], references: [EMAIL], onDelete: NoAction, onUpdate: NoAction, map: "VIEWER_BRIDGE_ibfk_2")
+  VIEWEREMAIL String @db.VarChar(255)
 
   @@id([PROJECTID, VIEWEREMAIL])
   @@index([VIEWEREMAIL], map: "VIEWEREMAIL")

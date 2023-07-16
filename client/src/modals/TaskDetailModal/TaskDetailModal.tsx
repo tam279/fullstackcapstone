@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
+import { Dropdown, DropdownButton } from "react-bootstrap";
 
 interface TaskDetailModalProps {
   show: boolean;
@@ -31,7 +32,7 @@ interface Task {
   DURATION: number;
   TECHNICIAN: string;
   TAG: string;
-  DEPENDENCY_NAME: string | null;
+  DEPENDENCY: any;
 }
 
 interface Comment {
@@ -40,6 +41,8 @@ interface Comment {
   DATE: string;
   TASKID: number;
   EMAIL: string;
+  FILENAME: string | null;
+  FILEDATA: Buffer | null; // UPDATE: Add this field
 }
 
 const TaskDetailModal: FC<TaskDetailModalProps> = ({
@@ -50,6 +53,7 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [task, setTask] = useState<Task | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchTaskAndComments = async () => {
@@ -60,7 +64,7 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
         setTask(taskResponse.data);
 
         const commentsResponse = await axios.get<Comment[]>(
-          `${config.backend}/api/comments?taskId=${taskId}`
+          `${config.backend}/api/comments/task?taskId=${taskId}`
         );
         setComments(commentsResponse.data);
       } catch (err) {
@@ -75,38 +79,80 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
 
   const handleCommentSubmit = async () => {
     try {
+      const now = new Date();
+      const formattedDate = now.toISOString().slice(0, 19).replace("T", " ");
+
+      const formData = new FormData();
+      formData.append("COMMENT", newComment);
+      formData.append("TASKID", taskId.toString());
+      formData.append("EMAIL", "manager@company1.com");
+      formData.append("DATE", formattedDate);
+      if (selectedFile) {
+        formData.append("file", selectedFile, selectedFile.name);
+      }
+
       const response = await axios.post<Comment>(
-        `${config.backend}/api/comments`,
+        `${config.backend}/api/comments`, // UPDATE: Changed the route
+        formData,
+
         {
-          comment: newComment,
-          taskId,
-          // Any other fields the API needs...
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       if (response.status === 200) {
         setComments((prevComments) => [...prevComments, response.data]);
         setNewComment("");
+        setSelectedFile(null);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleStartTask = async () => {
+  // UPDATE: New function to download a file from a comment
+  const downloadCommentFile = async (commentId: number) => {
     try {
-      // Update the task status based on the current status
-      let newStatus = "";
-      if (task?.STATUS === "Not Started") {
-        newStatus = "In Progress";
-      } else if (task?.STATUS === "In Progress") {
-        newStatus = "Completed";
-      } else {
-        newStatus = "Not Started";
+      // Find the comment object from the comments state array
+      const comment = comments.find(
+        (comment) => comment.COMMENTID === commentId
+      );
+
+      if (!comment || !comment.FILENAME) {
+        throw new Error(`No comment or filename found with ID: ${commentId}`);
       }
 
+      const response = await axios.get<ArrayBuffer>(
+        `${config.backend}/api/comments/${comment.COMMENTID}/file`,
+        { responseType: "arraybuffer" }
+      );
+      const blob = new Blob([response.data], {
+        type: "application/octet-stream",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const fileName = comment.FILENAME;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    try {
       const response = await axios.put<Task>(
-        `${config.backend}/api/tasks/${taskId}`,
+        `${config.backend}/api/updateTasks/${taskId}`,
         {
           ...task,
           STATUS: newStatus,
@@ -119,6 +165,32 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const renderCommentFiles = (comment: Comment) => {
+    if (!comment.FILENAME) {
+      return null;
+    }
+
+    return (
+      <div>
+        <p>Files:</p>
+        <ul>
+          <li>
+            <a
+              href={`${config.backend}/api/comments/file/${comment.COMMENTID}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {comment.FILENAME}
+            </a>
+            <Button onClick={() => downloadCommentFile(comment.COMMENTID)}>
+              Download {comment.FILENAME}
+            </Button>
+          </li>
+        </ul>
+      </div>
+    );
   };
 
   if (!task) {
@@ -166,7 +238,7 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
               <Form.Label>Current Status</Form.Label>
               <Form.Control as="select" defaultValue={task.STATUS} disabled>
                 <option>Not Started</option>
-                <option>On going</option>
+                <option>In Progress</option>
                 <option>Completed</option>
               </Form.Control>
             </Form.Group>
@@ -179,28 +251,27 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
                 disabled
               />
             </Form.Group>
-            {task.DEPENDENCY_NAME && (
+            {task.DEPENDENCY && (
               <Form.Group>
                 <Form.Label>Dependency</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={task.DEPENDENCY_NAME}
-                  disabled
-                />
+                <Form.Control type="text" value={task.DEPENDENCY} disabled />
               </Form.Group>
             )}
           </Col>
           <Col>
-            <h4>Comments:</h4>
-            {comments.map((comment: Comment, i: number) => (
-              <div key={i}>
-                <p>
-                  {comment.EMAIL} -{" "}
-                  {new Date(comment.DATE).toLocaleDateString()}
-                </p>
-                <p>{comment.COMMENT}</p>
-              </div>
-            ))}
+            <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+              <h4>Comments:</h4>
+              {comments.map((comment: Comment, i: number) => (
+                <div key={i}>
+                  <p>
+                    {comment.EMAIL} - {new Date(comment.DATE).toLocaleString()}
+                  </p>
+                  <p>{comment.COMMENT}</p>
+                  {renderCommentFiles(comment)}
+                </div>
+              ))}
+            </div>
+
             <InputGroup>
               <FormControl
                 as="textarea"
@@ -211,18 +282,30 @@ const TaskDetailModal: FC<TaskDetailModalProps> = ({
             </InputGroup>
             <Form.Group>
               <Form.Label>Files</Form.Label>
-              <Form.Control type="file" />
+              <Form.Control type="file" onChange={handleFileChange} />
             </Form.Group>
             <Button onClick={handleCommentSubmit}>Send</Button>
           </Col>
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleStartTask}>
-          {task.STATUS === "Not Started" && "Start Task"}
-          {task.STATUS === "In Progress" && "Complete"}
-          {task.STATUS === "Completed" && "Not Started"}
-        </Button>
+        <DropdownButton variant="secondary" title="Select Action">
+          {task.STATUS === "Not Started" && (
+            <Dropdown.Item onClick={() => handleStatusChange("In Progress")}>
+              Start Task
+            </Dropdown.Item>
+          )}
+          {task.STATUS === "In Progress" && (
+            <Dropdown.Item onClick={() => handleStatusChange("Completed")}>
+              Complete Task
+            </Dropdown.Item>
+          )}
+          {task.STATUS === "Completed" && (
+            <Dropdown.Item onClick={() => handleStatusChange("Not Started")}>
+              Restart Task
+            </Dropdown.Item>
+          )}
+        </DropdownButton>
         <Button variant="primary" onClick={handleClose}>
           Cancel
         </Button>

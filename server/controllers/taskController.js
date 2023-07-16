@@ -6,22 +6,15 @@ exports.getTasks = async (req, res) => {
     const sql = `
         SELECT
             T.*,
-            T.PROJECTID,
-            GROUP_CONCAT(U.FIRSTNAME, ' ', U.LASTNAME) AS TECHNICIAN_NAMES,
-            D.DEPENDSON_TASKID,
-            DT.NAME AS DEPENDENCY_NAME
+            GROUP_CONCAT(U.FIRSTNAME, ' ', U.LASTNAME) AS TECHNICIAN_NAMES
         FROM
             TASK AS T
         LEFT JOIN
             TASK_TECHNICIAN_BRIDGE AS TT ON T.TASKID = TT.TASKID
         LEFT JOIN
             USER AS U ON TT.EMAIL = U.EMAIL
-        LEFT JOIN
-            DEPENDENCY_BRIDGE AS D ON T.TASKID = D.TASKID
-        LEFT JOIN
-            TASK AS DT ON D.DEPENDSON_TASKID = DT.TASKID
         GROUP BY
-            T.TASKID, D.DEPENDSON_TASKID, DT.NAME
+            T.TASKID
     `;
 
     try {
@@ -35,7 +28,7 @@ exports.getTasks = async (req, res) => {
 
 
 exports.createTask = async (req, res) => {
-    const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, TECHNICIAN_EMAIL } = req.body;
+    const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, TECHNICIAN_EMAIL, DEPENDENCY } = req.body;
 
     // Calculate the duration in milliseconds
     const durationMs = new Date(ENDDATE) - new Date(STARTDATE);
@@ -43,11 +36,11 @@ exports.createTask = async (req, res) => {
     // Convert duration to total minutes
     const duration = Math.floor(durationMs / (1000 * 60));
 
-    const sql = "INSERT INTO TASK (NAME, STARTDATE, ENDDATE, DURATION, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO TASK (NAME, STARTDATE, ENDDATE, DURATION, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, DEPENDENCY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const sqlBridge = "INSERT INTO TASK_TECHNICIAN_BRIDGE (EMAIL, TASKID) VALUES (?, ?)";
 
     try {
-        const [result] = await db.query(sql, [NAME, STARTDATE, ENDDATE, duration, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID]);
+        const [result] = await db.query(sql, [NAME, STARTDATE, ENDDATE, duration, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, DEPENDENCY]);
 
         // Get the ID of the last inserted task
         const lastInsertedTaskId = result.insertId;
@@ -68,16 +61,17 @@ exports.createTask = async (req, res) => {
 
 
 
+
 exports.updateTask = async (req, res) => {
     const id = req.params.id;
-    const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, TECHNICIAN_EMAIL } = req.body;
+    const { NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, TECHNICIAN_EMAIL, DEPENDENCY } = req.body;
     
-    const sqlTask = "UPDATE TASK SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, DESCRIPTION = ?, STATUS = ?, PRIORITY = ?, PROJECTID = ? WHERE TASKID = ?";
+    const sqlTask = "UPDATE TASK SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, DESCRIPTION = ?, STATUS = ?, PRIORITY = ?, PROJECTID = ?, DEPENDENCY = ? WHERE TASKID = ?";
     const sqlDeleteBridge = "DELETE FROM TASK_TECHNICIAN_BRIDGE WHERE TASKID = ?";
     const sqlInsertBridge = "INSERT INTO TASK_TECHNICIAN_BRIDGE (EMAIL, TASKID) VALUES (?, ?)";
     
     try {
-        const [resultTask] = await db.query(sqlTask, [NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, id]);
+        const [resultTask] = await db.query(sqlTask, [NAME, STARTDATE, ENDDATE, PROGRESS, DESCRIPTION, STATUS, PRIORITY, PROJECTID, DEPENDENCY, id]);
         
         // Delete existing technicians for the task
         const [resultDeleteBridge] = await db.query(sqlDeleteBridge, [id]);
@@ -98,23 +92,28 @@ exports.updateTask = async (req, res) => {
 
 
 exports.deleteTask = async (req, res) => {
-    const id = req.params.id;
-    
-    const sqlTask = "DELETE FROM TASK WHERE TASKID = ?";
-    const sqlBridge = "DELETE FROM TASK_TECHNICIAN_BRIDGE WHERE TASKID = ?";
+  const id = req.params.id;
+  const deleteTaskSql = 'DELETE FROM TASK WHERE TASKID = ?';
+  const deleteUserTaskBridgeSql = 'DELETE FROM user_task_bridge WHERE TASKID = ?';
 
-    try {
-        const [resultTask] = await db.query(sqlTask, [id]);
+  try {
+    // Delete rows from TASK_USER_BRIDGE and DEPENDENCY_BRIDGE tables that reference the task
+    await db.query(deleteUserTaskBridgeSql, [id]);
 
-        // Delete technicians for the task
-        const [resultBridge] = await db.query(sqlBridge, [id]);
+    // Delete the task
+    await db.query(deleteTaskSql, [id]);
 
-        res.status(200).send({ message: 'Task deleted successfully' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
-    }
+    res.status(200).send({ message: 'Task deleted successfully' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: 'An error occurred', error: err.message });
+  }
 };
+
+
+
+
+
 
 
 
@@ -123,23 +122,17 @@ exports.getTask = async (req, res) => {
     const sql = `
         SELECT
             T.*,
-            GROUP_CONCAT(U.FIRSTNAME, ' ', U.LASTNAME) AS TECHNICIAN_NAMES,
-            D.DEPENDSON_TASKID,
-            DT.NAME AS DEPENDENCY_NAME
+            GROUP_CONCAT(U.FIRSTNAME, ' ', U.LASTNAME) AS TECHNICIAN_NAMES
         FROM
             TASK AS T
         LEFT JOIN
             TASK_TECHNICIAN_BRIDGE AS TT ON T.TASKID = TT.TASKID
         LEFT JOIN
             USER AS U ON TT.EMAIL = U.EMAIL
-        LEFT JOIN
-            DEPENDENCY_BRIDGE AS D ON T.TASKID = D.TASKID
-        LEFT JOIN
-            TASK AS DT ON D.DEPENDSON_TASKID = DT.TASKID
         WHERE
             T.TASKID = ?
         GROUP BY
-            T.TASKID, D.DEPENDSON_TASKID, DT.NAME
+            T.TASKID
     `;
 
     try {
@@ -154,3 +147,29 @@ exports.getTask = async (req, res) => {
     }
 };
 
+
+exports.activateTask = async (req, res) => {
+    const taskId = req.params.id;
+    const sql = "UPDATE TASK SET ISACTIVE = 1 WHERE TASKID = ?";
+
+    try {
+        const [result] = await db.query(sql, [taskId]);
+        res.status(200).send({ message: 'Task activated successfully' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: 'An error occurred', error: err.message });
+    }
+};
+
+exports.deactivateTask = async (req, res) => {
+    const taskId = req.params.id;
+    const sql = "UPDATE TASK SET ISACTIVE = 0 WHERE TASKID = ?";
+
+    try {
+        const [result] = await db.query(sql, [taskId]);
+        res.status(200).send({ message: 'Task deactivated successfully' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ message: 'An error occurred', error: err.message });
+    }
+};

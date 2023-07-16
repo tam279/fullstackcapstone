@@ -219,7 +219,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
                 <Form.Control
                   as="textarea"
                   rows={3}
-                  placeholder="Task dependencies. Enter the task ID..."
+                  placeholder="Task dependencies. Enter the task name, follow by the comma..."
                   name="dependencies"
                   onChange={handleFormChange}
                 />

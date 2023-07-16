@@ -1,17 +1,27 @@
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
 const path = require("path");
 require("dotenv").config();
 const userController = require("./controllers/userController");
 const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
 const commentController = require("./controllers/commentController");
+console.log(commentController);const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // This sets 'uploads/' as the destination folder for the uploaded files.
+
+
 
 const bodyParser = require("body-parser");
 const session = require("express-session");
 
+
 const app = express();
+const helmet = require("helmet");
+
+
+// Set the limit option to a larger value
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 //use cors middleware
 app.use(
   cors({
@@ -81,6 +91,9 @@ app.get("/api/project/:projectId/technicians", userController.getProjectTechnici
 //   }
 // });
 
+// app.post('/api/createComments', upload.single('file'), commentController.createComment);
+
+
 app.put("/api/updateUser/:email", userController.updateUser);
 app.delete("/api/deleteUser/:email", userController.deleteUser);
 app.put("/api/deactivateUser/:email", userController.deactivateUser);
@@ -113,8 +126,10 @@ app.get("/api/project/:id", projectController.getProject);
 app.get("/api/tasks", taskController.getTasks);
 app.post("/api/createTasks", taskController.createTask);
 app.put("/api/updateTasks/:id", taskController.updateTask);
-app.delete("/api/deleteTasks/:id", taskController.deleteTask);
+app.delete("/api/tasks/:id", taskController.deleteTask);
 app.get("/api/tasks/:id", taskController.getTask);
+app.put('/api/tasks/:id/activate', taskController.activateTask);
+app.put('/api/tasks/:id/deactivate', taskController.deactivateTask);
 
 
 
@@ -127,9 +142,13 @@ app.get("/api/userActivity/:projectId", userController.getUserActivityByProjectI
 
 // Comment routes
 app.get("/api/comments", commentController.getComments);
+app.get("/api/comments/task", commentController.getCommentsByTaskId);
 app.post("/api/comments", commentController.createComment);
-app.put("/api/comments/:id", commentController.updateComment);
+app.put("/api/comments/:id/file", upload.single('file'), commentController.updateComment);
 app.delete("/api/comments/:id", commentController.deleteComment);
+app.put("/api/comments/:id", upload.single('file'), commentController.updateComment);
+
+
 
 //email service
 const { sendEmail } = require("./service/mail");
@@ -156,7 +175,7 @@ app.get("/prismatest", async (req, res) => {
   );
 });
 (async () => {
-  const result = await prisma.pROJECT.findMany();
+  const result = await prisma.project.findMany();
   // console.log(result);
 })();
 //end prisma
