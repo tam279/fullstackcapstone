@@ -3,25 +3,34 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 const userController = require("./controllers/userController");
+const companyController = require("./controllers/companyController");
 const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
+const activityController = require("./controllers/activityController");
+
+
+
 const commentController = require("./controllers/commentController");
-console.log(commentController);const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // This sets 'uploads/' as the destination folder for the uploaded files.
 
-
+console.log(commentController);
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
 
 const bodyParser = require("body-parser");
 const session = require("express-session");
 
-
 const app = express();
 const helmet = require("helmet");
 
-
 // Set the limit option to a larger value
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(
+  bodyParser.urlencoded({
+    limit: "50mb",
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
 //use cors middleware
 app.use(
   cors({
@@ -73,10 +82,22 @@ app.get(
   auth.handleJWT
 );
 //auth end
-
+// Completed intergrating new APi wtih Prisma:
+// To the user information:
 app.get("/api/users", userController.getUsers);
-app.post("/api/createUser", userController.createUser);
-app.get("/api/project/:projectId/technicians", userController.getProjectTechnicians);
+app.post("/api/users", userController.createUser);
+app.put("/api/user/:id", userController.updateUser);
+app.delete("/api/user/:id", userController.deleteUser);
+
+// The Companies API routes:
+app.get("/api/companies", companyController.getCompanies);
+
+// done until here
+
+app.post("/api/companies", companyController.createCompany);
+app.put("/api/company/:id", companyController.updateCompany);
+app.delete("/api/company/:id", companyController.deleteCompany);
+
 
 
 // This is
@@ -93,62 +114,44 @@ app.get("/api/project/:projectId/technicians", userController.getProjectTechnici
 
 // app.post('/api/createComments', upload.single('file'), commentController.createComment);
 
-
-app.put("/api/updateUser/:email", userController.updateUser);
-app.delete("/api/deleteUser/:email", userController.deleteUser);
-app.put("/api/deactivateUser/:email", userController.deactivateUser);
-app.get("/api/loginMethods", userController.getLoginMethods);
-app.put("/api/activateUser/:email", userController.activateUser);
-app.put("/api/activateCompany/:id", userController.activateCompany);
-app.put("/api/deactivateCompany/:id", userController.deactivateCompany);
-
-app.get("/api/companies", userController.getCompanies);
-app.post("/api/createCompany", userController.createCompany);
-// Update company
-app.put("/api/updateCompany/:id", userController.updateCompany);
-
-// Delete company
-app.delete("/api/deleteCompany/:id", userController.deleteCompany);
-
 // projects
-app.get(
-  "/api/projects",
-  passport.authenticate("jwt", { session: false }),
-  projectController.getProjects
-);
-app.post("/api/createProject", projectController.createProject);
-app.put("/api/updateProject/:id", projectController.updateProject);
-app.delete("/api/deleteProject/:id", projectController.deleteProject);
+// app.get("/api/projects",passport.authenticate("jwt", { session: false }), projectController.getProjects);
+app.get("/api/projects", projectController.getProjects);
+app.post("/api/projects", projectController.createProject);
+app.put("/api/project/:id", projectController.updateProject);
+app.delete("/api/project/:id", projectController.deleteProject);
 app.get("/api/project/:id", projectController.getProject);
-//projects end
 
-// Task routes
-app.get("/api/tasks", taskController.getTasks);
-app.post("/api/createTasks", taskController.createTask);
-app.put("/api/updateTasks/:id", taskController.updateTask);
-app.delete("/api/tasks/:id", taskController.deleteTask);
-app.get("/api/tasks/:id", taskController.getTask);
-app.put('/api/tasks/:id/activate', taskController.activateTask);
-app.put('/api/tasks/:id/deactivate', taskController.deactivateTask);
+app.get("/api/project/:projectId/tasks", taskController.getTasks);
+app.post("/api/project/:projectId/tasks", taskController.createTask); // Creating a new task doesn't require a task ID
+app.put("/api/project/:projectId/task/:taskId", taskController.updateTask); // Use :taskId instead of :id for clarity
+app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask); // Use :taskId instead of :id for clarity
+app.get("/api/project/:projectId/task/:taskId", taskController.getTask); // To get a specific task of a project
 
-
-
-app.get("/api/roles", userController.getRoles);
 
 // User activity routes
-app.get("/api/userActivity", userController.getUserActivity);
-app.post("/api/createUserActivity", userController.createUserActivity);
-app.get("/api/userActivity/:projectId", userController.getUserActivityByProjectId);
+app.get("/api/userActivity", activityController.getUserActivity);
+app.post("/api/createUserActivity", activityController.createUserActivity);
+app.get(
+  "/api/userActivity/:projectId",
+  activityController.getUserActivityByProjectId
+);
 
 // Comment routes
 app.get("/api/comments", commentController.getComments);
 app.get("/api/comments/task", commentController.getCommentsByTaskId);
 app.post("/api/comments", commentController.createComment);
-app.put("/api/comments/:id/file", upload.single('file'), commentController.updateComment);
+app.put(
+  "/api/comments/:id/file",
+  upload.single("file"),
+  commentController.updateComment
+);
 app.delete("/api/comments/:id", commentController.deleteComment);
-app.put("/api/comments/:id", upload.single('file'), commentController.updateComment);
-
-
+app.put(
+  "/api/comments/:id",
+  upload.single("file"),
+  commentController.updateComment
+);
 
 //email service
 const { sendEmail } = require("./service/mail");

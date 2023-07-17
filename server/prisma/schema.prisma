@@ -4,221 +4,141 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
-model comment {
-  COMMENTID Int       @id @default(autoincrement())
-  COMMENT   String?   @db.VarChar(255)
-  DATE      DateTime? @db.Date
-  TASKID    Int?
-  EMAIL     String?   @db.VarChar(255)
+model Company {
+  id          String @id @default(uuid())
+  name        String
+  address     String
+  phoneNumber String
+  website     String
 
-  @@index([EMAIL], map: "EMAIL")
-  @@index([TASKID], map: "TASKID")
+  users    User[]
+  projects Project[]
+  deleted  Boolean   @default(false)
 }
 
-model comment_file_bridge {
-  COMMENTID Int
-  FILEID    Int
+model User {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  password    String
+  firstName   String
+  lastName    String
+  role        Role       @default(USER)
+  company     Company    @relation(fields: [companyId], references: [id])
+  companyId   String
+  phoneNumber String
+  jobTitle    String
+  tags        Tag[]
+  tasks       Task[]
+  comments    Comment[]
+  activity    Activity[]
 
-  @@id([COMMENTID, FILEID])
-  @@index([FILEID], map: "FILEID")
+  projectsAsTechnician Project[] @relation("Technicians")
+  projectsAsViewer     Project[] @relation("Viewers")
+  projectsAsManager    Project[] @relation("manager")
+
+  deleted Boolean @default(false)
 }
 
-model company {
-  COMPANYID    Int       @id @default(autoincrement())
-  COMPANYNAME  String?   @db.VarChar(255)
-  CREATED_AT   DateTime? @db.Timestamp(0)
-  ISACTIVE     Int?      @default(1)
-  ADDRESS      String?   @db.VarChar(255)
-  PHONE_NUMBER String?   @db.VarChar(20)
-  WEBSITE      String?   @db.VarChar(255)
+enum Role {
+  USER
+  ADMIN
 }
 
-model file {
-  FILEID       Int     @id @default(autoincrement())
-  FILENAME     String? @db.VarChar(255)
-  FILELOCATION String? @db.VarChar(255)
+model Tag {
+  id   String @id @default(uuid())
+  name String
+
+  users    User[]
+  projects Project[]
+
+  deleted Boolean @default(false)
 }
 
-model login_method {
-  METHODID   Int     @id @default(autoincrement())
-  METHODNAME String? @db.VarChar(255)
+model Project {
+  id          String  @id @default(uuid())
+  name        String
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   String
+  description String
+
+  startDate DateTime
+  endDate   DateTime
+
+  tag         Tag[]
+  technicians User[]     @relation("Technicians")
+  viewers     User[]     @relation("Viewers")
+  manager     User       @relation("manager", fields: [managerId], references: [id])
+  managerId   String
+  tasks       Task[]
+  activity    Activity[]
+
+  deleted Boolean @default(false)
 }
 
-model password_reset_tokens {
-  EMAIL       String?   @db.VarChar(255)
-  TOKEN       String    @id @db.VarChar(255)
-  EXPIRY_DATE DateTime? @db.Timestamp(0)
+model Task {
+  id          String   @id @default(uuid())
+  name        String
+  project     Project? @relation(fields: [projectId], references: [id])
+  projectId   String?
+  description String
 
-  @@index([EMAIL], map: "EMAIL")
+  status        Status
+  priorityLevel Int
+
+  startDate DateTime
+  endDate   DateTime
+
+  technicians User[]
+  comments    Comment[]
+  files       File[]    @relation("File")
+
+  dependencies   Task[] @relation("Dependencies")
+  dependentTasks Task[] @relation("Dependencies")
+
+  deleted Boolean @default(false)
 }
 
-model project {
-  PROJECTID       Int       @id @default(autoincrement())
-  NAME            String?   @db.VarChar(255)
-  DESCRIPTION     String?   @db.VarChar(255)
-  STARTDATE       DateTime? @db.Date
-  ENDDATE         DateTime? @db.Date
-  STATUS          String?   @default("Not Started") @db.VarChar(50)
-  TOTAL_TASKS     Int?      @default(0)
-  COMPLETED_TASKS Int?      @default(0)
-  PROGRESS        Int?      @default(0)
-  ISACTIVE        Int?      @default(1)
-  COMPANYID       Int?
-
-  @@index([COMPANYID], map: "COMPANYID")
+enum Status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
 }
 
-model project_manager_bridge {
-  PROJECTID    Int
-  MANAGEREMAIL String @db.VarChar(255)
+model Comment {
+  id        String   @id @default(uuid())
+  comment   String
+  timeStamp DateTime
+  files     File[]
 
-  @@id([PROJECTID, MANAGEREMAIL])
-  @@index([MANAGEREMAIL], map: "MANAGEREMAIL")
+  task   Task    @relation(fields: [taskId], references: [id])
+  taskId String
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  deleted Boolean @default(false)
 }
 
-model project_technician_bridge {
-  PROJECTID       Int
-  TECHNICIANEMAIL String @db.VarChar(255)
-
-  @@id([PROJECTID, TECHNICIANEMAIL])
-  @@index([TECHNICIANEMAIL], map: "TECHNICIANEMAIL")
+model File {
+  id        String   @id @default(uuid())
+  name      String
+  task      Task     @relation("File", fields: [taskId], references: [id])
+  taskId    String
+  Comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId String?
+  deleted   Boolean  @default(false)
 }
 
-model project_viewer_bridge {
-  PROJECTID   Int
-  VIEWEREMAIL String @db.VarChar(255)
+model Activity {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id])
+  project   Project   @relation(fields: [projectId], references: [id])
+  activity  String
+  timestamp DateTime? @default(now()) @db.Timestamp(0)
 
-  @@id([PROJECTID, VIEWEREMAIL])
-  @@index([VIEWEREMAIL], map: "VIEWEREMAIL")
-}
-
-model projecttagbridge {
-  TAGID     Int
-  PROJECTID Int
-
-  @@id([TAGID, PROJECTID])
-  @@index([PROJECTID], map: "PROJECTID")
-}
-
-model role {
-  ROLEID   Int     @id @default(autoincrement())
-  ROLENAME String? @db.VarChar(255)
-}
-
-model tag {
-  TAGID   Int     @id @default(autoincrement())
-  TAGNAME String? @db.VarChar(255)
-}
-
-model task {
-  TASKID           Int       @id @default(autoincrement())
-  NAME             String?   @db.VarChar(255)
-  STARTDATE        DateTime? @db.DateTime(0)
-  ENDDATE          DateTime? @db.DateTime(0)
-  PROGRESS         Int?      @default(0)
-  DESCRIPTION      String?   @db.VarChar(255)
-  STATUS           String?   @db.VarChar(50)
-  PRIORITY         String?   @db.VarChar(50)
-  ISACTIVE         Int?      @default(1)
-  PROJECTID        Int?
-  DURATION         String?   @db.VarChar(50)
-  TAG              String?   @db.VarChar(255)
-  DEPENDENCY       Int?
-  projectPROJECTID Int?
-  DEPENDENCIES     task[]    @relation("Dependencies")
-  DEPENDENTTASK    task[]    @relation("Dependencies")
-
-  @@index([PROJECTID], map: "PROJECTID")
-}
-
-model task_file_bridge {
-  FILEID Int
-  TASKID Int
-
-  @@id([FILEID, TASKID])
-  @@index([TASKID], map: "TASKID")
-}
-
-model task_technician_bridge {
-  EMAIL  String @db.VarChar(255)
-  TASKID Int
-
-  @@id([EMAIL, TASKID])
-  @@index([TASKID], map: "TASKID")
-}
-
-model task_user_bridge {
-  EMAIL  String @db.VarChar(255)
-  TASKID Int
-
-  @@id([EMAIL, TASKID])
-  @@index([TASKID], map: "TASKID")
-}
-
-model user {
-  EMAIL             String  @id @unique(map: "EMAIL") @db.VarChar(255)
-  PASSWORD          String? @db.VarChar(255)
-  FIRSTNAME         String? @db.VarChar(255)
-  LASTNAME          String? @db.VarChar(255)
-  ISACTIVE          Int?    @default(1)
-  IS_EMAIL_VERIFIED Int?    @default(0)
-  TAG               String? @db.VarChar(255)
-  COMPANYID         Int?
-  ROLEID            Int?
-  METHODID          Int?
-  PHONE_NUMBER      String? @db.VarChar(20)
-  JOB_TITLE         String? @db.VarChar(255)
-
-  @@index([COMPANYID], map: "COMPANYID")
-  @@index([METHODID], map: "METHODID")
-  @@index([ROLEID], map: "ROLEID")
-}
-
-model user_activity {
-  ACTIVITYID  Int       @id @default(autoincrement())
-  EMAIL       String?   @db.VarChar(255)
-  TIMESTAMP   DateTime? @default(now()) @db.Timestamp(0)
-  DESCRIPTION String?   @db.VarChar(255)
-  PROJECTID   Int?
-
-  @@index([EMAIL], map: "EMAIL")
-  @@index([PROJECTID], map: "PROJECTID")
-}
-
-model user_project_bridge {
-  USER_EMAIL String   @db.VarChar(255)
-  PROJECTID  Int
-  IS_MANAGER Boolean? @default(false)
-
-  @@id([USER_EMAIL, PROJECTID])
-  @@index([PROJECTID], map: "PROJECTID")
-}
-
-model user_task_bridge {
-  USER_EMAIL    String   @db.VarChar(255)
-  TASKID        Int
-  IS_TECHNICIAN Boolean? @default(false)
-
-  @@id([USER_EMAIL, TASKID])
-  @@index([TASKID], map: "TASKID")
-}
-
-model usertagbridge {
-  TAGID Int
-  EMAIL String @db.VarChar(255)
-
-  @@id([TAGID, EMAIL])
-  @@index([EMAIL], map: "EMAIL")
-}
-
-model viewer_bridge {
-  PROJECTID   Int
-  VIEWEREMAIL String @db.VarChar(255)
-
-  @@id([PROJECTID, VIEWEREMAIL])
-  @@index([VIEWEREMAIL], map: "VIEWEREMAIL")
+  userId    String
+  projectId String
 }

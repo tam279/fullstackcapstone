@@ -1,266 +1,269 @@
 // projectController.js
 
-const mysql = require('mysql2/promise');
-const db = require('../db/database');
+const mysql = require("mysql2/promise");
+const db = require("../db/database");
 
-const ACTION_TYPES = {
-  CREATE: 'CREATE',
-  UPDATE: 'UPDATE',
-  DELETE: 'DELETE',
-};
+// getProjects will get name, startDate,endDate, company, technicians, viewers, manager, tasks
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 exports.getProjects = async (req, res) => {
-    const sql = `
-        SELECT PROJECT.*, CONCAT(USER.FIRSTNAME, ' ', USER.LASTNAME) AS MANAGERNAME
-        FROM PROJECT
-        INNER JOIN PROJECT_MANAGER_BRIDGE ON PROJECT.PROJECTID = PROJECT_MANAGER_BRIDGE.PROJECTID
-        INNER JOIN USER ON PROJECT_MANAGER_BRIDGE.MANAGEREMAIL = USER.EMAIL`;
-
-    try {
-        const [result, fields] = await db.query(sql);
-        res.status(200).json(result);
-    } catch (err) {
-        console.log("Error message: ", err.message);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
-    }
-};
-
-exports.createProject = async (req, res) => {
-  const {
-    NAME,
-    STARTDATE,
-    ENDDATE,
-    STATUS,
-    MANAGEREMAIL,
-    TECHNICIANEMAILS,
-    VIEWEREMAILS,
-    DESCRIPTION,
-    COMPANYID
-  } = req.body;
-
-  // Format STARTDATE and ENDDATE to MySQL Date format
-  const formattedStartDate = new Date(STARTDATE).toISOString().slice(0, 10);
-  const formattedEndDate = new Date(ENDDATE).toISOString().slice(0, 10);
-
-  const sqlProject =
-    "INSERT INTO PROJECT (NAME, STARTDATE, ENDDATE, STATUS, DESCRIPTION, COMPANYID) VALUES (?, ?, ?, ?, ?, ?)";
-  const sqlProjectManagerBridge =
-    "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
-  const sqlProjectTechnicianBridge =
-    "INSERT INTO PROJECT_TECHNICIAN_BRIDGE (PROJECTID, TECHNICIANEMAIL) VALUES (?, ?)";
-  const sqlProjectViewerBridge =
-    "INSERT INTO VIEWER_BRIDGE (PROJECTID, VIEWEREMAIL) VALUES (?, ?)";
-
   try {
-    const [projectResult] = await db.query(sqlProject, [
-      NAME,
-      formattedStartDate,
-      formattedEndDate,
-      STATUS,
-      DESCRIPTION,
-      parseInt(COMPANYID)
-    ]);
+    const projects = await prisma.project.findMany({
+      select: {
+        name: true,
+        startDate: true,
+        endDate: true,
+        company: {
+          select: {
+            name: true,
+          },
+        },
+        technicians: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        viewers: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        manager: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        tasks: {
+          select: {
+            name: true,
+            description: true,
+            status: true,
+            priorityLevel: true,
+            startDate: true,
+            endDate: true,
+            technicians: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+            comments: {
+              select: {
+                comment: true,
+                timeStamp: true,
+                User: {
+                  // Changed from 'user' to 'User'
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    const projectId = projectResult.insertId;
-
-    await db.query(sqlProjectManagerBridge, [projectId, MANAGEREMAIL]);
-
-    for (let technicianEmail of TECHNICIANEMAILS) {
-      await db.query(sqlProjectTechnicianBridge, [projectId, technicianEmail]);
-    }
-
-    for (let viewerEmail of VIEWEREMAILS) {
-      await db.query(sqlProjectViewerBridge, [projectId, viewerEmail]);
-    }
-
-    res.status(200).send({ message: "Project created successfully" });
-    const activitySql =
-      "INSERT INTO USER_ACTIVITY (USER_EMAIL, ACTION_TYPE, TARGET_TYPE, TARGET_ID, TIMESTAMP) VALUES (?, ?, ?, ?, NOW())";
-    await db.query(activitySql, [req.user?.email, ACTION_TYPES.CREATE, 'PROJECT', projectId]);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: "An error occurred", error: err.message });
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching projects" });
   }
 };
 
-
-
-exports.updateProject = async (req, res) => {
-    const id = req.params.id;
+// createProject need name, startDate, endDate, deleted, manager, technicians, viewer, description, company
+// Create Project
+exports.createProject = async (req, res) => {
+  try {
     const {
-        NAME,
-        STARTDATE,
-        ENDDATE,
-        PROGRESS,
-        STATUS,
-        MANAGEREMAIL,
-        DESCRIPTION,
-        COMPANYID,
-        TECHNICIANEMAILS,
-        VIEWEREMAILS
+      name,
+      startDate,
+      endDate,
+      manager,
+      technicians,
+      viewer,
+      description,
+      company,
     } = req.body;
-
-    // Format STARTDATE and ENDDATE to MySQL Date format
-    const formattedStartDate = new Date(STARTDATE).toISOString().slice(0, 10);
-    const formattedEndDate = new Date(ENDDATE).toISOString().slice(0, 10);
-
-
-    const checkEmailSql = "SELECT * FROM USER WHERE EMAIL = ?";
-    const [emailResult] = await db.query(checkEmailSql, [MANAGEREMAIL]);
-
-    if (emailResult.length === 0) {
-        return res.status(400).send({ message: 'MANAGEREMAIL not found in User table' });
-    }
-
-
-    const sqlUpdateProject =
-        "UPDATE PROJECT SET NAME = ?, STARTDATE = ?, ENDDATE = ?, PROGRESS = ?, STATUS = ?, DESCRIPTION = ?, COMPANYID = ? WHERE PROJECTID = ?";
-    const sqlDeleteManagerBridge = "DELETE FROM PROJECT_MANAGER_BRIDGE WHERE PROJECTID = ?";
-    const sqlInsertManagerBridge =
-        "INSERT INTO PROJECT_MANAGER_BRIDGE (PROJECTID, MANAGEREMAIL) VALUES (?, ?)";
-    const sqlDeleteTechnicianBridge = "DELETE FROM PROJECT_TECHNICIAN_BRIDGE WHERE PROJECTID = ?";
-    const sqlInsertTechnicianBridge =
-        "INSERT INTO PROJECT_TECHNICIAN_BRIDGE (PROJECTID, TECHNICIANEMAIL) VALUES (?, ?)";
-    const sqlDeleteViewerBridge = "DELETE FROM VIEWER_BRIDGE WHERE PROJECTID = ?";
-    const sqlInsertViewerBridge =
-        "INSERT INTO VIEWER_BRIDGE (PROJECTID, VIEWEREMAIL) VALUES (?, ?)";
-
-    try {
-        await db.query(sqlUpdateProject, [
-            NAME,
-            formattedStartDate,
-            formattedEndDate,
-            PROGRESS,
-            STATUS,
-            DESCRIPTION,
-            COMPANYID,
-            id
-        ]);
-
-        // Update Manager
-        await db.query(sqlDeleteManagerBridge, [id]);
-        await db.query(sqlInsertManagerBridge, [id, MANAGEREMAIL]);
-
-        // Update Technicians
-        await db.query(sqlDeleteTechnicianBridge, [id]);
-        for (let technicianEmail of TECHNICIANEMAILS) {
-            await db.query(sqlInsertTechnicianBridge, [id, technicianEmail]);
-        }
-
-        // Update Viewers
-        await db.query(sqlDeleteViewerBridge, [id]);
-        for (let viewerEmail of VIEWEREMAILS) {
-            await db.query(sqlInsertViewerBridge, [id, viewerEmail]);
-        }
-
-        res.status(200).send({ message: 'Project updated successfully' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
-    }
+    const newProject = await prisma.project.create({
+      data: {
+        name,
+        startDate,
+        endDate,
+        manager: { connect: { id: manager } }, // Assuming you pass an ID
+        technicians: { connect: technicians.map((tech) => ({ id: tech })) }, // Assuming you pass an array of IDs
+        viewers: { connect: { id: viewer } }, // Assuming you pass an ID
+        description,
+        company: { connect: { id: company } }, // Assuming you pass an ID
+        deleted: false,
+      },
+    });
+    res.status(200).json(newProject);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the project" });
+  }
 };
 
+// Update Project
+exports.updateProject = async (req, res) => {
+  const id = req.params.id; // make sure to get the id from the params
 
+  const {
+    name,
+    startDate,
+    endDate,
+    manager,
+    technicians,
+    viewer,
+    description,
+    company,
+  } = req.body;
 
+  try {
+    const updatedProject = await prisma.project.update({
+      where: {
+        id: id, // use the id as is (assuming it's a string)
+      },
+      data: {
+        name,
+        startDate,
+        endDate,
+        manager: {
+          connect: {
+            id: manager,
+          },
+        },
+        technicians: {
+          set: technicians.map((techId) => ({
+            id: techId,
+          })),
+        },
+        viewers: {
+          connect: {
+            id: viewer,
+          },
+        },
+        description,
+        company: {
+          connect: {
+            id: company,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the project" });
+  }
+};
+
+// Delete (soft delete) Project
 exports.deleteProject = async (req, res) => {
-    const id = req.params.id;
-    const sqlProject = "DELETE FROM PROJECT WHERE PROJECTID = ?";
-    const sqlProjectManagerBridge = "DELETE FROM PROJECT_MANAGER_BRIDGE WHERE PROJECTID = ?";
-    const sqlProjectTechnicianBridge = "DELETE FROM PROJECT_TECHNICIAN_BRIDGE WHERE PROJECTID = ?";
-    const sqlProjectViewerBridge = "DELETE FROM VIEWER_BRIDGE WHERE PROJECTID = ?";
-
-    try {
-        // Delete from bridge tables first
-        await db.query(sqlProjectManagerBridge, [id]);
-        await db.query(sqlProjectTechnicianBridge, [id]);
-        await db.query(sqlProjectViewerBridge, [id]);
-
-        // Then delete from Project table
-        await db.query(sqlProject, [id]);
-
-        res.status(200).send({ message: 'Project deleted successfully' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
-    }
+  try {
+    const { id } = req.params;
+    const deletedProject = await prisma.project.update({
+      where: { id },
+      data: {
+        deleted: true,
+      },
+    });
+    res.status(200).json({ message: "Project successfully deleted" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the project" });
+  }
 };
+
+// Get a specific Project
 exports.getProject = async (req, res) => {
+  try {
     const id = req.params.id;
-    try {
-        // SQL to get basic project details
-        let sql = "SELECT * FROM PROJECT WHERE PROJECTID = ?";
-        const [result] = await db.query(sql, [id]);
-        if (result.length === 0) {
-            return res.status(404).send({ message: 'No project found with the provided ID' });
-        }
-        const project = result[0];
+    const project = await prisma.project.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        startDate: true,
+        endDate: true,
+        company: {
+          select: {
+            name: true,
+          },
+        },
+        technicians: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        viewers: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        manager: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        tasks: {
+          select: {
+            name: true,
+            description: true,
+            status: true,
+            priorityLevel: true,
+            startDate: true,
+            endDate: true,
+            technicians: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+            comments: {
+              select: {
+                comment: true,
+                timeStamp: true,
+                User: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-        // SQL to get manager of the project
-        sql = `SELECT CONCAT(u.FIRSTNAME, ' ' ,u.LASTNAME) NAME, pmb.MANAGEREMAIL FROM USER u INNER JOIN PROJECT_MANAGER_BRIDGE pmb 
-                ON u.EMAIL = pmb.MANAGEREMAIL WHERE pmb.PROJECTID = ?`;
-        const [manager] = await db.query(sql, [id]);
-        project.manager = manager;
-
-        // SQL to get technicians of the project
-        sql = `SELECT CONCAT(u.FIRSTNAME, ' ' ,u.LASTNAME) NAME, ptb.TECHNICIANEMAIL FROM USER u INNER JOIN PROJECT_TECHNICIAN_BRIDGE ptb 
-                ON u.EMAIL = ptb.TECHNICIANEMAIL WHERE ptb.PROJECTID = ?`;
-        const [technicians] = await db.query(sql, [id]);
-        project.technicians = technicians;
-
-        // SQL to get viewers of the project
-        sql = `SELECT CONCAT(u.FIRSTNAME, ' ' ,u.LASTNAME) NAME ,vb.VIEWEREMAIL FROM USER u INNER JOIN VIEWER_BRIDGE vb 
-                ON u.EMAIL = vb.VIEWEREMAIL WHERE vb.PROJECTID = ?`;
-        const [viewers] = await db.query(sql, [id]);
-        project.viewers = viewers;
-
-        // SQL to get total tasks and completed tasks
-        sql = `SELECT COUNT(*) AS TOTAL_TASKS, 
-                COUNT(CASE WHEN STATUS = 'Completed' THEN 1 END) AS COMPLETED_TASKS
-                FROM TASK WHERE PROJECTID = ?`;
-        const [tasks] = await db.query(sql, [id]);
-        project.total_tasks = tasks[0].TOTAL_TASKS;
-        project.completed_tasks = tasks[0].COMPLETED_TASKS;
-
-        res.status(200).json(project);
-    } catch (err) {
-        console.log("Error message: ", err.message);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
+    if (!project) {
+      return res
+        .status(404)
+        .json({ message: "No project found with the provided ID" });
     }
+
+    res.status(200).json(project);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the project" });
+  }
 };
-
-
-exports.activateProject = async (req, res) => {
-    const id = req.params.id;
-    const sql = "UPDATE PROJECT SET ISACTIVE = '1' WHERE PROJECTID = ?";
-
-    try {
-        const [result] = await db.query(sql, [id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).send({ message: 'No project found with the provided ID' });
-        }
-
-        res.status(200).send({ message: 'Project activated successfully' });
-    } catch (err) {
-        console.log("Error message: ", err.message);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
-    }
-};
-
-exports.deactivateProject = async (req, res) => {
-    const id = req.params.id;
-    const sql = "UPDATE PROJECT SET ISACTIVE = '0' WHERE PROJECTID = ?";
-
-    try {
-        const [result] = await db.query(sql, [id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).send({ message: 'No project found with the provided ID' });
-        }
-
-        res.status(200).send({ message: 'Project deactivated successfully' });
-    } catch (err) {
-        console.log("Error message: ", err.message);
-        res.status(500).send({ message: 'An error occurred', error: err.message });
-    }
-};
-
