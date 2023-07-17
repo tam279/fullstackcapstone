@@ -4,16 +4,17 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
 }
 
 model comment {
-  COMMENTID Int       @id @default(autoincrement())
-  COMMENT   String?   @db.VarChar(255)
-  DATE      DateTime? @db.Date
+  COMMENTID String    @id
+  COMMENT   String?
+  DATE      DateTime?
   TASKID    Int?
-  EMAIL     String?   @db.VarChar(255)
+  EMAIL     String?
+  FILENAME  String?
 
   @@index([EMAIL], map: "EMAIL")
   @@index([TASKID], map: "TASKID")
@@ -24,57 +25,52 @@ model comment_file_bridge {
   FILEID    Int
 
   @@id([COMMENTID, FILEID])
-  @@index([FILEID], map: "FILEID")
 }
 
 model company {
-  COMPANYID    Int       @id @default(autoincrement())
-  COMPANYNAME  String?   @db.VarChar(255)
-  CREATED_AT   DateTime? @db.Timestamp(0)
+  COMPANYID    String    @id
+  COMPANYNAME  String?
+  CREATED_AT   DateTime?
   ISACTIVE     Int?      @default(1)
-  ADDRESS      String?   @db.VarChar(255)
-  PHONE_NUMBER String?   @db.VarChar(20)
-  WEBSITE      String?   @db.VarChar(255)
+  ADDRESS      String?
+  PHONE_NUMBER String?
+  WEBSITE      String?
 }
 
 model file {
-  FILEID       Int     @id @default(autoincrement())
-  FILENAME     String? @db.VarChar(255)
-  FILELOCATION String? @db.VarChar(255)
+  FILEID       Int     @id @default(sequence())
+  FILENAME     String?
+  FILELOCATION String?
 }
 
 model login_method {
-  METHODID   Int     @id @default(autoincrement())
-  METHODNAME String? @db.VarChar(255)
+  METHODID   Int     @id @default(sequence())
+  METHODNAME String?
 }
 
 model password_reset_tokens {
-  EMAIL       String?   @db.VarChar(255)
-  TOKEN       String    @id @db.VarChar(255)
+  EMAIL       String?
+  TOKEN       String    @id
   EXPIRY_DATE DateTime? @db.Timestamp(0)
-
-  @@index([EMAIL], map: "EMAIL")
 }
 
 model project {
-  PROJECTID       Int       @id @default(autoincrement())
-  NAME            String?   @db.VarChar(255)
-  DESCRIPTION     String?   @db.VarChar(255)
-  STARTDATE       DateTime? @db.Date
-  ENDDATE         DateTime? @db.Date
-  STATUS          String?   @default("Not Started") @db.VarChar(50)
-  TOTAL_TASKS     Int?      @default(0)
-  COMPLETED_TASKS Int?      @default(0)
-  PROGRESS        Int?      @default(0)
-  ISACTIVE        Int?      @default(1)
-  COMPANYID       Int?
+  PROJECTID   String    @id
+  NAME        String?
+  DESCRIPTION String?
+  STARTDATE   DateTime?
+  ENDDATE     DateTime?
+  STATUS      String?   @default("Not Started")
+  PROGRESS    Int?      @default(0)
+  ISACTIVE    Int?      @default(1)
+  COMPANYID   Int?
 
   @@index([COMPANYID], map: "COMPANYID")
 }
 
 model project_manager_bridge {
   PROJECTID    Int
-  MANAGEREMAIL String @db.VarChar(255)
+  MANAGEREMAIL String
 
   @@id([PROJECTID, MANAGEREMAIL])
   @@index([MANAGEREMAIL], map: "MANAGEREMAIL")
@@ -82,7 +78,7 @@ model project_manager_bridge {
 
 model project_technician_bridge {
   PROJECTID       Int
-  TECHNICIANEMAIL String @db.VarChar(255)
+  TECHNICIANEMAIL String
 
   @@id([PROJECTID, TECHNICIANEMAIL])
   @@index([TECHNICIANEMAIL], map: "TECHNICIANEMAIL")
@@ -90,7 +86,7 @@ model project_technician_bridge {
 
 model project_viewer_bridge {
   PROJECTID   Int
-  VIEWEREMAIL String @db.VarChar(255)
+  VIEWEREMAIL String
 
   @@id([PROJECTID, VIEWEREMAIL])
   @@index([VIEWEREMAIL], map: "VIEWEREMAIL")
@@ -105,32 +101,30 @@ model projecttagbridge {
 }
 
 model role {
-  ROLEID   Int     @id @default(autoincrement())
-  ROLENAME String? @db.VarChar(255)
+  ROLEID   String  @id
+  ROLENAME String?
 }
 
 model tag {
-  TAGID   Int     @id @default(autoincrement())
-  TAGNAME String? @db.VarChar(255)
+  TAGID   String  @id
+  TAGNAME String?
 }
 
 model task {
-  TASKID           Int       @id @default(autoincrement())
-  NAME             String?   @db.VarChar(255)
-  STARTDATE        DateTime? @db.DateTime(0)
-  ENDDATE          DateTime? @db.DateTime(0)
+  TASKID           String    @id
+  NAME             String?
+  STARTDATE        DateTime?
+  ENDDATE          DateTime?
   PROGRESS         Int?      @default(0)
-  DESCRIPTION      String?   @db.VarChar(255)
-  STATUS           String?   @db.VarChar(50)
-  PRIORITY         String?   @db.VarChar(50)
+  DESCRIPTION      String?
+  STATUS           String?
+  PRIORITY         String?
   ISACTIVE         Int?      @default(1)
   PROJECTID        Int?
-  DURATION         String?   @db.VarChar(50)
-  TAG              String?   @db.VarChar(255)
+  DURATION         String?
+  TAG              String?
   DEPENDENCY       Int?
   projectPROJECTID Int?
-  DEPENDENCIES     task[]    @relation("Dependencies")
-  DEPENDENTTASK    task[]    @relation("Dependencies")
 
   @@index([PROJECTID], map: "PROJECTID")
 }
@@ -144,7 +138,7 @@ model task_file_bridge {
 }
 
 model task_technician_bridge {
-  EMAIL  String @db.VarChar(255)
+  EMAIL  String
   TASKID Int
 
   @@id([EMAIL, TASKID])
@@ -152,7 +146,7 @@ model task_technician_bridge {
 }
 
 model task_user_bridge {
-  EMAIL  String @db.VarChar(255)
+  EMAIL  String
   TASKID Int
 
   @@id([EMAIL, TASKID])
@@ -160,18 +154,18 @@ model task_user_bridge {
 }
 
 model user {
-  EMAIL             String  @id @unique(map: "EMAIL") @db.VarChar(255)
-  PASSWORD          String? @db.VarChar(255)
-  FIRSTNAME         String? @db.VarChar(255)
-  LASTNAME          String? @db.VarChar(255)
+  EMAIL             String  @id @unique(map: "EMAIL")
+  PASSWORD          String?
+  FIRSTNAME         String?
+  LASTNAME          String?
   ISACTIVE          Int?    @default(1)
   IS_EMAIL_VERIFIED Int?    @default(0)
-  TAG               String? @db.VarChar(255)
+  TAG               String?
   COMPANYID         Int?
   ROLEID            Int?
   METHODID          Int?
-  PHONE_NUMBER      String? @db.VarChar(20)
-  JOB_TITLE         String? @db.VarChar(255)
+  PHONE_NUMBER      String?
+  JOB_TITLE         String?
 
   @@index([COMPANYID], map: "COMPANYID")
   @@index([METHODID], map: "METHODID")
@@ -179,10 +173,10 @@ model user {
 }
 
 model user_activity {
-  ACTIVITYID  Int       @id @default(autoincrement())
-  EMAIL       String?   @db.VarChar(255)
+  ACTIVITYID  String    @id
+  EMAIL       String?
   TIMESTAMP   DateTime? @default(now()) @db.Timestamp(0)
-  DESCRIPTION String?   @db.VarChar(255)
+  DESCRIPTION String?
   PROJECTID   Int?
 
   @@index([EMAIL], map: "EMAIL")
@@ -190,7 +184,7 @@ model user_activity {
 }
 
 model user_project_bridge {
-  USER_EMAIL String   @db.VarChar(255)
+  USER_EMAIL String
   PROJECTID  Int
   IS_MANAGER Boolean? @default(false)
 
@@ -199,7 +193,7 @@ model user_project_bridge {
 }
 
 model user_task_bridge {
-  USER_EMAIL    String   @db.VarChar(255)
+  USER_EMAIL    String
   TASKID        Int
   IS_TECHNICIAN Boolean? @default(false)
 
@@ -209,7 +203,7 @@ model user_task_bridge {
 
 model usertagbridge {
   TAGID Int
-  EMAIL String @db.VarChar(255)
+  EMAIL String
 
   @@id([TAGID, EMAIL])
   @@index([EMAIL], map: "EMAIL")
@@ -217,8 +211,27 @@ model usertagbridge {
 
 model viewer_bridge {
   PROJECTID   Int
-  VIEWEREMAIL String @db.VarChar(255)
+  VIEWEREMAIL String
 
   @@id([PROJECTID, VIEWEREMAIL])
   @@index([VIEWEREMAIL], map: "VIEWEREMAIL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Dependencies {
+  A Int
+  B Int
+
+  @@map("_Dependencies")
+  @@ignore
+}
+
+model prisma_new_comment {
+  COMMENTID Int       @id(map: "comment_pkey") @default(sequence())
+  COMMENT   String?
+  DATE      DateTime? @db.Date
+  TASKID    Int?
+  EMAIL     String?
+
+  @@map("_prisma_new_comment")
 }
