@@ -30,18 +30,25 @@ app.use(
 );
 
 //DEV ONLY CORS remove localhost from deployment
+// Enable CORS for all routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 //use cors middleware to only allow our front end to use this api
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "https://capdep-1vfm28xyt-azriee.vercel.app",
-      "https://capdep.vercel.app/",
-    ], // replace this with your React application URL
-    credentials: true, // this enables cookies to be sent with requests from the client
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // add 'OPTIONS' to this array
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:3000",
+//       "https://capdep-1vfm28xyt-azriee.vercel.app",
+//       "https://capdep.vercel.app/",
+//     ], // replace this with your React application URL
+//     credentials: true, // this enables cookies to be sent with requests from the client
+//     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // add 'OPTIONS' to this array
+//   })
+// );
 
 app.use(bodyParser.json());
 
