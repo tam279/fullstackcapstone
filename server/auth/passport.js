@@ -13,16 +13,15 @@ passport.use(
     async (email, password, done) => {
       try {
         // Query the user based on the provided email
-        const user = await prisma.user.findUnique({ where: { EMAIL: email } });
-        console.log(user);
+        const user = await prisma.user.findUnique({
+          where: { email: email.toLowerCase() },
+        });
         if (!user) {
           // User not found, authentication failed
           return done(null, false);
         }
-
-        console.log(bcrypt.hashSync(password, 10));
         // Verify the password
-        bcrypt.compare(password, user.PASSWORD, (err, isMatch) => {
+        bcrypt.compare(password, user.password, (err, isMatch) => {
           if (err) {
             // Handle error
             return console.error(err);
@@ -35,7 +34,10 @@ passport.use(
 
             // Add the token to the user
             user.token = token;
-
+            // Remove Uncesessary fields from the user for return
+            delete user.password;
+            delete user.id;
+            delete user.deleted;
             // Pass the user to the next middleware
             return done(null, user);
           } else {
