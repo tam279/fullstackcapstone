@@ -18,8 +18,7 @@ const session = require("express-session");
 
 const app = express();
 const helmet = require("helmet");
-// Enable CORS for all routes
-app.use(cors());
+
 // Set the limit option to a larger value
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(
@@ -32,7 +31,7 @@ app.use(
 //use cors middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // replace this with your React application URL
+    origin: "https://capdep-1vfm28xyt-azriee.vercel.app/", // replace this with your React application URL
     credentials: true, // this enables cookies to be sent with requests from the client
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // add 'OPTIONS' to this array
   })
