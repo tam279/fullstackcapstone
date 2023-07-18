@@ -8,8 +8,6 @@ const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
 const activityController = require("./controllers/activityController");
 
-
-
 const commentController = require("./controllers/commentController");
 
 const multer = require("multer");
@@ -20,7 +18,8 @@ const session = require("express-session");
 
 const app = express();
 const helmet = require("helmet");
-
+// Enable CORS for all routes
+app.use(cors());
 // Set the limit option to a larger value
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(
@@ -94,8 +93,6 @@ app.post("/api/companies", companyController.createCompany);
 app.put("/api/company/:id", companyController.updateCompany);
 app.delete("/api/company/:id", companyController.deleteCompany);
 
-
-
 // This is
 // app.get("/api/user/:email", async (req, res) => {
 //   try {
@@ -123,7 +120,6 @@ app.post("/api/project/:projectId/tasks", taskController.createTask); // Creatin
 app.put("/api/project/:projectId/task/:taskId", taskController.updateTask); // Use :taskId instead of :id for clarity
 app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask); // Use :taskId instead of :id for clarity
 app.get("/api/project/:projectId/task/:taskId", taskController.getTask); // To get a specific task of a project
-
 
 // User activity routes
 app.get("/api/userActivity", activityController.getUserActivity);
