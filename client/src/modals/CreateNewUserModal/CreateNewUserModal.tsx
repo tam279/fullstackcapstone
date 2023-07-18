@@ -1,6 +1,6 @@
-import React, { FC, useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col, Table } from 'react-bootstrap';
-import config from '../../config';
+import React, { FC, useState, useEffect } from "react";
+import { Modal, Button, Form, Table } from "react-bootstrap";
+import config from "../../config";
 
 interface NewUserModalProps {
   show: boolean;
@@ -9,70 +9,94 @@ interface NewUserModalProps {
 }
 
 interface Company {
-  COMPANYID: number;
-  COMPANYNAME: string;
-  CREATED_AT: string;
-  ISACTIVE: number;
+  id: string;
+  name: string;
+  address: string;
+  phoneNumber: string;
+  website: string;
+  deleted: boolean;
 }
 
-const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+const NewUserModal: FC<NewUserModalProps> = ({
+  show,
+  onHide,
+  onUserCreated,
+}) => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [company, setCompany] = useState<number | null>(null);
   const [role, setRole] = useState<number | null>(null);
-  const [email, setEmail] = useState('');
-  const [loginMethod, setLoginMethod] = useState<number | null>(null);
-  const [password, setPassword] = useState('');
-  const [tag, setTag] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [jobTitle, setJobTitle] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [tag, setTag] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
     fetch(`${config.backend}/api/companies`)
-      .then(response => response.json())
-      .then(data => setCompanies(data))
-      .catch(error => console.error('Error:', error));
+      .then((response) => response.json())
+      .then((data) => setCompanies(data))
+      .catch((error) => console.error("Error:", error));
   }, []);
 
   const handleCreateUser = () => {
+    if (
+      !firstName ||
+      !lastName ||
+      !company ||
+      !role ||
+      !email ||
+      !password ||
+      !phoneNumber ||
+      !jobTitle
+    ) {
+      alert("Please fill out all fields");
+      return;
+    }
+
     const newUser = {
       firstName: firstName,
       lastName: lastName,
-      companyID: company,
-      roleID: role,
+      companyId: company,
+      role: role,
       email: email,
       password: password,
-      methodID: loginMethod,
-      tag: tag,
       phoneNumber: phoneNumber,
       jobTitle: jobTitle,
+      deleted: false,
     };
 
-    fetch(`${config.backend}/api/createUser`, {
-      method: 'POST',
+    fetch(`${config.backend}/api/users`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(newUser),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to create user");
+        }
+        return response.json();
+      })
       .then((data) => {
         console.log(data);
         onUserCreated();
       })
-      .catch((error) => console.error('Error:', error));
+      .catch((error) => {
+        alert(error);
+        console.error("Error:", error);
+      });
 
-    setFirstName('');
-    setLastName('');
+    setFirstName("");
+    setLastName("");
     setCompany(null);
     setRole(null);
-    setEmail('');
-    setLoginMethod(null);
-    setPassword('');
-    setTag('');
-    setPhoneNumber('');
-    setJobTitle('');
+    setEmail("");
+    setPassword("");
+    setPhoneNumber("");
+    setJobTitle("");
 
     onHide();
   };
@@ -87,7 +111,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
         <Table striped bordered hover>
           <tbody>
             <tr>
-              <td><strong>Email:</strong></td>
+              <td>
+                <strong>Email:</strong>
+              </td>
               <td>
                 <Form.Control
                   type="email"
@@ -96,7 +122,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </td>
-              <td><strong>First Name:</strong></td>
+              <td>
+                <strong>First Name:</strong>
+              </td>
               <td>
                 <Form.Control
                   type="text"
@@ -105,7 +133,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setFirstName(e.target.value)}
                 />
               </td>
-              <td><strong>Last Name:</strong></td>
+              <td>
+                <strong>Last Name:</strong>
+              </td>
               <td>
                 <Form.Control
                   type="text"
@@ -116,26 +146,30 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
               </td>
             </tr>
             <tr>
-              <td><strong>Company:</strong></td>
+              <td>
+                <strong>Company:</strong>
+              </td>
               <td>
                 <Form.Control
                   as="select"
-                  value={company || ''}
+                  value={company || ""}
                   onChange={(e) => setCompany(Number(e.target.value) || null)}
                 >
                   <option value="">Select Company</option>
                   {companies.map((company, index) => (
-                    <option key={index} value={company.COMPANYID}>
-                      {company.COMPANYNAME}
+                    <option key={index} value={company.id}>
+                      {company.name}
                     </option>
                   ))}
                 </Form.Control>
               </td>
-              <td><strong>Role:</strong></td>
+              <td>
+                <strong>Role:</strong>
+              </td>
               <td>
                 <Form.Control
                   as="select"
-                  value={role || ''}
+                  value={role || ""}
                   onChange={(e) => setRole(Number(e.target.value) || null)}
                 >
                   <option value="">Select Role</option>
@@ -145,22 +179,11 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   <option value={4}>Viewers</option>
                 </Form.Control>
               </td>
-              <td><strong>Login Method:</strong></td>
-              <td>
-                <Form.Control
-                  as="select"
-                  value={loginMethod || ''}
-                  onChange={(e) => setLoginMethod(Number(e.target.value) || null)}
-                >
-                  <option value="">Select Login Method</option>
-                  <option value={1}>Google</option>
-                  <option value={2}>Microsoft</option>
-                  <option value={3}>Our own password</option>
-                </Form.Control>
-              </td>
             </tr>
             <tr>
-              <td><strong>Password:</strong></td>
+              <td>
+                <strong>Password:</strong>
+              </td>
               <td>
                 <Form.Control
                   type="password"
@@ -169,7 +192,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </td>
-              <td><strong>Tag:</strong></td>
+              <td>
+                <strong>Tag:</strong>
+              </td>
               <td>
                 <Form.Control
                   type="text"
@@ -178,7 +203,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
                   onChange={(e) => setTag(e.target.value)}
                 />
               </td>
-              <td><strong>Phone Number:</strong></td>
+              <td>
+                <strong>Phone Number:</strong>
+              </td>
               <td>
                 <Form.Control
                   type="text"
@@ -189,7 +216,9 @@ const NewUserModal: FC<NewUserModalProps> = ({ show, onHide, onUserCreated }) =>
               </td>
             </tr>
             <tr>
-              <td><strong>Job Title:</strong></td>
+              <td>
+                <strong>Job Title:</strong>
+              </td>
               <td colSpan={5}>
                 <Form.Control
                   type="text"

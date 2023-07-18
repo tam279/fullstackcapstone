@@ -9,17 +9,14 @@ interface User {
   LASTNAME: string;
   COMPANYNAME: string;
   ROLENAME: string;
-  METHODNAME: string;
   TAG: string;
   PHONE_NUMBER: string;
   JOB_TITLE: string;
   ISACTIVE: number;
   COMPANY: string;
   ROLE: string;
-  LOGIN_METHOD: string;
   COMPANYID: number | undefined;
   ROLEID: number | undefined;
-  METHODID: number | undefined;
 }
 
 interface Company {
@@ -35,10 +32,6 @@ interface Role {
   ROLENAME: string;
 }
 
-interface LoginMethod {
-  METHODID: number;
-  METHODNAME: string;
-}
 
 interface EditUserModalProps {
   show: boolean;
@@ -46,12 +39,9 @@ interface EditUserModalProps {
   user: User;
   updateUser: (email: string, updatedUser: User) => void;
   deleteUser: (email: string) => void;
-  deactivateUser: (email: string) => void; // Added deactivateUser prop
-  activateUser: (email: string) => void; // Added activateUser prop
   fetchUsers: () => void;
   companies: Company[];
   roles: Role[];
-  loginMethods: LoginMethod[];
 }
 
 const EditUserModal: React.FC<EditUserModalProps> = ({
@@ -60,11 +50,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   user,
   updateUser,
   deleteUser,
-  deactivateUser,
   fetchUsers,
   companies,
   roles,
-  loginMethods,
 }) => {
   const getCompanyId = (companyName: string) => {
     const company = companies.find((comp) => comp.COMPANYNAME === companyName);
@@ -74,11 +62,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const getRoleId = (roleName: string) => {
     const role = roles.find((rol) => rol.ROLENAME === roleName);
     return role ? role.ROLEID : undefined;
-  };
-
-  const getMethodId = (methodName: string) => {
-    const method = loginMethods.find((method) => method.METHODNAME === methodName);
-    return method ? method.METHODID : undefined;
   };
 
   const getCompanyName = (companyId: number | undefined): string | undefined => {
@@ -91,22 +74,12 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     return role ? role.ROLENAME : undefined;
   };
 
-  const getMethodName = (loginMethodId: number | undefined): string | undefined => {
-    const method = loginMethods.find(m => m.METHODID === loginMethodId);
-    return method ? method.METHODNAME : undefined;
-  };
-
-  useEffect(() => {
-    console.log(loginMethods);
-  }, [loginMethods]);
-
   useEffect(() => {
     if (user) {
       setFirstName(user.FIRSTNAME);
       setLastName(user.LASTNAME);
       setCompanyId(user.COMPANYID !== undefined ? user.COMPANYID.toString() : undefined);
       setRoleId(user.ROLEID !== undefined ? user.ROLEID.toString() : undefined);
-      setLoginMethodId(user.METHODID !== undefined ? user.METHODID.toString() : undefined);
       setTag(user.TAG);
       setPhoneNumber(user.PHONE_NUMBER);
       setJobTitle(user.JOB_TITLE);
@@ -122,9 +95,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [roleId, setRoleId] = useState<string | undefined>(
     user.ROLEID !== undefined ? user.ROLEID.toString() : undefined
   );
-  const [loginMethodId, setLoginMethodId] = useState<string | undefined>(
-    user.METHODID !== undefined ? user.METHODID.toString() : undefined
-  );
+
   const [tag, setTag] = useState(user.TAG);
   const [phoneNumber, setPhoneNumber] = useState(user.PHONE_NUMBER);
   const [jobTitle, setJobTitle] = useState(user.JOB_TITLE);
@@ -138,7 +109,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       LASTNAME: lastName,
       COMPANYID: companyId !== undefined ? Number(companyId) : undefined,
       ROLEID: roleId !== undefined ? Number(roleId) : undefined,
-      METHODID: loginMethodId !== undefined ? Number(loginMethodId) : undefined,
       TAG: tag,
       PHONE_NUMBER: phoneNumber,
       JOB_TITLE: jobTitle,
@@ -154,26 +124,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   };
 
-  const handleActivate = async () => {
-    try {
-      await axios.put(`${config.backend}/api/activateUser/${user.EMAIL}`);
-      fetchUsers();
-      onHide();
-    } catch (error) {
-      console.error('Error activating user', error);
-    }
-  };
-
-  const handleDeactivate = async () => {
-    try {
-      await axios.put(`${config.backend}/api/deactivateUser/${user.EMAIL}`);
-      fetchUsers();
-      onHide();
-    } catch (error) {
-      console.error('Error deactivating user', error);
-    }
-  };
-
   const handleDelete = async () => {
     try {
       await axios.delete(`${config.backend}/api/deleteUser/${user.EMAIL}`);
@@ -183,8 +133,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       console.error('Error deleting user', error);
     }
   };
-  const log = loginMethods
-  console.log(loginMethods);
+
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
@@ -253,20 +202,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     ))}
                   </Form.Control>
                 </td>
-                <td><strong>Login Method:</strong></td>
-                <td>
-                  <Form.Control
-                    as="select"
-                    value={loginMethodId}
-                    onChange={(e) => setLoginMethodId(e.target.value)}
-                  >
-                    {loginMethods.map((method) => (
-                      <option key={method.METHODID} value={method.METHODID}>
-                        {method.METHODNAME}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </td>
+         
               </tr>
               <tr>
                 <td><strong>Phone Number:</strong></td>
@@ -310,12 +246,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
         <Modal.Footer>
           <Button variant="danger" onClick={handleDelete}>
             Delete
-          </Button>
-          <Button variant="warning" onClick={handleDeactivate}>
-            Deactivate
-          </Button>
-          <Button variant="success" onClick={handleActivate}>
-            Activate
           </Button>
           <Button variant="secondary" onClick={onHide}>
             Cancel

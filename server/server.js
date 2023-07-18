@@ -91,9 +91,6 @@ app.delete("/api/user/:id", userController.deleteUser);
 
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);
-
-// done until here
-
 app.post("/api/companies", companyController.createCompany);
 app.put("/api/company/:id", companyController.updateCompany);
 app.delete("/api/company/:id", companyController.deleteCompany);
