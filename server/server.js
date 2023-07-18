@@ -12,7 +12,6 @@ const activityController = require("./controllers/activityController");
 
 const commentController = require("./controllers/commentController");
 
-console.log(commentController);
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
 
