@@ -142,3 +142,22 @@ model Activity {
   userId    String
   projectId String
 }
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Dependencies {
+  A Int
+  B Int
+
+  @@map("_Dependencies")
+  @@ignore
+}
+
+model prisma_new_comment {
+  COMMENTID Int       @id(map: "comment_pkey") @default(sequence())
+  COMMENT   String?
+  DATE      DateTime? @db.Date
+  TASKID    Int?
+  EMAIL     String?
+
+  @@map("_prisma_new_comment")
+}
