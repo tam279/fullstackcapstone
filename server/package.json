@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "start dep": "node server.js"
+    "startdep": "node server.js",
+    "startbuild": "npm install && npx prisma generate"
   },
   "keywords": [],
   "author": "",

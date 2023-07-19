@@ -8,11 +8,8 @@ const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
 const activityController = require("./controllers/activityController");
 
-
-
 const commentController = require("./controllers/commentController");
 
-console.log(commentController);
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
 
@@ -34,7 +31,7 @@ app.use(
 //use cors middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // replace this with your React application URL
+    origin: "https://capdep-1vfm28xyt-azriee.vercel.app", // replace this with your React application URL
     credentials: true, // this enables cookies to be sent with requests from the client
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // add 'OPTIONS' to this array
   })
@@ -95,8 +92,6 @@ app.post("/api/companies", companyController.createCompany);
 app.put("/api/company/:id", companyController.updateCompany);
 app.delete("/api/company/:id", companyController.deleteCompany);
 
-
-
 // This is
 // app.get("/api/user/:email", async (req, res) => {
 //   try {
@@ -124,7 +119,6 @@ app.post("/api/project/:projectId/tasks", taskController.createTask); // Creatin
 app.put("/api/project/:projectId/task/:taskId", taskController.updateTask); // Use :taskId instead of :id for clarity
 app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask); // Use :taskId instead of :id for clarity
 app.get("/api/project/:projectId/task/:taskId", taskController.getTask); // To get a specific task of a project
-
 
 // User activity routes
 app.get("/api/userActivity", activityController.getUserActivity);
