@@ -28,10 +28,16 @@ app.use(
     parameterLimit: 50000,
   })
 );
-//use cors middleware
+
+//DEV ONLY CORS remove localhost from deployment
+//use cors middleware to only allow our front end to use this api
 app.use(
   cors({
-    origin: "https://capdep-1vfm28xyt-azriee.vercel.app", // replace this with your React application URL
+    origin: [
+      "http://localhost:3000",
+      "https://capdep-1vfm28xyt-azriee.vercel.app",
+      "https://capdep.vercel.app/",
+    ], // replace this with your React application URL
     credentials: true, // this enables cookies to be sent with requests from the client
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // add 'OPTIONS' to this array
   })
