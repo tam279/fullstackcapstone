@@ -10,65 +10,69 @@ import {
   InputGroup,
   FormControl,
 } from "react-bootstrap";
-import axios from "axios";
-import config from "../../config";
 import SidebarProject from "../../components/SidebarProject/SidebarProject";
 import NewUserModal from "../../modals/CreateNewUserModal/CreateNewUserModal";
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  company: Company;
-  role: string;
-  phoneNumber: string;
-  jobTitle: string;
-  deleted: any;
-}
-
-interface Company {
-  name: string;
-  address: string;
-  phoneNumber: string;
-  website: string;
-  deleted: boolean;
-}
+import NewCompanyModal from "../../modals/CreateNewCompanyModal/CreateNewCompanyModal";
+import { User, Company } from "../../problemdomain/Interface/Interface";
+import {
+  fetchUserData,
+  fetchCompanyData,
+} from "../../problemdomain/DataService/DataService";
+// import EditUserModal from "../../modals/EditUserModal/EditUserModal";
 
 const UserManagementPage = () => {
-  // Handle show the list of users
   const [userData, setUserData] = useState<User[]>([]);
-  const [showNewUserModal, setShowNewUserModal] = useState(false);
-  const handleShowNewUserModal = () => setShowNewUserModal(true);
-  const handleCloseNewUserModal = () => setShowNewUserModal(false);
-  const fetchUserData = () => {
-    axios
-      .get(`${config.backend}/api/users`)
-      .then((response) => {
-        setUserData(response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  // Handle showing the list of companies:
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>("userlist");
+  const [showModal, setShowModal] = useState(false);
+  const [showEditUserModal, setShowEditUserModal] = useState(false); // to control EditUserModal visibility
+  const [editingUser, setEditingUser] = useState<User | null>(null); // to hold the user that is being edited
 
-  useEffect(() => {
-    fetchCompanyData();
-  }, []);
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
-  const fetchCompanyData = async () => {
+  const fetchAndSetUserData = async () => {
     try {
-      const response = await axios.get(`${config.backend}/api/companies`);
-      setCompanies(response.data);
+      const newUserData = await fetchUserData();
+      setUserData(newUserData);
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const fetchAndSetCompanyData = async () => {
+    try {
+      const newCompanyData = await fetchCompanyData();
+      setCompanies(newCompanyData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [userData, companyData] = await Promise.all([
+          fetchUserData(),
+          fetchCompanyData(),
+        ]);
+        setUserData(userData);
+        setCompanies(companyData);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const handleShowEditUserModal = (user: User) => {
+    setEditingUser(user); // set the user that is being edited
+    setShowEditUserModal(true); // show the EditUserModal
+  };
+
+  const handleCloseEditUserModal = () => {
+    setEditingUser(null); // reset the user that is being edited
+    setShowEditUserModal(false); // hide the EditUserModal
   };
   return (
     <Container>
@@ -80,17 +84,21 @@ const UserManagementPage = () => {
         <Col xs={9} md={10} lg={10}>
           <div className="d-flex align-items-center justify-content-between my-3">
             <h1>User Management</h1>
-            <Button onClick={handleShowNewUserModal}>+ New User</Button>
+            <Button onClick={handleShowModal}>
+              {activeTab === "userlist" ? "+ New User" : "+ New Company"}
+            </Button>
           </div>
           <Tabs
             defaultActiveKey="userlist"
             id="user-management-tabs"
             className="mb-3"
+            onSelect={(k) => k !== null && setActiveTab(k)}
           >
             <Tab eventKey="userlist" title="User List">
               <Table striped bordered hover>
                 <thead>
                   <tr>
+                    <th>Edit</th>
                     <th>Email</th>
                     <th>First Name</th>
                     <th>Last Name</th>
@@ -104,6 +112,15 @@ const UserManagementPage = () => {
                 <tbody>
                   {userData.map((user) => (
                     <tr key={user.id}>
+                      <td>
+                        {" "}
+                        <Button
+                          variant="link"
+                          onClick={() => handleShowEditUserModal(user)}
+                        >
+                          Edit
+                        </Button>{" "}
+                      </td>
                       <td>{user.email}</td>
                       <td>{user.firstName}</td>
                       <td>{user.lastName}</td>
@@ -130,8 +147,8 @@ const UserManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {companies.map((company, index) => (
-                    <tr key={index}>
+                  {companies.map((company) => (
+                    <tr key={company.id}>
                       <td>{company.name}</td>
                       <td>{company.address}</td>
                       <td>{company.phoneNumber}</td>
@@ -145,11 +162,28 @@ const UserManagementPage = () => {
           </Tabs>
         </Col>
       </Row>
-      <NewUserModal
-        show={showNewUserModal}
-        onHide={handleCloseNewUserModal}
-        onUserCreated={fetchUserData}
-      />
+      {activeTab === "userlist" ? (
+        <NewUserModal
+          show={showModal}
+          onHide={handleCloseModal}
+          onUserCreated={fetchAndSetUserData}
+        />
+      ) : (
+        <NewCompanyModal
+          show={showModal}
+          onHide={handleCloseModal}
+          onSuccess={fetchAndSetCompanyData}
+        />
+      )}
+
+      {/* {editingUser && (
+        <EditUserModal
+          show={showEditUserModal}
+          onHide={handleCloseEditUserModal}
+          user={editingUser}
+          onUserUpdated={fetchAndSetUserData}
+        />
+      )} */}
     </Container>
   );
 };

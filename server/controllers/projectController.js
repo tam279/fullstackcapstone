@@ -77,8 +77,7 @@ exports.getProjects = async (req, res) => {
   }
 };
 
-// createProject need name, startDate, endDate, deleted, manager, technicians, viewer, description, company
-// Create Project
+// CreateProject need name, startDate, endDate, deleted, manager, technicians, viewer, description, company
 exports.createProject = async (req, res) => {
   try {
     const {
@@ -96,11 +95,11 @@ exports.createProject = async (req, res) => {
         name,
         startDate,
         endDate,
-        manager: { connect: { id: manager } }, // Assuming you pass an ID
-        technicians: { connect: technicians.map((tech) => ({ id: tech })) }, // Assuming you pass an array of IDs
-        viewers: { connect: { id: viewer } }, // Assuming you pass an ID
+        manager: { connect: { id: manager } },
+        technicians: { connect: technicians.map((tech) => ({ id: tech })) },
+        viewers: { connect: { id: viewer } },
         description,
-        company: { connect: { id: company } }, // Assuming you pass an ID
+        company: { connect: { id: company } },
         deleted: false,
       },
     });
@@ -131,7 +130,7 @@ exports.updateProject = async (req, res) => {
   try {
     const updatedProject = await prisma.project.update({
       where: {
-        id: id, // use the id as is (assuming it's a string)
+        id: id, 
       },
       data: {
         name,

@@ -13,4 +13,24 @@ async function testdb() {
   );
 }
 
+async function getUsers() {
+  const users = await prisma.user.findMany({
+    select: {
+      email: true,
+      firstName: true,
+      lastName: true,
+      company: {
+        select: { name: true },
+      },
+      role: true,
+      phoneNumber: true,
+      jobTitle: true,
+      deleted: true,
+    },
+  });
+  console.log(users);
+}
+
+getUsers();
+
 module.exports = { prisma, testdb };

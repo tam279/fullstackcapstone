@@ -68,13 +68,15 @@ model Project {
   startDate DateTime
   endDate   DateTime
 
-  tag         Tag[]
-  technicians User[]     @relation("Technicians")
-  viewers     User[]     @relation("Viewers")
-  manager     User       @relation("manager", fields: [managerId], references: [id])
+  tag Tag[]
+
+  technicians User[] @relation("Technicians")
+  viewers     User[] @relation("Viewers")
+  manager     User   @relation("manager", fields: [managerId], references: [id])
   managerId   String
-  tasks       Task[]
-  activity    Activity[]
+
+  tasks    Task[]
+  activity Activity[]
 
   deleted Boolean @default(false)
 }

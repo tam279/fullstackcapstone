@@ -1,20 +1,13 @@
 import React, { FC, useState, useEffect } from "react";
 import { Modal, Button, Form, Table } from "react-bootstrap";
+import { Company, User, Role } from "../../problemdomain/Interface/Interface";
+import { fetchCompanyData } from "../../problemdomain/DataService/DataService";
 import config from "../../config";
 
 interface NewUserModalProps {
   show: boolean;
   onHide: () => void;
-  onUserCreated: () => void;
-}
-
-interface Company {
-  id: string;
-  name: string;
-  address: string;
-  phoneNumber: string;
-  website: string;
-  deleted: boolean;
+  onUserCreated: (newUser: User) => void;
 }
 
 const NewUserModal: FC<NewUserModalProps> = ({
@@ -24,19 +17,20 @@ const NewUserModal: FC<NewUserModalProps> = ({
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [company, setCompany] = useState<number | null>(null);
-  const [role, setRole] = useState<number | null>(null);
+  const [company, setCompany] = useState<Company | null>(null); // Change here
+  const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tag, setTag] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
-    fetch(`${config.backend}/api/companies`)
-      .then((response) => response.json())
-      .then((data) => setCompanies(data))
+    fetchCompanyData()
+      .then((data) => {
+        console.log("Companies:", data);
+        setCompanies(data);
+      })
       .catch((error) => console.error("Error:", error));
   }, []);
 
@@ -58,7 +52,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
     const newUser = {
       firstName: firstName,
       lastName: lastName,
-      companyId: company,
+      companyId: company.id, // Change here
       role: role,
       email: email,
       password: password,
@@ -82,7 +76,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
       })
       .then((data) => {
         console.log(data);
-        onUserCreated();
+        onUserCreated(data);
       })
       .catch((error) => {
         alert(error);
@@ -152,8 +146,16 @@ const NewUserModal: FC<NewUserModalProps> = ({
               <td>
                 <Form.Control
                   as="select"
-                  value={company || ""}
-                  onChange={(e) => setCompany(Number(e.target.value) || null)}
+                  value={company ? company.id : ""}
+                  onChange={(e) => {
+                    const selectedCompanyId = e.target.value;
+                    console.log("Selected company ID:", selectedCompanyId);
+                    const selectedCompany = companies.find(
+                      (company) => company.id === selectedCompanyId
+                    );
+                    console.log("Selected company:", selectedCompany);
+                    setCompany(selectedCompany || null);
+                  }}
                 >
                   <option value="">Select Company</option>
                   {companies.map((company, index) => (
@@ -170,13 +172,14 @@ const NewUserModal: FC<NewUserModalProps> = ({
                 <Form.Control
                   as="select"
                   value={role || ""}
-                  onChange={(e) => setRole(Number(e.target.value) || null)}
+                  onChange={(e) => setRole(e.target.value as Role)}
                 >
                   <option value="">Select Role</option>
-                  <option value={1}>Admin</option>
-                  <option value={2}>Project Manager</option>
-                  <option value={3}>IT Technicians</option>
-                  <option value={4}>Viewers</option>
+                  {Object.values(Role).map((role, index) => (
+                    <option key={index} value={role}>
+                      {role}
+                    </option>
+                  ))}
                 </Form.Control>
               </td>
             </tr>
@@ -193,17 +196,6 @@ const NewUserModal: FC<NewUserModalProps> = ({
                 />
               </td>
               <td>
-                <strong>Tag:</strong>
-              </td>
-              <td>
-                <Form.Control
-                  type="text"
-                  placeholder="A+ Certification, Cisco +"
-                  value={tag}
-                  onChange={(e) => setTag(e.target.value)}
-                />
-              </td>
-              <td>
                 <strong>Phone Number:</strong>
               </td>
               <td>
@@ -214,12 +206,10 @@ const NewUserModal: FC<NewUserModalProps> = ({
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 />
               </td>
-            </tr>
-            <tr>
               <td>
                 <strong>Job Title:</strong>
               </td>
-              <td colSpan={5}>
+              <td>
                 <Form.Control
                   type="text"
                   placeholder="Enter job title"
