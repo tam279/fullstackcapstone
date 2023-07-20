@@ -41,7 +41,7 @@ app.use(
     ],
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-    preflightContinue: true,
+    preflightContinue: false,
   })
 );
 
@@ -152,6 +152,22 @@ app.delete("/api/comments/:id", commentController.deleteComment);
 //   commentController.updateComment
 // );
 
+const { sendContactEmail } = require("./service/mail");
+// Handle POST requests to '/contact' endpoint
+app.post("/contact", (req, res) => {
+  // Here you can access the form data sent from the frontend
+  const formData = req.body;
+  console.log(formData);
+
+  // Specify the recipient's email address for the contact form submission
+  const recipientEmail = process.env.CONTACT_EMAIL; // Replace with the recipient's email address
+  // Call the sendContactEmail function with the form data and recipient's email
+  sendContactEmail(formData, recipientEmail);
+
+  // Respond to the client
+  res.status(200).json({ message: "Form data received successfully." });
+});
+
 //email service
 const { sendEmail } = require("./service/mail");
 
@@ -189,7 +205,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     return res.json({ message: "File uploaded successfully", file: newFile });
   } catch (error) {
-    console.error('Error creating file entry:', error);
+    console.error("Error creating file entry:", error);
     return res.status(500).json({ error: "Error uploading the file" });
   }
 });
@@ -221,26 +237,6 @@ app.get("/download/:fileId", async (req, res) => {
   }
 });
 //upload feature end
-
-//prisma test
-const { prisma, testdb } = require("./prisma/prisma");
-app.get("/prismatest", async (req, res) => {
-  testdb();
-  res.send(
-    await prisma.uSER.findMany({
-      include: {
-        PROJECT_MANAGER_BRIDGE: true,
-        PROJECT_TECHNICIAN_BRIDGE: true,
-        VIEWER_BRIDGE: true,
-      },
-    })
-  );
-});
-(async () => {
-  const result = await prisma.project.findMany();
-  // console.log(result);
-})();
-//end prisma
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");

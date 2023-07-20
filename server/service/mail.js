@@ -1,7 +1,9 @@
+// Import required modules
 require('dotenv').config();
 const nodemailer = require("nodemailer");
 
-async function sendEmail() {
+// Function to send a contact form email
+async function sendContactEmail(formData, recipientEmail) {
   try {
     // Create a transporter
     const transporter = nodemailer.createTransport({
@@ -14,12 +16,12 @@ async function sendEmail() {
       },
     });
 
-    // Define email options
+    // Construct email message using the form data
     const mailOptions = {
-      from: "cproject275@gmail.com",
-      to: "ianazriel.almodovar@edu.sait.ca",
-      subject: "Test Email",
-      text: "This is a test email sent from Nodemailer.",
+      from: process.env.EMAIL,
+      to: recipientEmail, // Recipient's email address passed as a parameter
+      subject: "Contact Form Submission",
+      text: `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message}`,
     };
 
     // Send the email
@@ -31,4 +33,4 @@ async function sendEmail() {
   }
 }
 
-module.exports = { sendEmail };
+module.exports = { sendContactEmail };
