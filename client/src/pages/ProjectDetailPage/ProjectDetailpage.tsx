@@ -1,3 +1,4 @@
+// path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\fullstackcapstone\client\src\pages\ProjectDetailPage\ProjectDetailpage.tsx
 import React, { useEffect, useState } from "react";
 import { Button, Tabs, Tab, Table, Form, Row, Col } from "react-bootstrap";
 import { AiFillEdit } from "react-icons/ai";

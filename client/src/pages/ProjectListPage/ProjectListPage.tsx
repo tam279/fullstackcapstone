@@ -1,44 +1,34 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import SidebarProject from "../../components/SidebarProject/SidebarProject";
-import { Button, Table, ProgressBar, Form } from "react-bootstrap";
+import { Button, Table, Form } from "react-bootstrap";
 import "./ProjectListPage.css";
 import CreateNewProjectModal from "../../modals/CreateNewProjectModal/CreateNewProjectModal";
 import EditProjectModal from "../../modals/EditProjectModal/EditProjectModal";
 import axios from "axios";
 import config from "../../config";
-
-interface ProjectData {
-  PROJECTID: number;
-  NAME: string;
-  STARTDATE: string;
-  ENDDATE: string;
-  MANAGERNAME: string;
-  DESCRIPTION: string;
-  STATUS: string;
-  COMPANYID: number;
-  ISACTIVE: number;
-}
-
-interface CompanyData {
-  COMPANYID: number;
-  COMPANYNAME: string;
-}
+import {
+  Company,
+  Project,
+  User,
+} from "../../problemdomain/Interface/Interface";
+import {
+  fetchUserData,
+  fetchCompanyData,
+} from "../../problemdomain/DataService/DataService";
 
 const ProjectListPage = () => {
-  const [projects, setProjects] = useState<ProjectData[]>([]);
-  const [companies, setCompanies] = useState<CompanyData[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [users, setUsers] = useState<User[]>([]); // Add this line to hold users
+  const [companies, setCompanies] = useState<Company[]>([]); // Add this line to hold companies
   const [show, setShow] = useState(false);
-  const [editingProject, setEditingProject] = useState<ProjectData | null>(
-    null
-  );
-  const [filterDate, setFilterDate] = useState<string>(""); // Filter for the ENDDATE
-  const [filterStatus, setFilterStatus] = useState<string>(""); // Filter for the STATUS
-  const location = useLocation();
+  const [showEdit, setShowEdit] = useState(false); // Added this line
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
+    fetchUsers();
     fetchCompanies();
   }, []);
 
@@ -61,34 +51,26 @@ const ProjectListPage = () => {
         }
       });
   };
-
-  // New fetch function for companies
-  const fetchCompanies = () => {
-    axios
-      .get(`${config.backend}/api/companies`)
-      .then((response) => {
-        setCompanies(response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  const fetchUsers = async () => {
+    const fetchedUsers = await fetchUserData();
+    setUsers(fetchedUsers);
   };
-  const handleClose = () => setShow(false);
+
+  const fetchCompanies = async () => {
+    const fetchedCompanies = await fetchCompanyData();
+    setCompanies(fetchedCompanies);
+  };
+
+  const handleClose = () => {
+    setShow(false);
+    setShowEdit(false);
+  }; // Updated this line
   const handleShow = () => setShow(true);
 
-  const handleProjectClick = (project: ProjectData) => {
-    const projectPath = `/project/${project.PROJECTID}`;
+  const handleProjectClick = (project: Project) => {
+    const projectPath = `/project/${project.id}`;
     navigate(projectPath);
   };
-
-  const displayedProjects = projects
-    .filter((project) => {
-      return (
-        (!filterDate || new Date(project.ENDDATE) > new Date(filterDate)) &&
-        (!filterStatus || project.STATUS === filterStatus)
-      );
-    })
-    .sort((a, b) => a.NAME.localeCompare(b.NAME));
 
   return (
     <div className="ProjectListPage">
@@ -110,75 +92,42 @@ const ProjectListPage = () => {
                   + New Project
                 </Button>
               </th>
-              <th>Project ID</th>
               <th>Name</th>
               <th>Start date</th>
-              <th>
-                End date
-                <Form.Control
-                  type="date"
-                  placeholder="Filter by end date"
-                  value={filterDate}
-                  onChange={(e) => setFilterDate(e.target.value)}
-                />
-              </th>
+              <th>End date</th>
               <th>Manager name</th>
               <th>Description</th>
               <th>Company Name</th>
-              <th>
-                Status
-                <Form.Control
-                  as="select"
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="">Filter by status...</option>
-                  <option value="Not Started">Not Started</option>
-                  <option value="In process">In Process</option>
-                  <option value="Completed">Completed</option>
-                  {/* Add more status options here... */}
-                </Form.Control>
-              </th>
-              <th>Is Active</th>
-              <th>Actions</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {displayedProjects.map((project) => (
-              <tr key={project.PROJECTID}>
+            {projects.map((project) => (
+              <tr key={project.id}>
                 <td>
                   <Button
                     variant="primary"
-                    onClick={() => setEditingProject(project)}
+                    onClick={() => {
+                      setEditingProject(project);
+                      setShowEdit(true);
+                    }}
                   >
-                    Edit
+                    Edit{" "}
                   </Button>
                 </td>
                 <td>
                   <div onClick={() => handleProjectClick(project)}>
-                    {project.PROJECTID}
+                    {project.name}
                   </div>
                 </td>
+                <td>{new Date(project.startDate).toLocaleDateString()}</td>
+                <td>{new Date(project.endDate).toLocaleDateString()}</td>
                 <td>
-                  <div>{project.NAME}</div>
+                  {project.manager.firstName} {project.manager.lastName}
                 </td>
-                <td>{new Date(project.STARTDATE).toLocaleDateString()}</td>
-                <td>{new Date(project.ENDDATE).toLocaleDateString()}</td>
-                <td>{project.MANAGERNAME}</td>
-                <td>{project.DESCRIPTION}</td>
-                <td>
-                  {companies.find(
-                    (company) => company.COMPANYID === project.COMPANYID
-                  )?.COMPANYNAME || "Unknown"}
-                </td>
-                <td>{project.STATUS}</td>
-                <td>
-                  {project.ISACTIVE === 1
-                    ? "Active"
-                    : project.ISACTIVE === 0
-                    ? "Inactive"
-                    : "Unknown"}
-                </td>
+                <td>{project.description}</td>
+                <td>{project.company.name}</td>
+                <td>{project.deleted ? "Deleted" : "Active"}</td>
               </tr>
             ))}
           </tbody>
@@ -187,16 +136,20 @@ const ProjectListPage = () => {
         <CreateNewProjectModal
           show={show}
           handleClose={handleClose}
-          companies={companies}
           refetchProjects={fetchProjects}
+          companies={[]}
         />
-        <EditProjectModal
-          show={editingProject !== null}
-          handleClose={() => setEditingProject(null)}
-          projectId={editingProject?.PROJECTID || 0} // Update prop name to projectId
-          refetchProjects={fetchProjects}
-          companies={companies}
-        />
+
+        {editingProject && (
+          <EditProjectModal
+            show={showEdit} // Updated this line
+            handleClose={handleClose}
+            project={editingProject}
+            refetchProjects={fetchProjects}
+            users={users}
+            companies={companies} // Replace roles with companies
+          />
+        )}
       </div>
     </div>
   );

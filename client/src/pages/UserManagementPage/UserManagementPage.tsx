@@ -18,7 +18,8 @@ import {
   fetchUserData,
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
-// import EditUserModal from "../../modals/EditUserModal/EditUserModal";
+import EditUserModal from "../../modals/EditUserModal/EditUserModal";
+import EditCompanyModal from "../../modals/EditCompanyModal/EditCompanyModal";
 
 const UserManagementPage = () => {
   const [userData, setUserData] = useState<User[]>([]);
@@ -27,6 +28,8 @@ const UserManagementPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false); // to control EditUserModal visibility
   const [editingUser, setEditingUser] = useState<User | null>(null); // to hold the user that is being edited
+  const [showEditCompanyModal, setShowEditCompanyModal] = useState(false); // to control EditCompanyModal visibility
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null); // to hold the company that is being edited
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -65,6 +68,7 @@ const UserManagementPage = () => {
 
     fetchData();
   }, []);
+
   const handleShowEditUserModal = (user: User) => {
     setEditingUser(user); // set the user that is being edited
     setShowEditUserModal(true); // show the EditUserModal
@@ -74,6 +78,17 @@ const UserManagementPage = () => {
     setEditingUser(null); // reset the user that is being edited
     setShowEditUserModal(false); // hide the EditUserModal
   };
+
+  const handleShowEditCompanyModal = (company: Company) => {
+    setEditingCompany(company); // set the company that is being edited
+    setShowEditCompanyModal(true); // show the EditCompanyModal
+  };
+
+  const handleCloseEditCompanyModal = () => {
+    setEditingCompany(null); // reset the company that is being edited
+    setShowEditCompanyModal(false); // hide the EditCompanyModal
+  };
+
   return (
     <Container>
       <Row>
@@ -139,6 +154,7 @@ const UserManagementPage = () => {
               <Table striped bordered hover>
                 <thead>
                   <tr>
+                    <th>Edit</th>
                     <th>Name</th>
                     <th>Address</th>
                     <th>Phone Number</th>
@@ -149,6 +165,14 @@ const UserManagementPage = () => {
                 <tbody>
                   {companies.map((company) => (
                     <tr key={company.id}>
+                      <td>
+                        <Button
+                          variant="link"
+                          onClick={() => handleShowEditCompanyModal(company)}
+                        >
+                          Edit
+                        </Button>{" "}
+                      </td>
                       <td>{company.name}</td>
                       <td>{company.address}</td>
                       <td>{company.phoneNumber}</td>
@@ -175,15 +199,32 @@ const UserManagementPage = () => {
           onSuccess={fetchAndSetCompanyData}
         />
       )}
-
-      {/* {editingUser && (
+      {editingUser && (
         <EditUserModal
           show={showEditUserModal}
           onHide={handleCloseEditUserModal}
           user={editingUser}
           onUserUpdated={fetchAndSetUserData}
+          updateUser={function (email: string, updatedUser: User): void {
+            throw new Error("Function not implemented.");
+          }}
+          deleteUser={function (email: string): void {
+            throw new Error("Function not implemented.");
+          }}
+          fetchUsers={fetchAndSetUserData} // changed here
+          companies={companies} // pass the companies data here
+          roles={[]}
         />
-      )} */}
+      )}
+
+      {editingCompany && (
+        <EditCompanyModal
+          show={showEditCompanyModal}
+          onHide={handleCloseEditCompanyModal}
+          company={editingCompany}
+          fetchCompanies={fetchAndSetCompanyData}
+        />
+      )}
     </Container>
   );
 };

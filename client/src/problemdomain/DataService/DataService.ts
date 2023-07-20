@@ -11,3 +11,4 @@ export const fetchCompanyData = async () => {
   const response = await axios.get(`${config.backend}/api/companies`);
   return response.data;
 };
+

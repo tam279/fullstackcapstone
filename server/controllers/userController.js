@@ -12,11 +12,12 @@ exports.getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
+        id: true,
         email: true,
         firstName: true,
         lastName: true,
         company: {
-          select: { name: true },
+          select: { id: true, name: true },
         },
         role: true,
         phoneNumber: true,
@@ -71,6 +72,8 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const id = req.params.id; // Extract the id parameter correctly
+  console.log("id:", id);
+
   const {
     email,
     firstName,
@@ -128,8 +131,6 @@ exports.deleteUser = async (req, res) => {
       .json({ error: "An error occurred while deleting the user" });
   }
 };
-
-
 
 // Ian need for User Login
 // exports.getUserByEmail = async (email) => {
