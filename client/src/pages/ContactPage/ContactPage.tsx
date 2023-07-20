@@ -3,6 +3,7 @@ import Footer from '../../components/Footer/Footer';
 import './ContactPage.css';
 import Navigation from '../../components/Navigation/Navigation';
 import { Container, Row, Col } from 'react-bootstrap';
+import ContactForm from './ContactForm';
 
 const ContactPage: FC = () => {
     return (
@@ -30,14 +31,7 @@ const ContactPage: FC = () => {
                         </div>
                     </Col>
                     <Col md={6}>
-                        <form className="contact-form">
-                            <h2>Contact Form:</h2>
-                            <input type="text" name="name" placeholder="Name" required />
-                            <input type="email" name="email" placeholder="Email" required />
-                            <input type="tel" name="phone" placeholder="Phone number" required />
-                            <textarea name="message" placeholder="Message" required></textarea>
-                            <button type="submit">Submit</button>
-                        </form>
+                        <ContactForm />
                     </Col>
                 </Row>
             </Container>
