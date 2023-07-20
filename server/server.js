@@ -10,8 +10,8 @@ const activityController = require("./controllers/activityController");
 
 const commentController = require("./controllers/commentController");
 
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
+// const multer = require("multer");
+// const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
 
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -31,15 +31,17 @@ app.use(
 
 //DEV ONLY CORS remove localhost from deployment
 //use cors middleware to only allow our front end to use this api
+// Enable CORS for all routes
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
       "https://capdep-1vfm28xyt-azriee.vercel.app",
-      "https://capdep.vercel.app/",
-    ], // replace this with your React application URL
-    credentials: true, // this enables cookies to be sent with requests from the client
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"], // add 'OPTIONS' to this array
+      "https://capdep.vercel.app",
+    ],
+    credentials: true,
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    preflightContinue: false,
   })
 );
 
@@ -138,17 +140,33 @@ app.get(
 app.get("/api/comments", commentController.getComments);
 app.get("/api/comments/task", commentController.getCommentsByTaskId);
 app.post("/api/comments", commentController.createComment);
-app.put(
-  "/api/comments/:id/file",
-  upload.single("file"),
-  commentController.updateComment
-);
+// app.put(
+//   "/api/comments/:id/file",
+//   upload.single("file"),
+//   commentController.updateComment
+// );
 app.delete("/api/comments/:id", commentController.deleteComment);
-app.put(
-  "/api/comments/:id",
-  upload.single("file"),
-  commentController.updateComment
-);
+// app.put(
+//   "/api/comments/:id",
+//   upload.single("file"),
+//   commentController.updateComment
+// );
+
+const { sendContactEmail } = require("./service/mail");
+// Handle POST requests to '/contact' endpoint
+app.post("/contact", (req, res) => {
+  // Here you can access the form data sent from the frontend
+  const formData = req.body;
+  console.log(formData);
+
+  // Specify the recipient's email address for the contact form submission
+  const recipientEmail = process.env.CONTACT_EMAIL; // Replace with the recipient's email address
+  // Call the sendContactEmail function with the form data and recipient's email
+  sendContactEmail(formData, recipientEmail);
+
+  // Respond to the client
+  res.status(200).json({ message: "Form data received successfully." });
+});
 
 //email service
 const { sendEmail } = require("./service/mail");
@@ -160,25 +178,65 @@ app.get("/api/sendmail", (req, res) => {
 });
 //email end
 
-//prisma test
-const { prisma, testdb } = require("./prisma/prisma");
-app.get("/prismatest", async (req, res) => {
-  testdb();
-  res.send(
-    await prisma.uSER.findMany({
-      include: {
-        PROJECT_MANAGER_BRIDGE: true,
-        PROJECT_TECHNICIAN_BRIDGE: true,
-        VIEWER_BRIDGE: true,
-      },
-    })
-  );
+//upload feature
+const { createFileEntry, getFileById } = require("./service/file-feature/file");
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB in bytes
+  },
 });
-(async () => {
-  const result = await prisma.project.findMany();
-  // console.log(result);
-})();
-//end prisma
+
+app.post("/upload", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file provided" });
+  }
+
+  // Access the file data (bytes) as a Buffer: req.file.buffer
+  const fileDataBytes = req.file.buffer;
+
+  // Access the original filename as a string: req.file.originalname
+  const filename = req.file.originalname;
+
+  try {
+    // Create a new file entry in the database using the createFileEntry function
+    const newFile = await createFileEntry(filename, fileDataBytes);
+
+    return res.json({ message: "File uploaded successfully", file: newFile });
+  } catch (error) {
+    console.error("Error creating file entry:", error);
+    return res.status(500).json({ error: "Error uploading the file" });
+  }
+});
+//download
+
+app.get("/download/:fileId", async (req, res) => {
+  const fileId = req.params.fileId;
+
+  try {
+    // Fetch the file data from the database by its ID
+    const file = await getFileById(fileId);
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Convert the file data (Bytes) from the database to a Buffer
+    const fileData = Buffer.from(file.data);
+
+    // Set response headers for file download
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename="${file.name}"`);
+
+    // Send the Buffer data as the response body
+    res.send(fileData);
+  } catch (error) {
+    console.error("Error fetching file by ID:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+//upload feature end
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");
