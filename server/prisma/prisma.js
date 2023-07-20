@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function testdb() {
   console.log(
-    await prisma.uSER.findMany({
+    await prisma.user.findMany({
       include: {
         PROJECT_MANAGER_BRIDGE: true,
         PROJECT_TECHNICIAN_BRIDGE: true,

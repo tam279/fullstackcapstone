@@ -10,8 +10,8 @@ const activityController = require("./controllers/activityController");
 
 const commentController = require("./controllers/commentController");
 
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
+// const multer = require("multer");
+// const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
 
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -32,16 +32,18 @@ app.use(
 //DEV ONLY CORS remove localhost from deployment
 //use cors middleware to only allow our front end to use this api
 // Enable CORS for all routes
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://capdep-1vfm28xyt-azriee.vercel.app",
-    "https://capdep.vercel.app",
-  ],
-  credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-  preflightContinue: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://capdep-1vfm28xyt-azriee.vercel.app",
+      "https://capdep.vercel.app",
+    ],
+    credentials: true,
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    preflightContinue: true,
+  })
+);
 
 app.use(bodyParser.json());
 
@@ -138,17 +140,17 @@ app.get(
 app.get("/api/comments", commentController.getComments);
 app.get("/api/comments/task", commentController.getCommentsByTaskId);
 app.post("/api/comments", commentController.createComment);
-app.put(
-  "/api/comments/:id/file",
-  upload.single("file"),
-  commentController.updateComment
-);
+// app.put(
+//   "/api/comments/:id/file",
+//   upload.single("file"),
+//   commentController.updateComment
+// );
 app.delete("/api/comments/:id", commentController.deleteComment);
-app.put(
-  "/api/comments/:id",
-  upload.single("file"),
-  commentController.updateComment
-);
+// app.put(
+//   "/api/comments/:id",
+//   upload.single("file"),
+//   commentController.updateComment
+// );
 
 //email service
 const { sendEmail } = require("./service/mail");
@@ -159,6 +161,66 @@ app.get("/api/sendmail", (req, res) => {
   res.json({ message }); // Send the response as JSON
 });
 //email end
+
+//upload feature
+const { createFileEntry, getFileById } = require("./service/file-feature/file");
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB in bytes
+  },
+});
+
+app.post("/upload", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file provided" });
+  }
+
+  // Access the file data (bytes) as a Buffer: req.file.buffer
+  const fileDataBytes = req.file.buffer;
+
+  // Access the original filename as a string: req.file.originalname
+  const filename = req.file.originalname;
+
+  try {
+    // Create a new file entry in the database using the createFileEntry function
+    const newFile = await createFileEntry(filename, fileDataBytes);
+
+    return res.json({ message: "File uploaded successfully", file: newFile });
+  } catch (error) {
+    console.error('Error creating file entry:', error);
+    return res.status(500).json({ error: "Error uploading the file" });
+  }
+});
+//download
+
+app.get("/download/:fileId", async (req, res) => {
+  const fileId = req.params.fileId;
+
+  try {
+    // Fetch the file data from the database by its ID
+    const file = await getFileById(fileId);
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Convert the file data (Bytes) from the database to a Buffer
+    const fileData = Buffer.from(file.data);
+
+    // Set response headers for file download
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename="${file.name}"`);
+
+    // Send the Buffer data as the response body
+    res.send(fileData);
+  } catch (error) {
+    console.error("Error fetching file by ID:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+//upload feature end
 
 //prisma test
 const { prisma, testdb } = require("./prisma/prisma");

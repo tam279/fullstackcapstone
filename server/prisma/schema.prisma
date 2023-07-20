@@ -9,147 +9,108 @@ datasource db {
 }
 
 model Company {
-  id          String @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   address     String
   phoneNumber String
   website     String
-
-  users    User[]
-  projects Project[]
-  deleted  Boolean   @default(false)
+  deleted     Boolean   @default(false)
+  projects    Project[]
+  users       User[]
 }
 
 model User {
-  id          String     @id @default(uuid())
-  email       String     @unique
-  password    String
-  firstName   String
-  lastName    String
-  role        Role       @default(USER)
-  company     Company    @relation(fields: [companyId], references: [id])
-  companyId   String
-  phoneNumber String
-  jobTitle    String
-  tags        Tag[]
-  tasks       Task[]
-  comments    Comment[]
-  activity    Activity[]
-
-  projectsAsTechnician Project[] @relation("Technicians")
-  projectsAsViewer     Project[] @relation("Viewers")
-  projectsAsManager    Project[] @relation("manager")
-
-  deleted Boolean @default(false)
-}
-
-enum Role {
-  USER
-  ADMIN
+  id                   String     @id @default(uuid())
+  email                String     @unique
+  password             String
+  firstName            String
+  lastName             String
+  role                 Role       @default(USER)
+  companyId            String
+  phoneNumber          String
+  jobTitle             String
+  deleted              Boolean    @default(false)
+  activity             Activity[]
+  comments             Comment[]
+  projectsAsManager    Project[]  @relation("manager")
+  company              Company    @relation(fields: [companyId], references: [id])
+  tags                 Tag[]      @relation("TagToUser")
+  tasks                Task[]     @relation("TaskToUser")
+  projectsAsTechnician Project[]  @relation("Technicians")
+  projectsAsViewer     Project[]  @relation("Viewers")
 }
 
 model Tag {
-  id   String @id @default(uuid())
-  name String
-
-  users    User[]
-  projects Project[]
-
-  deleted Boolean @default(false)
+  id       String    @id @default(uuid())
+  name     String
+  deleted  Boolean   @default(false)
+  projects Project[] @relation("ProjectToTag")
+  users    User[]    @relation("TagToUser")
 }
 
 model Project {
-  id          String  @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String
-  company     Company @relation(fields: [companyId], references: [id])
   companyId   String
   description String
-
-  startDate DateTime
-  endDate   DateTime
-
-  tag         Tag[]
+  startDate   DateTime
+  endDate     DateTime
+  managerId   String
+  deleted     Boolean    @default(false)
+  activity    Activity[]
+  company     Company    @relation(fields: [companyId], references: [id])
+  manager     User       @relation("manager", fields: [managerId], references: [id])
+  tasks       Task[]
+  tag         Tag[]      @relation("ProjectToTag")
   technicians User[]     @relation("Technicians")
   viewers     User[]     @relation("Viewers")
-  manager     User       @relation("manager", fields: [managerId], references: [id])
-  managerId   String
-  tasks       Task[]
-  activity    Activity[]
-
-  deleted Boolean @default(false)
 }
 
 model Task {
-  id          String   @id @default(uuid())
-  name        String
-  project     Project? @relation(fields: [projectId], references: [id])
-  projectId   String?
-  description String
-
+  id            String    @id @default(uuid())
+  name          String
+  projectId     String?
+  description   String
   status        Status
   priorityLevel Int
-
-  startDate DateTime
-  endDate   DateTime
-
-  technicians User[]
-  comments    Comment[]
-  files       File[]    @relation("File")
-
-  dependencies   Task[] @relation("Dependencies")
-  dependentTasks Task[] @relation("Dependencies")
-
-  deleted Boolean @default(false)
-}
-
-enum Status {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETED
+  startDate     DateTime
+  endDate       DateTime
+  deleted       Boolean   @default(false)
+  comments      Comment[]
+  project       Project?  @relation(fields: [projectId], references: [id])
+  technicians   User[]    @relation("TaskToUser")
 }
 
 model Comment {
   id        String   @id @default(uuid())
   comment   String
   timeStamp DateTime
+  taskId    String
+  userId    String?
+  deleted   Boolean  @default(false)
+  task      Task     @relation(fields: [taskId], references: [id])
+  User      User?    @relation(fields: [userId], references: [id])
   files     File[]
-
-  task   Task    @relation(fields: [taskId], references: [id])
-  taskId String
-  User   User?   @relation(fields: [userId], references: [id])
-  userId String?
-
-  deleted Boolean @default(false)
 }
 
 model File {
   id        String   @id @default(uuid())
   name      String
-  task      Task     @relation("File", fields: [taskId], references: [id])
-  taskId    String
-  Comment   Comment? @relation(fields: [commentId], references: [id])
+  taskId    String?
   commentId String?
   deleted   Boolean  @default(false)
+  data      Bytes
+  Comment   Comment? @relation(fields: [commentId], references: [id])
 }
 
 model Activity {
   id        String    @id @default(uuid())
-  user      User      @relation(fields: [userId], references: [id])
-  project   Project   @relation(fields: [projectId], references: [id])
   activity  String
   timestamp DateTime? @default(now()) @db.Timestamp(0)
-
   userId    String
   projectId String
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Dependencies {
-  A Int
-  B Int
-
-  @@map("_Dependencies")
-  @@ignore
+  project   Project   @relation(fields: [projectId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model prisma_new_comment {
@@ -160,4 +121,15 @@ model prisma_new_comment {
   EMAIL     String?
 
   @@map("_prisma_new_comment")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
 }
