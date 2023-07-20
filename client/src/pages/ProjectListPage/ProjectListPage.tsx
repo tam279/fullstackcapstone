@@ -23,7 +23,6 @@ interface ProjectData {
 interface CompanyData {
   COMPANYID: number;
   COMPANYNAME: string;
-  // other company fields...
 }
 
 const ProjectListPage = () => {

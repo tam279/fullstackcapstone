@@ -13,6 +13,7 @@ exports.getCompanies = async (req, res) => {
   try {
     const companies = await prisma.company.findMany({
       select: {
+        id: true,
         name: true,
         address: true,
         phoneNumber: true,
@@ -42,7 +43,7 @@ exports.createCompany = async (req, res) => {
         website,
       },
     });
-    
+
     res.status(201).json(company);
   } catch (error) {
     console.error(error);
