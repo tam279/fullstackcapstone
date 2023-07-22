@@ -122,11 +122,20 @@ app.put("/api/project/:id", projectController.updateProject);
 app.delete("/api/project/:id", projectController.deleteProject);
 app.get("/api/project/:id", projectController.getProject);
 
+// tasks
 app.get("/api/project/:projectId/tasks", taskController.getTasks);
-app.post("/api/project/:projectId/tasks", taskController.createTask); // Creating a new task doesn't require a task ID
-app.put("/api/project/:projectId/task/:taskId", taskController.updateTask); // Use :taskId instead of :id for clarity
-app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask); // Use :taskId instead of :id for clarity
-app.get("/api/project/:projectId/task/:taskId", taskController.getTask); // To get a specific task of a project
+app.post("/api/project/:projectId/tasks", taskController.createTask);
+app.put("/api/project/:projectId/task/:taskId", taskController.updateTask);
+app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask);
+app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
+
+// Comment routes
+app.get("/api/:taskId/comments", commentController.getCommentsByProjectId);
+app.post("/api/projects/:projectId/comments", commentController.createComment);
+app.delete(
+  "/api/projects/:projectId/comments/:commentId",
+  commentController.deleteComment
+);
 
 // User activity routes
 app.get("/api/userActivity", activityController.getUserActivity);
@@ -135,22 +144,6 @@ app.get(
   "/api/userActivity/:projectId",
   activityController.getUserActivityByProjectId
 );
-
-// Comment routes
-app.get("/api/comments", commentController.getComments);
-app.get("/api/comments/task", commentController.getCommentsByTaskId);
-app.post("/api/comments", commentController.createComment);
-// app.put(
-//   "/api/comments/:id/file",
-//   upload.single("file"),
-//   commentController.updateComment
-// );
-app.delete("/api/comments/:id", commentController.deleteComment);
-// app.put(
-//   "/api/comments/:id",
-//   upload.single("file"),
-//   commentController.updateComment
-// );
 
 const { sendContactEmail } = require("./service/mail");
 // Handle POST requests to '/contact' endpoint

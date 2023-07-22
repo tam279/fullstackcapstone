@@ -1,6 +1,5 @@
-// path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\fullstackcapstone\client\src\pages\ProjectDetailPage\ProjectDetailpage.tsx
 import React, { useEffect, useState } from "react";
-import { Button, Tabs, Tab, Table, Form, Row, Col } from "react-bootstrap";
+import { Button, Tabs, Tab, Table, Form } from "react-bootstrap";
 import { AiFillEdit } from "react-icons/ai";
 import "./ProjectDetailPage.css";
 import { Chart } from "react-google-charts";
@@ -11,55 +10,17 @@ import EditTaskModal from "../../modals/EditTaskModal/EditTaskModal";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import config from "../../config";
-
-interface Task {
-  DEPENDENCY: any;
-  TASKID: number;
-  NAME: string;
-  STARTDATE: string;
-  ENDDATE: string;
-  PROGRESS: number;
-  DESCRIPTION: string;
-  STATUS: string;
-  PRIORITY: string;
-  ISACTIVE: number;
-  PROJECTID: number;
-  DURATION: number;
-  TECHNICIAN: string;
-  TAG: string;
-  FILTER: string;
-  TECHNICIAN_NAMES: string;
-}
-interface Manager {
-  FIRSTNAME: string;
-  LASTNAME: string;
-}
-
-interface Technician {
-  FIRSTNAME: string;
-  LASTNAME: string;
-}
-
-interface Viewer {
-  FIRSTNAME: string;
-  LASTNAME: string;
-}
-
-interface Project {
-  PROJECTID: number;
-  NAME: string;
-  DESCRIPTION: string;
-  STARTDATE: string;
-  ENDDATE: string;
-  STATUS: string;
-  ISACTIVE: number;
-  COMPANYID: number;
-  manager: any[];
-  technicians: any[];
-  viewers: any[];
-  total_tasks: number;
-  completed_tasks: number;
-}
+import {
+  User,
+  Project,
+  Task,
+  Activity,
+  Company,
+} from "../../problemdomain/Interface/Interface";
+import {
+  fetchUserData,
+  fetchCompanyData,
+} from "../../problemdomain/DataService/DataService";
 
 interface UserActivity {
   ACTIVITYID: number;
@@ -77,15 +38,18 @@ const ProjectDetailPage: React.FC = () => {
   const [project, setProject] = useState<Project | null>(null);
   const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
   const [editModalShow, setEditModalShow] = useState(false);
-
   const [status, setStatus] = useState("");
-
   const [key, setKey] = useState<TabKey>("Tasks");
   const [show, setShow] = useState(false);
+  const [newTaskId, setNewTaskId] = useState<number | null>(null);
+  const [editTask, setEditTask] = useState<Task | null>(null);
 
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+    setNewTaskId(null); // reset newTaskId state when modal is closed
+  };
+
   const handleShow = () => setShow(true);
   const [editTaskId, setEditTaskId] = useState<number | null>(null);
 
@@ -94,7 +58,7 @@ const ProjectDetailPage: React.FC = () => {
   const updateTask = async (task: Task) => {
     try {
       const response = await axios.put(
-        `${config.backend}/api/tasks/${task.TASKID}`,
+        `${config.backend}/api/tasks/${task.id}`,
         task
       );
       if (response.status === 200) {
@@ -106,57 +70,55 @@ const ProjectDetailPage: React.FC = () => {
       console.error("Error updating task:", err);
     }
   };
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get(`${config.backend}/api/tasks`);
-        console.log("Tasks Response:", response.data);
-
+        const response = await axios.get(
+          `${config.backend}/api/project/${projectId}/tasks`
+        );
         if (projectId) {
-          let filteredTasks = response.data.filter(
-            (task: Task) => task.PROJECTID === Number(projectId)
-          );
+          let filteredTasks: Task[] = response.data;
           if (updatedTask) {
-            filteredTasks = filteredTasks.map((task: { TASKID: number }) =>
-              task.TASKID === updatedTask.TASKID ? updatedTask : task
+            filteredTasks = filteredTasks.map((task: Task) =>
+              task.id === updatedTask.id ? updatedTask : task
             );
           }
           setTasks(filteredTasks);
-        } else {
-          setTasks(response.data);
         }
       } catch (err) {
         console.error("Error fetching tasks:", err);
       }
     };
 
-    // Fetch tasks initially
     fetchTasks();
-  }, [projectId, updatedTask]);
+  }, [projectId, updatedTask, newTaskId]);
 
   useEffect(() => {
     const fetchProject = async () => {
-      const response = await axios.get(
-        `${config.backend}/api/project/${projectId}`
-      );
-      setProject(response.data);
+      console.log("fetchProjects is called");
+
+      if (projectId) {
+        const response = await axios.get(
+          `${config.backend}/api/project/${projectId}`
+        );
+        setProject(response.data);
+      }
     };
 
     fetchProject();
   }, [projectId]);
 
-  useEffect(() => {
-    const fetchUserActivity = async () => {
-      const response = await axios.get(`${config.backend}/api/userActivity`);
-      const filteredActivity = response.data.filter(
-        (activity: UserActivity) =>
-          activity.PROJECTID === parseInt(projectId || "", 10)
-      );
-      setUserActivity(filteredActivity);
-    };
+  // useEffect(() => {
+  //   const fetchUserActivity = async () => {
+  //     if (projectId) {
+  //       const response = await axios.get(`${config.backend}/api/userActivity`);
+  //       setUserActivity(response.data);
+  //     }
+  //   };
 
-    fetchUserActivity();
-  }, [projectId]);
+  //   fetchUserActivity();
+  // }, [projectId]);
 
   const data = [
     [
@@ -169,13 +131,13 @@ const ProjectDetailPage: React.FC = () => {
       { type: "string", label: "Dependencies" },
     ],
     ...tasks.map((task) => [
-      task.TASKID,
-      task.NAME,
-      new Date(task.STARTDATE),
-      new Date(task.ENDDATE),
-      null,
-      task.PROGRESS,
-      null,
+      task.id,
+      task.name,
+      new Date(task.startDate),
+      new Date(task.endDate),
+      null, // You need to provide duration here
+      null, // You need to provide percent complete here
+      task.dependencies ? task.dependencies.join(", ") : null,
     ]),
   ];
 
@@ -190,25 +152,22 @@ const ProjectDetailPage: React.FC = () => {
   const originalWarn = console.warn;
   console.warn = function (...args) {
     const arg = args && args[0];
-    if (arg && arg.includes("Attempting to load version '51' of Google Charts"))
+    if (
+      arg &&
+      arg.includes("Attempting to load version '51' of Google Charts")
+    ) {
       return;
+    }
     originalWarn(...args);
   };
   const handleEditModalClose = () => {
     setEditModalShow(false);
-    setEditTaskId(null);
+    setEditTask(null); // Reset editTask state when modal is closed
   };
   const handleEditModalShow = () => setEditModalShow(true);
 
-  console.log("Tasks:", tasks);
-  console.log("Project:", project);
-  console.log("User Activity:", userActivity);
-
   return (
-    <div
-      className="project1-container"
-      style={{ padding: "0", margin: "0", width: "100vw", height: "100vh" }}
-    >
+    <div className="project1-container">
       <div className="sidebar-container">
         <SidebarProject />
       </div>
@@ -232,46 +191,50 @@ const ProjectDetailPage: React.FC = () => {
                       + New Task
                     </Button>
                   </th>
-                  <th>Task ID</th> {/* Add this line */}
+                  <th>Status</th>
                   <th>Priority</th>
                   <th>Technician name</th>
-                  <th>Duration</th>
-                  <th>Status</th>
                   <th>Dependency</th>
+                  {/* <th>Duration</th> */}
+
                   <th>
                     <button>Filter</button>
                   </th>
                 </tr>
               </thead>
-
               <tbody>
                 {tasks.map((task) => (
-                  <tr key={task.TASKID} onClick={() => handleTask5Click(task)}>
+                  <tr key={task.id} onClick={() => handleTask5Click(task)}>
                     <td>
                       <Button
                         variant="link"
                         onClick={(event) => {
                           event.stopPropagation();
                           handleEditModalShow();
-                          setEditTaskId(task.TASKID);
+                          setEditTask(task); // Set the task to be edited in the state
                         }}
                       >
                         <AiFillEdit size={20} />
                       </Button>
-                      {task.NAME}
+                      {task.name}
                     </td>
-                    <td>{task.TASKID}</td> {/* Add this line */}
+                    <td>{task.status}</td>
                     <td>
                       <Form.Control as="select">
-                        <option>{task.PRIORITY}</option>
+                        <option>{task.priorityLevel}</option>
                       </Form.Control>
                     </td>
-                    <td>{task.TECHNICIAN_NAMES}</td>
-                    <td>{task.DURATION} hours</td>
-                    <td>{task.STATUS}</td>
                     <td>
-                      {task.DEPENDENCY ? (
-                        <span>{task.DEPENDENCY}</span>
+                      {task.technicians
+                        .map((tech) => `${tech.firstName} ${tech.lastName}`)
+                        .join(", ")}
+                    </td>
+
+                    {/* <td>{task.duration} hours</td> */}
+
+                    <td>
+                      {task.dependencies ? (
+                        <span>{task.dependencies.join(", ")}</span>
                       ) : (
                         <span>No Dependency</span>
                       )}
@@ -290,6 +253,7 @@ const ProjectDetailPage: React.FC = () => {
               rootProps={{ "data-testid": "1" }}
             />
           </Tab>
+
           <Tab eventKey="Details" title="Details">
             {project ? (
               <Table striped bordered hover size="sm" className="mt-3">
@@ -298,66 +262,65 @@ const ProjectDetailPage: React.FC = () => {
                     <td>
                       <strong>Project:</strong>
                     </td>
-                    <td>{project.NAME}</td>
+                    <td>{project.name}</td>
                     <td>
                       <strong>Manager:</strong>
                     </td>
                     <td>
                       {project &&
-                        project.manager.length > 0 &&
-                        `${project.manager[0].NAME}`}
+                        project.manager &&
+                        `${project.manager.firstName} ${project.manager.lastName}`}
                     </td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Description:</strong>
                     </td>
-                    <td colSpan={Number(3)}>{project.DESCRIPTION}</td>
+                    <td colSpan={3}>{project.description}</td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Start Date:</strong>
                     </td>
-                    <td>{new Date(project.STARTDATE).toLocaleDateString()}</td>
+                    <td>{new Date(project.startDate).toLocaleDateString()}</td>
                     <td>
                       <strong>End Date:</strong>
                     </td>
-                    <td>{new Date(project.ENDDATE).toLocaleDateString()}</td>
+                    <td>{new Date(project.endDate).toLocaleDateString()}</td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Technicians:</strong>
                     </td>
+
                     <td>
                       {project &&
-                        project.technicians.map((tech) => tech.NAME).join(", ")}
+                        project.technicians
+                          .map((tech) => `${tech.firstName} ${tech.lastName}`)
+                          .join(", ")}
                     </td>
                     <td>
                       <strong>Viewers:</strong>
                     </td>
                     <td>
                       {project &&
-                        project.viewers.map((tech) => tech.NAME).join(", ")}
+                        project.viewers
+                          .map(
+                            (viewers) =>
+                              `${viewers.firstName} ${viewers.lastName}`
+                          )
+                          .join(", ")}
                     </td>
                   </tr>
                   <tr>
                     <td>
                       <strong>Total Tasks:</strong>
                     </td>
-                    <td>{project.total_tasks}</td>
+                    <td>{project.tasks.length}</td>
                     <td>
                       <strong>Completed Tasks:</strong>
                     </td>
-                    <td>{project.completed_tasks}</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Status:</strong>
-                    </td>
-                    <td>{project.STATUS}</td>
-                    <td>
-                      <strong></strong>
-                    </td>
+                    <td>{/* Update this line with the appropriate value */}</td>
                     <td>
                       <Button variant="primary">Export data</Button>
                     </td>
@@ -368,8 +331,7 @@ const ProjectDetailPage: React.FC = () => {
               <p>Loading...</p>
             )}
           </Tab>
-
-          <Tab eventKey="User activity" title="User activity">
+          {/* <Tab eventKey="User activity" title="User activity">
             <div className="user-activity-mode">
               <h2>User Activity</h2>
               <table className="table table-striped">
@@ -379,9 +341,6 @@ const ProjectDetailPage: React.FC = () => {
                     <th>Time</th>
                     <th>User</th>
                     <th>Detail</th>
-                    <th>
-                      <button>Filter</button>
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -395,34 +354,38 @@ const ProjectDetailPage: React.FC = () => {
                       </td>
                       <td>{activity.EMAIL}</td>
                       <td>{activity.DESCRIPTION}</td>
-                      <td>Filter 1</td> {/* Update this as needed */}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </Tab>
+          </Tab> */}
         </Tabs>
 
         {projectId && (
           <CreateNewTaskModal
             show={show}
             handleClose={handleClose}
-            projectId={parseInt(projectId, 10)}
+            projectId={projectId}
           />
         )}
-        {selectedTask && (
+        {selectedTask && projectId && (
           <TaskDetailModal
             show={task5ModalShow}
             handleClose={handleTask5ModalClose}
-            taskId={selectedTask.TASKID}
+            taskId={selectedTask.id}
+            projectId={projectId}
           />
         )}
-        <EditTaskModal
-          show={editModalShow}
-          handleClose={handleEditModalClose}
-          taskId={editTaskId ?? undefined}
-        />
+
+        {editTask && projectId && (
+          <EditTaskModal
+            handleClose={handleEditModalClose}
+            task={editTask}
+            projectId={projectId}
+            show={editModalShow}
+          />
+        )}
       </div>
     </div>
   );

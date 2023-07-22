@@ -63,13 +63,21 @@ exports.createTask = async (req, res) => {
 // Update task
 exports.updateTask = async (req, res) => {
   const { projectId, taskId } = req.params;
-  const { name, description, status, priorityLevel, startDate, endDate, technicians } = req.body;
+  const {
+    name,
+    description,
+    status,
+    priorityLevel,
+    startDate,
+    endDate,
+    technicians,
+  } = req.body;
 
   try {
     const updatedTask = await prisma.task.update({
       where: {
-        id: taskId,  // Ensure the task ID matches
-        projectId,  // Ensure the project ID matches
+        id: taskId, // Ensure the task ID matches
+        projectId, // Ensure the project ID matches
       },
       data: {
         name,
@@ -120,12 +128,12 @@ exports.getTask = async (req, res) => {
 
   try {
     const task = await prisma.task.findFirst({
-      where: { 
+      where: {
         id: taskId,
         projectId,
         deleted: false,
       },
-      include: { technicians: true }
+      include: { technicians: true },
     });
 
     if (!task) {

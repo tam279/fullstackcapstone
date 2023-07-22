@@ -16,6 +16,7 @@ import {
   fetchUserData,
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
+import { Link } from "react-router-dom";
 
 const ProjectListPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -116,9 +117,7 @@ const ProjectListPage = () => {
                   </Button>
                 </td>
                 <td>
-                  <div onClick={() => handleProjectClick(project)}>
-                    {project.name}
-                  </div>
+                  <Link to={`/project/${project.id}`}>{project.name}</Link>
                 </td>
                 <td>{new Date(project.startDate).toLocaleDateString()}</td>
                 <td>{new Date(project.endDate).toLocaleDateString()}</td>

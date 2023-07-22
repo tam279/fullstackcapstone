@@ -75,10 +75,12 @@ export interface Task {
   technicians: User[];
   comments: Comment[];
   files: File[];
-  dependencies: Task[];
+  dependencies: string[];
   dependentTasks: Task[];
   deleted: boolean;
+  label?: string;
 }
+
 
 export enum Status {
   NOT_STARTED = "NOT_STARTED",

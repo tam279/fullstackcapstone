@@ -206,6 +206,7 @@ exports.getProject = async (req, res) => {
         name: true,
         startDate: true,
         endDate: true,
+        description: true,
         company: {
           select: {
             name: true,

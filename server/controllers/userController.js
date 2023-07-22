@@ -23,6 +23,13 @@ exports.getUsers = async (req, res) => {
         phoneNumber: true,
         jobTitle: true,
         deleted: true,
+        projectsAsTechnician: {
+          select: {
+            id: true,
+            name: true,
+            // Include any other fields you need from the Project
+          },
+        },
       },
     });
 

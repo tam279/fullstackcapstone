@@ -1,121 +1,111 @@
-const db = require('../db/database');
-const fs = require('fs');
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-exports.getComments = async (req, res) => {
-  const sql = 'SELECT * FROM COMMENT';
+exports.getCommentsByProjectId = async (req, res) => {
+  const { projectId } = req.params;
 
   try {
-    const [results, fields] = await db.query(sql);
-    
-    // Convert FILEDATA from Blob to Buffer
-    results.forEach(comment => {
-      if (comment.FILEDATA) {
-        comment.FILEDATA = Buffer.from(comment.FILEDATA);
-      }
+    // Get tasks of the project
+    const tasks = await prisma.task.findMany({
+      where: { projectId: projectId, deleted: false },
     });
-    
-    res.status(200).json(results);
+
+    // Get comments for each task
+    const commentsPromises = tasks.map((task) =>
+      prisma.comment.findMany({
+        where: { taskId: task.id, deleted: false },
+        include: { User: true, files: true }, // Note the 'User' field is capitalized as per your schema
+      })
+    );
+
+    const comments = await Promise.all(commentsPromises);
+
+    // Flatten the comments array
+    const flattenedComments = comments.flat();
+
+    res.status(200).json(flattenedComments);
   } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: 'An error occurred', error: err.message });
+    console.error(`Error getting comments for project ${projectId}: `, err);
+    res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };
-
 
 exports.createComment = async (req, res) => {
-  const { COMMENT, TASKID, EMAIL, DATE } = req.body;
-  let FILENAME = null;
-  let FILEDATA = null;
-
-  // Check if a file was uploaded
-  if (req.file) {
-    const file = req.file;
-
-    // Read the file data
-    FILEDATA = fs.readFileSync(file.path);
-
-    // Assign the original name of the file
-    FILENAME = file.originalname;
-
-    // Remove the file from disk
-    fs.unlinkSync(file.path);
-  }
+  const { comment, taskId, userId } = req.body;
 
   try {
-    const sql = `
-      INSERT INTO COMMENT (COMMENT, DATE, TASKID, EMAIL, FILENAME, FILEDATA)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const [result, fields] = await db.query(sql, [COMMENT, DATE, TASKID, EMAIL, FILENAME, FILEDATA]);
+    const newComment = await prisma.comment.create({
+      data: {
+        comment: comment,
+        taskId: taskId,
+        userId: userId,
+        timeStamp: new Date(), // Automatically set the timestamp to the current date and time
+        files: {
+          create: req.file
+            ? [
+                {
+                  name: req.file.originalname,
+                  data: fs.readFileSync(req.file.path),
+                  deleted: false,
+                },
+              ]
+            : [],
+        },
+      },
+    });
 
-    res.status(200).send({ message: 'Comment created successfully' });
+    // Remove the file from disk
+    if (req.file) fs.unlinkSync(req.file.path);
+
+    res.status(200).json(newComment);
   } catch (err) {
     console.log(err);
-    res.status(500).send({ message: 'An error occurred', error: err.message });
+    res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };
-
-
 
 exports.updateComment = async (req, res) => {
-  const id = req.params.id;
-  const { COMMENT, DATE, TASKID, EMAIL } = req.body;
+  const { id } = req.params;
+  const { comment } = req.body;
 
-  let FILENAME = null;
-  let FILEDATA = null;
-
-  // Check if a file was uploaded
-  if (req.file) {
-    const file = req.file;
-
-    // Read the file data
-    FILEDATA = fs.readFileSync(file.path);
-
-    // Assign the original name of the file
-    FILENAME = file.originalname;
+  try {
+    const updatedComment = await prisma.comment.update({
+      where: { id: id },
+      data: {
+        comment: comment,
+        files: req.file
+          ? {
+              create: {
+                name: req.file.originalname,
+                data: fs.readFileSync(req.file.path),
+                deleted: false,
+              },
+            }
+          : undefined,
+      },
+    });
 
     // Remove the file from disk
-    fs.unlinkSync(file.path);
-  }
+    if (req.file) fs.unlinkSync(req.file.path);
 
-  try {
-    const sql = `
-      UPDATE COMMENT 
-      SET COMMENT = ?, DATE = ?, TASKID = ?, EMAIL = ?, FILENAME = ?, FILEDATA = ? 
-      WHERE COMMENTID = ?
-    `;
-    const [result, fields] = await db.query(sql, [COMMENT, DATE, TASKID, EMAIL, FILENAME, FILEDATA, id]);
-
-    res.status(200).send({ message: 'Comment updated successfully' });
+    res.status(200).json(updatedComment);
   } catch (err) {
     console.log(err);
-    res.status(500).send({ message: 'An error occurred', error: err.message });
+    res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };
-
 
 exports.deleteComment = async (req, res) => {
-  const id = req.params.id;
-  const sql = 'DELETE FROM COMMENT WHERE COMMENTID = ?';
+  const { id } = req.params;
 
   try {
-    const [result, fields] = await db.query(sql, [id]);
-    res.status(200).send({ message: 'Comment deleted successfully' });
+    const deletedComment = await prisma.comment.update({
+      where: { id: id },
+      data: { deleted: true }, // Instead of deleting, we mark it as deleted
+    });
+    res.status(200).json(deletedComment);
   } catch (err) {
     console.log(err);
-    res.status(500).send({ message: 'An error occurred', error: err.message });
-  }
-};
-
-exports.getCommentsByTaskId = async (req, res) => {
-  const taskId = req.query.taskId;
-  const sql = 'SELECT * FROM COMMENT WHERE TASKID = ?';
-
-  try {
-    const [result, fields] = await db.query(sql, [taskId]);
-    res.status(200).json(result);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: 'An error occurred', error: err.message });
+    res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };
