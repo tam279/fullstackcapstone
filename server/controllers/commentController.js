@@ -1,31 +1,27 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-exports.getCommentsByProjectId = async (req, res) => {
-  const { projectId } = req.params;
-
+exports.getCommentsByTaskId = async (req, res) => {
+  const { taskId } = req.params;
+  if (!taskId) {
+    return res.status(400).send({ message: "TaskId is required" });
+  }
   try {
-    // Get tasks of the project
-    const tasks = await prisma.task.findMany({
-      where: { projectId: projectId, deleted: false },
-    });
+    // Check if taskId is not null
+    if (taskId !== null) {
+      // Get comments of the task
+      const comments = await prisma.comment.findMany({
+        where: { taskId: taskId, deleted: false },
+        include: { User: true, files: true },
+      });
 
-    // Get comments for each task
-    const commentsPromises = tasks.map((task) =>
-      prisma.comment.findMany({
-        where: { taskId: task.id, deleted: false },
-        include: { User: true, files: true }, // Note the 'User' field is capitalized as per your schema
-      })
-    );
-
-    const comments = await Promise.all(commentsPromises);
-
-    // Flatten the comments array
-    const flattenedComments = comments.flat();
-
-    res.status(200).json(flattenedComments);
+      res.status(200).json(comments);
+    } else {
+      // Handle case where taskId is null
+      // ...
+    }
   } catch (err) {
-    console.error(`Error getting comments for project ${projectId}: `, err);
+    console.error(`Error getting comments for task ${taskId}: `, err);
     res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };

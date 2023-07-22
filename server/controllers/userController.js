@@ -79,7 +79,6 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const id = req.params.id; // Extract the id parameter correctly
-  console.log("id:", id);
 
   const {
     email,

@@ -61,6 +61,7 @@ exports.createTask = async (req, res) => {
 };
 
 // Update task
+// Update task
 exports.updateTask = async (req, res) => {
   const { projectId, taskId } = req.params;
   const {
@@ -74,24 +75,29 @@ exports.updateTask = async (req, res) => {
   } = req.body;
 
   try {
+    let updatedTaskData = {
+      name,
+      description,
+      status,
+      priorityLevel,
+      startDate,
+      endDate,
+    };
+
+    if (technicians) {
+      updatedTaskData["technicians"] = {
+        connect: technicians.map((techId) => ({
+          id: techId,
+        })),
+      };
+    }
+
     const updatedTask = await prisma.task.update({
       where: {
         id: taskId, // Ensure the task ID matches
         projectId, // Ensure the project ID matches
       },
-      data: {
-        name,
-        description,
-        status,
-        priorityLevel,
-        startDate,
-        endDate,
-        technicians: {
-          connect: technicians.map((techId) => ({
-            id: techId,
-          })),
-        },
-      },
+      data: updatedTaskData,
     });
 
     res.status(200).json(updatedTask);

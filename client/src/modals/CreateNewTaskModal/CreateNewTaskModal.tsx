@@ -2,21 +2,29 @@ import React, { FC, useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
-import { User, Project, Status } from "../../problemdomain/Interface/Interface";
+import {
+  User,
+  Project,
+  Status,
+  Task,
+} from "../../problemdomain/Interface/Interface";
 import { fetchUserData } from "../../problemdomain/DataService/DataService";
 
 interface CreateTaskModalProps {
   show: boolean;
   handleClose: () => void;
   projectId: string;
+  addNewTask: (task: Task) => void; // Add this line
 }
 
 const CreateTaskModal: FC<CreateTaskModalProps> = ({
   show,
   handleClose,
   projectId,
+  addNewTask,
 }) => {
   const [users, setUsers] = useState<User[]>([]);
+
   const [formValues, setFormValues] = useState({
     name: "",
     description: "",
@@ -112,10 +120,17 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
       };
 
       // Make the POST request to create the task
-      await axios.post(
+      const response = await axios.post(
         `${config.backend}/api/project/${formValues.projectId}/tasks`,
         taskData
       );
+
+      // If successful, the API should return the new task
+      const newTask = response.data;
+
+      // Update the parent component's state with the new task
+      addNewTask(newTask);
+
       handleClose();
     } catch (error) {
       console.error("Error creating task:", error);

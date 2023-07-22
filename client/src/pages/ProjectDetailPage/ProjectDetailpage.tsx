@@ -165,6 +165,9 @@ const ProjectDetailPage: React.FC = () => {
     setEditTask(null); // Reset editTask state when modal is closed
   };
   const handleEditModalShow = () => setEditModalShow(true);
+  const addNewTask = (task: Task) => {
+    setTasks((prevTasks) => [...prevTasks, task]);
+  };
 
   return (
     <div className="project1-container">
@@ -361,29 +364,33 @@ const ProjectDetailPage: React.FC = () => {
             </div>
           </Tab> */}
         </Tabs>
-
         {projectId && (
           <CreateNewTaskModal
             show={show}
             handleClose={handleClose}
             projectId={projectId}
+            addNewTask={addNewTask} // pass the new function here
           />
         )}
-        {selectedTask && projectId && (
-          <TaskDetailModal
-            show={task5ModalShow}
-            handleClose={handleTask5ModalClose}
-            taskId={selectedTask.id}
-            projectId={projectId}
-          />
-        )}
-
-        {editTask && projectId && (
+        <TaskDetailModal
+          show={show}
+          handleClose={handleClose}
+          task={selectedTask} // make sure selectedTask is defined
+          projectId={projectId || ""} // use a default value to ensure projectId is always a string
+          taskId={selectedTask?.id || ""} // Provide taskId prop according to its type and requirement
+          onTaskUpdated={(updatedTask: Task) => {
+            // Do something with the updatedTask
+          }}
+        />
+        {editTask && (
           <EditTaskModal
+            show={editModalShow}
             handleClose={handleEditModalClose}
             task={editTask}
-            projectId={projectId}
-            show={editModalShow}
+            projectId={projectId || ""}
+            onTaskUpdated={(updatedTask) => {
+              // Do something with the updatedTask
+            }}
           />
         )}
       </div>

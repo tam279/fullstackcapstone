@@ -89,6 +89,7 @@ export enum Status {
 }
 
 export interface Comment {
+  User: any;
   id: string;
   comment: string;
   timeStamp: Date;

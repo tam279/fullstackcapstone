@@ -14,10 +14,17 @@ interface EditTaskModalProps {
   show: boolean;
   handleClose: () => void;
   task: Task;
-  projectId: string; // add this line
+  projectId: string;
+  onTaskUpdated: (updatedTask: Task) => void; // Added this line
 }
 
-const EditTaskModal: FC<EditTaskModalProps> = ({ show, handleClose, task }) => {
+const EditTaskModal: FC<EditTaskModalProps> = ({
+  show,
+  handleClose,
+  task,
+  onTaskUpdated,
+}) => {
+  // Added onTaskUpdated here
   const [users, setUsers] = useState<User[]>([]);
   const [formValues, setFormValues] = useState({
     name: task.name,
@@ -31,19 +38,26 @@ const EditTaskModal: FC<EditTaskModalProps> = ({ show, handleClose, task }) => {
     projectId: task.projectId,
   });
 
+const [lastFetchedProjectId, setLastFetchedProjectId] = useState<string | null>(
+  null
+);
+
   useEffect(() => {
     const fetchProjectTechnicians = async () => {
-      const userData = await fetchUserData();
-      const projectTechnicians = userData.filter((user: User) =>
-        user.projectsAsTechnician.some(
-          (project: Project) => project.id === task.projectId
-        )
-      );
-      setUsers(projectTechnicians);
+      if (task.projectId !== lastFetchedProjectId) {
+        const userData = await fetchUserData();
+        const projectTechnicians = userData.filter((user: User) =>
+          user.projectsAsTechnician.some(
+            (project: Project) => project.id === task.projectId
+          )
+        );
+        setUsers(projectTechnicians);
+        setLastFetchedProjectId(task.projectId);
+      }
     };
 
     fetchProjectTechnicians();
-  }, []);
+  }, [task.projectId, lastFetchedProjectId]); // Depend on task.projectId and lastFetchedProjectId
 
   const handleFormChange = (
     event: React.ChangeEvent<
@@ -99,7 +113,6 @@ const EditTaskModal: FC<EditTaskModalProps> = ({ show, handleClose, task }) => {
         description: formValues.description,
         status: formValues.status,
         priorityLevel: formValues.priorityLevel,
-        // Add the seconds and timezone manually
         startDate: new Date(formValues.startDate).toISOString(),
         endDate: new Date(formValues.endDate).toISOString(),
         technicians: technicianIds,
@@ -107,10 +120,14 @@ const EditTaskModal: FC<EditTaskModalProps> = ({ show, handleClose, task }) => {
         projectId: formValues.projectId,
       };
 
-      await axios.put(
+      const response = await axios.put(
         `${config.backend}/api/project/${formValues.projectId}/task/${task.id}`,
         taskData
       );
+
+      if (response.status === 200) {
+        onTaskUpdated(response.data);
+      }
 
       handleClose();
     } catch (error) {
