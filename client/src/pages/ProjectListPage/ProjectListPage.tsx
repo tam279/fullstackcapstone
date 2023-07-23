@@ -17,6 +17,7 @@ import {
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
 import { Link } from "react-router-dom";
+import jwt_decode from "jwt-decode";
 
 const ProjectListPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -25,7 +26,14 @@ const ProjectListPage = () => {
   const [show, setShow] = useState(false);
   const [showEdit, setShowEdit] = useState(false); // Added this line
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      const decodedToken: any = jwt_decode(token);
+      setCurrentUser(decodedToken.user);
+    }
+  }, []);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +47,7 @@ const ProjectListPage = () => {
       .get(`${config.backend}/api/projects`, {
         headers: {
           Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYW5hZ2VyQGNvbXBhbnkxLmNvbSIsImlhdCI6MTY4OTIyNDk5N30.W5GuZWhh3woOr87dUSk5VRz7Gy78Zt1R93OhRHC8tRE`,
-        }, 
+        },
       })
       .then((response) => {
         setProjects(response.data);
@@ -89,10 +97,13 @@ const ProjectListPage = () => {
           <thead>
             <tr>
               <th>
-                <Button variant="primary" onClick={handleShow}>
-                  + New Project
-                </Button>
+                {currentUser && currentUser.role === "ADMIN" && (
+                  <Button variant="primary" onClick={handleShow}>
+                    + New Project
+                  </Button>
+                )}
               </th>
+
               <th>Name</th>
               <th>Start date</th>
               <th>End date</th>
@@ -146,7 +157,7 @@ const ProjectListPage = () => {
             project={editingProject}
             refetchProjects={fetchProjects}
             users={users}
-            companies={companies} 
+            companies={companies}
           />
         )}
       </div>
