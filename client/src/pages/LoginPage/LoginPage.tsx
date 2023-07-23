@@ -10,7 +10,7 @@ const LoginPage = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     try {
@@ -19,14 +19,20 @@ const LoginPage = () => {
         password,
       });
 
-      // Assuming the server responds with a JWT token
-      const jwtToken = response.data.token;
+      // Assuming the server responds with a JWT token and role
+      const {
+        token,
+        user: { role },
+      } = response.data;
 
-      // Store the JWT token in localStorage or any other secure storage
-      localStorage.setItem("jwtToken", jwtToken);
+
+      console.log(response.data);
+      // Store the JWT token and role in localStorage
+      localStorage.setItem("jwtToken", token);
+      localStorage.setItem("userRole", role);
 
       // Redirect to the ChangePasswordPage or any other desired page
-      navigate("/ChangePasswordPage");
+      navigate("/projectlistpage");
     } catch (error) {
       // Handle login error
       console.error("Login failed:", error);

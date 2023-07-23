@@ -93,6 +93,8 @@ app.get("/api/users", userController.getUsers);
 app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
+app.post("/changePassword", userController.changePassword);
+
 
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);
@@ -127,6 +129,8 @@ app.get("/api/project/:projectId/tasks", taskController.getTasks);
 app.post("/api/project/:projectId/tasks", taskController.createTask);
 app.put("/api/project/:projectId/task/:taskId", taskController.updateTask);
 app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask);
+/* The code `app.get("/api/project/:projectId/task/:taskId", taskController.getTask);` is defining a
+GET route for retrieving a specific task within a project. */
 app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 
 // Comment routes

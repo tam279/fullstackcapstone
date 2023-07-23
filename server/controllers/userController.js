@@ -1,13 +1,12 @@
 // userController.js
 
-const mysql = require("mysql2/promise");
-const bcrypt = require("bcrypt");
-const db = require("../db/database");
-
-// getUsers will get email, firstname, lastname, company,role, phoneNumber, jobTitle, deleted
+/* The code `const { PrismaClient } = require("@prisma/client");` is importing the `PrismaClient` class
+from the `@prisma/client` package. */
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+/* The `exports.getUsers` function is a controller function that handles the logic for retrieving users
+from the database. */
 exports.getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -27,7 +26,6 @@ exports.getUsers = async (req, res) => {
           select: {
             id: true,
             name: true,
-            // Include any other fields you need from the Project
           },
         },
       },
@@ -40,6 +38,8 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+/* The `exports.createUser` function is a controller function that handles the logic for creating a new
+user in the database. */
 exports.createUser = async (req, res) => {
   const {
     email,
@@ -77,8 +77,10 @@ exports.createUser = async (req, res) => {
   }
 };
 
+/* The `exports.updateUser` function is a controller function that handles the logic for updating a
+user in the database. */
 exports.updateUser = async (req, res) => {
-  const id = req.params.id; // Extract the id parameter correctly
+  const id = req.params.id;
 
   const {
     email,
@@ -121,6 +123,8 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+/* The `exports.deleteUser` function is a controller function that handles the logic for deleting a
+user from the database. */
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -137,6 +141,26 @@ exports.deleteUser = async (req, res) => {
       .json({ error: "An error occurred while deleting the user" });
   }
 };
+
+
+exports.changePassword = async (req, res) => {
+  const { userId, newPassword } = req.body;
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { password: newPassword },
+    });
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while changing the password" });
+  }
+};
+
 
 // Ian need for User Login
 // exports.getUserByEmail = async (email) => {

@@ -1,9 +1,12 @@
-// taskController.js . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\server\controllers\taskController.js
+/* The code provided is a JavaScript file that contains the controller functions for managing tasks in
+a project management website. */
+// taskController.js . 
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Get all tasks of a project
+/* The `exports.getTasks` function is a controller function that retrieves all tasks of a project from
+the database. */
 exports.getTasks = async (req, res) => {
   const { projectId } = req.params;
 
@@ -20,7 +23,8 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-// Create a new task for a project
+/* The `exports.createTask` function is a controller function that is responsible for creating a new
+task for a project in the database. */
 exports.createTask = async (req, res) => {
   const { projectId } = req.params;
   const {
@@ -60,8 +64,9 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// Update task
-// Update task
+
+/* The `exports.updateTask` function is a controller function that is responsible for updating a
+specific task in the database. */
 exports.updateTask = async (req, res) => {
   const { projectId, taskId } = req.params;
   const {
@@ -94,8 +99,8 @@ exports.updateTask = async (req, res) => {
 
     const updatedTask = await prisma.task.update({
       where: {
-        id: taskId, // Ensure the task ID matches
-        projectId, // Ensure the project ID matches
+        id: taskId, 
+        projectId, 
       },
       data: updatedTaskData,
     });
@@ -109,6 +114,9 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+/* The `exports.deleteTask` function is a controller function that is responsible for deleting a
+specific task from the database. It takes in the `req` (request) and `res` (response) objects as
+parameters. */
 exports.deleteTask = async (req, res) => {
   const { projectId, taskId } = req.params;
 
@@ -129,6 +137,9 @@ exports.deleteTask = async (req, res) => {
   }
 };
 
+/* The `exports.getTask` function is a controller function that is responsible for retrieving a
+specific task from the database. It takes in the `req` (request) and `res` (response) objects as
+parameters. */
 exports.getTask = async (req, res) => {
   const { projectId, taskId } = req.params;
 

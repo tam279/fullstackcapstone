@@ -1,6 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+/* The `exports.getCommentsByTaskId` function is a controller function that handles the logic for
+retrieving comments for a specific task. */
 exports.getCommentsByTaskId = async (req, res) => {
   const { taskId } = req.params;
   if (!taskId) {
@@ -25,6 +27,7 @@ exports.getCommentsByTaskId = async (req, res) => {
     res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };
+
 
 exports.createComment = async (req, res) => {
   const { comment, taskId, userId } = req.body;

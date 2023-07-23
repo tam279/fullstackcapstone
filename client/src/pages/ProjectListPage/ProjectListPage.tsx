@@ -25,6 +25,7 @@ const ProjectListPage = () => {
   const [show, setShow] = useState(false);
   const [showEdit, setShowEdit] = useState(false); // Added this line
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,14 +39,13 @@ const ProjectListPage = () => {
       .get(`${config.backend}/api/projects`, {
         headers: {
           Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYW5hZ2VyQGNvbXBhbnkxLmNvbSIsImlhdCI6MTY4OTIyNDk5N30.W5GuZWhh3woOr87dUSk5VRz7Gy78Zt1R93OhRHC8tRE`,
-        }, //TODO replace bearer with locally stored bearer
+        }, 
       })
       .then((response) => {
         setProjects(response.data);
       })
       .catch((error) => {
         if (error.message === "Network Error" && !error.response) {
-          // Show a notification to the user
           console.error("Check your network connection");
         } else {
           console.error("Error:", error);
@@ -141,12 +141,12 @@ const ProjectListPage = () => {
 
         {editingProject && (
           <EditProjectModal
-            show={showEdit} // Updated this line
+            show={showEdit}
             handleClose={handleClose}
             project={editingProject}
             refetchProjects={fetchProjects}
             users={users}
-            companies={companies} // Replace roles with companies
+            companies={companies} 
           />
         )}
       </div>

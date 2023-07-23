@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React, { FC } from "react";
+import { Modal, Button } from "react-bootstrap";
 
 interface LogoutModalProps {
   show: boolean;
@@ -13,7 +13,8 @@ const LogoutModal: FC<LogoutModalProps> = ({ show, onHide, logout }) => {
     logout();
 
     // Remove the token from localStorage or any other secure storage
-    localStorage.removeItem('jwtToken');
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("userRole");
   };
 
   return (

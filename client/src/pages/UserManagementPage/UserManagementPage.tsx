@@ -26,10 +26,10 @@ const UserManagementPage = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>("userlist");
   const [showModal, setShowModal] = useState(false);
-  const [showEditUserModal, setShowEditUserModal] = useState(false); // to control EditUserModal visibility
-  const [editingUser, setEditingUser] = useState<User | null>(null); // to hold the user that is being edited
-  const [showEditCompanyModal, setShowEditCompanyModal] = useState(false); // to control EditCompanyModal visibility
-  const [editingCompany, setEditingCompany] = useState<Company | null>(null); // to hold the company that is being edited
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showEditCompanyModal, setShowEditCompanyModal] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -70,31 +70,32 @@ const UserManagementPage = () => {
   }, []);
 
   const handleShowEditUserModal = (user: User) => {
-    setEditingUser(user); // set the user that is being edited
-    setShowEditUserModal(true); // show the EditUserModal
+    setEditingUser(user);
+    setShowEditUserModal(true);
   };
 
   const handleCloseEditUserModal = () => {
-    setEditingUser(null); // reset the user that is being edited
-    setShowEditUserModal(false); // hide the EditUserModal
+    setEditingUser(null);
+    setShowEditUserModal(false);
   };
 
   const handleShowEditCompanyModal = (company: Company) => {
-    setEditingCompany(company); // set the company that is being edited
-    setShowEditCompanyModal(true); // show the EditCompanyModal
+    setEditingCompany(company);
+    setShowEditCompanyModal(true);
   };
 
   const handleCloseEditCompanyModal = () => {
-    setEditingCompany(null); // reset the company that is being edited
-    setShowEditCompanyModal(false); // hide the EditCompanyModal
+    setEditingCompany(null);
+    setShowEditCompanyModal(false);
   };
 
   return (
     <Container fluid>
       <Row>
-        <Col xs={3} md={2} lg={2} className="p-0 vh-100">
+        <Col xs={1} md={1} lg={2} className="p-0 vh-100">
           <SidebarProject />
         </Col>
+
         <Col xs={9} md={10} lg={10}>
           <div className="d-flex align-items-center justify-content-between my-3">
             <h1>User Management</h1>
@@ -210,8 +211,8 @@ const UserManagementPage = () => {
           deleteUser={function (email: string): void {
             throw new Error("Function not implemented.");
           }}
-          fetchUsers={fetchAndSetUserData} // changed here
-          companies={companies} // pass the companies data here
+          fetchUsers={fetchAndSetUserData}
+          companies={companies}
           roles={[]}
         />
       )}
