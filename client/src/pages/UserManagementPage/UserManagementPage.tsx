@@ -90,12 +90,11 @@ const UserManagementPage = () => {
   };
 
   return (
-    <Container>
+    <Container fluid>
       <Row>
-        <Col xs={3} md={2} lg={2} className="p-0 offset-lg-0">
+        <Col xs={3} md={2} lg={2} className="p-0 vh-100">
           <SidebarProject />
         </Col>
-
         <Col xs={9} md={10} lg={10}>
           <div className="d-flex align-items-center justify-content-between my-3">
             <h1>User Management</h1>

@@ -16,6 +16,7 @@ import {
   Task,
   Activity,
   Company,
+  Status, // Import Status enum
 } from "../../problemdomain/Interface/Interface";
 import {
   fetchUserData,
@@ -23,11 +24,23 @@ import {
 } from "../../problemdomain/DataService/DataService";
 
 interface UserActivity {
-  ACTIVITYID: number;
-  EMAIL: string;
-  TIMESTAMP: string;
-  DESCRIPTION: string;
-  PROJECTID: number;
+  id: string;
+  activity: string;
+  timestamp: string;
+  userId: string;
+  projectId: string;
+  user: {
+    id: string;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    companyId: string;
+    phoneNumber: string;
+    jobTitle: string;
+    deleted: boolean;
+  };
 }
 
 type TabKey = "Tasks" | "Grantt" | "Details" | "User activity";
@@ -42,6 +55,7 @@ const ProjectDetailPage: React.FC = () => {
   const [status, setStatus] = useState("");
   const [key, setKey] = useState<TabKey>("Tasks");
   const [show, setShow] = useState(false);
+  const [createTaskModalShow, setCreateTaskModalShow] = useState(false);
   const [newTaskId, setNewTaskId] = useState<number | null>(null);
   const [editTask, setEditTask] = useState<Task | null>(null);
 
@@ -50,8 +64,13 @@ const ProjectDetailPage: React.FC = () => {
     setNewTaskId(null); // reset newTaskId state when modal is closed
   };
 
-  const handleShow = () => setShow(true);
-  const [editTaskId, setEditTaskId] = useState<number | null>(null);
+  const handleShow = () => setCreateTaskModalShow(true);
+  const handleEditModalShow = () => setEditModalShow(true);
+
+  const handleEditModalClose = () => {
+    setEditModalShow(false);
+    setEditTask(null); // Reset editTask state when modal is closed
+  };
 
   const [updatedTask, setUpdatedTask] = useState<Task | null>(null);
 
@@ -83,6 +102,7 @@ const ProjectDetailPage: React.FC = () => {
             filteredTasks = filteredTasks.map((task: Task) =>
               task.id === updatedTask.id ? updatedTask : task
             );
+            setUpdatedTask(null); // Reset updatedTask here
           }
           setTasks(filteredTasks);
         }
@@ -109,16 +129,22 @@ const ProjectDetailPage: React.FC = () => {
     fetchProject();
   }, [projectId]);
 
-  // useEffect(() => {
-  //   const fetchUserActivity = async () => {
-  //     if (projectId) {
-  //       const response = await axios.get(`${config.backend}/api/userActivity`);
-  //       setUserActivity(response.data);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchUserActivity = async () => {
+      if (projectId) {
+        try {
+          const response = await axios.get(
+            `${config.backend}/api/userActivity/${projectId}`
+          );
+          setUserActivity(response.data);
+        } catch (err) {
+          console.error("Error fetching user activities:", err);
+        }
+      }
+    };
 
-  //   fetchUserActivity();
-  // }, [projectId]);
+    fetchUserActivity();
+  }, [projectId]);
 
   const data = [
     [
@@ -146,7 +172,11 @@ const ProjectDetailPage: React.FC = () => {
   const handleTask5ModalShow = () => setTask5ModalShow(true);
   const handleTask5Click = (task: Task) => {
     setSelectedTask(task);
-    handleTask5ModalShow();
+    setShow(true); // Change this line
+  };
+
+  const countCompletedTasks = (tasks: Task[]) => {
+    return tasks.filter((task) => task.status === Status.COMPLETED).length;
   };
 
   const originalWarn = console.warn;
@@ -160,11 +190,7 @@ const ProjectDetailPage: React.FC = () => {
     }
     originalWarn(...args);
   };
-  const handleEditModalClose = () => {
-    setEditModalShow(false);
-    setEditTask(null); // Reset editTask state when modal is closed
-  };
-  const handleEditModalShow = () => setEditModalShow(true);
+
   const addNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
   };
@@ -213,7 +239,7 @@ const ProjectDetailPage: React.FC = () => {
                         variant="link"
                         onClick={(event) => {
                           event.stopPropagation();
-                          handleEditModalShow();
+                          handleEditModalShow(); // Corrected function name
                           setEditTask(task); // Set the task to be edited in the state
                         }}
                       >
@@ -323,7 +349,7 @@ const ProjectDetailPage: React.FC = () => {
                     <td>
                       <strong>Completed Tasks:</strong>
                     </td>
-                    <td>{/* Update this line with the appropriate value */}</td>
+                    <td>{countCompletedTasks(project.tasks)}</td>
                     <td>
                       <Button variant="primary">Export data</Button>
                     </td>
@@ -334,7 +360,7 @@ const ProjectDetailPage: React.FC = () => {
               <p>Loading...</p>
             )}
           </Tab>
-          {/* <Tab eventKey="User activity" title="User activity">
+          <Tab eventKey="User activity" title="User activity">
             <div className="user-activity-mode">
               <h2>User Activity</h2>
               <table className="table table-striped">
@@ -348,26 +374,26 @@ const ProjectDetailPage: React.FC = () => {
                 </thead>
                 <tbody>
                   {userActivity.map((activity) => (
-                    <tr key={activity.ACTIVITYID}>
+                    <tr key={activity.id}>
                       <td>
-                        {new Date(activity.TIMESTAMP).toLocaleDateString()}
+                        {new Date(activity.timestamp).toLocaleDateString()}
                       </td>
                       <td>
-                        {new Date(activity.TIMESTAMP).toLocaleTimeString()}
+                        {new Date(activity.timestamp).toLocaleTimeString()}
                       </td>
-                      <td>{activity.EMAIL}</td>
-                      <td>{activity.DESCRIPTION}</td>
+                      <td>{activity.user.email}</td>
+                      <td>{activity.activity}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </Tab> */}
+          </Tab>
         </Tabs>
         {projectId && (
           <CreateNewTaskModal
-            show={show}
-            handleClose={handleClose}
+            show={createTaskModalShow}
+            handleClose={() => setCreateTaskModalShow(false)}
             projectId={projectId}
             addNewTask={addNewTask} // pass the new function here
           />
@@ -389,7 +415,7 @@ const ProjectDetailPage: React.FC = () => {
             task={editTask}
             projectId={projectId || ""}
             onTaskUpdated={(updatedTask) => {
-              // Do something with the updatedTask
+              updateTask(updatedTask);
             }}
           />
         )}

@@ -99,6 +99,30 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     .split("T")[0];
   const formattedEndDate = new Date(task.endDate).toISOString().split("T")[0];
 
+  const handleCreateComment = async () => {
+    try {
+      const response = await axios.post(
+        `${config.backend}/api/tasks/${taskId}/comments`,
+        {
+          comment: newComment,
+          taskId: taskId,
+          userId: "user_id", // you need to provide this from your context or state
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        setNewComment("");
+        setComments([...comments, response.data]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -166,7 +190,9 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
             </InputGroup>
             <input type="file" onChange={handleFileUpload} />{" "}
             {/* File upload input */}
-            <Button variant="primary">Send</Button>
+            <Button variant="primary" onClick={handleCreateComment}>
+              Send
+            </Button>
           </Col>
         </Row>
       </Modal.Body>

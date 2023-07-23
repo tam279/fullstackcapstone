@@ -131,15 +131,13 @@ app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 
 // Comment routes
 app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
-app.post("/api/projects/:projectId/comments", commentController.createComment);
+app.post("/api/tasks/:taskId/comments", commentController.createComment);
 app.delete(
-  "/api/projects/:projectId/comments/:commentId",
+  "/api/tasks/:taskId/comments/:commentId",
   commentController.deleteComment
 );
 
 // User activity routes
-app.get("/api/userActivity", activityController.getUserActivity);
-app.post("/api/createUserActivity", activityController.createUserActivity);
 app.get(
   "/api/userActivity/:projectId",
   activityController.getUserActivityByProjectId
