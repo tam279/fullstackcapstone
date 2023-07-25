@@ -95,7 +95,6 @@ app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
 app.post("/changePassword", userController.changePassword);
 
-
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);
 app.post("/api/companies", companyController.createCompany);
@@ -135,7 +134,7 @@ app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 
 // Comment routes
 app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
-app.post("/api/tasks/:taskId/comments", commentController.createComment);
+// app.post("/api/tasks/:taskId/comments", commentController.createComment);
 app.delete(
   "/api/tasks/:taskId/comments/:commentId",
   commentController.deleteComment
@@ -152,7 +151,7 @@ const { sendContactEmail } = require("./service/mail");
 app.post("/contact", (req, res) => {
   // Here you can access the form data sent from the frontend
   const formData = req.body;
-  console.log(formData);
+  // console.log(formData);
 
   // Specify the recipient's email address for the contact form submission
   const recipientEmail = process.env.CONTACT_EMAIL; // Replace with the recipient's email address
@@ -233,10 +232,19 @@ app.get("/download/:fileId", async (req, res) => {
 });
 //upload feature end
 
+//comment feature
+const comment = require("./service/comment")
+app.post(
+  "/api/tasks/:taskId/comments",
+  upload.any(),
+  comment.createComment
+);
+//comment end
+
 app.use((req, res, next) => {
   const error = new Error("Route not found");
   error.status = 404;
-  console.log(req.url); // Log the requested URL
+  // console.log(req.url); // Log the requested URL
   next(error);
 });
 

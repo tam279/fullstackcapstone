@@ -38,7 +38,55 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
   const [task, setTask] = useState<Task | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+
+    if (files && files.length > 0) {
+      // When the file input changes and there is at least one file, update the selectedFile state with the chosen file
+      setSelectedFile(files[0]);
+    } else {
+      // When the file input changes and there are no files selected (e.g., user cleared the input), set selectedFile to null
+      setSelectedFile(null);
+    }
+  };
+
+  const handleCreateComment = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("comment", newComment);
+      if (selectedFile) {
+        formData.append("file", selectedFile);
+      }
+
+      // Retrieve the user ID from local storage
+      const userId = localStorage.getItem("userId");
+
+      if (userId !== null) {
+        formData.append("userId", userId);
+      }
+
+      // Make the Axios request to your API endpoint
+      const response = await axios.post(
+        `${config.backend}/api/tasks/${taskId}/comments`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      // if (response.status === 200) {
+      //   setNewComment("");
+      //   setComments([...comments, response.data]);
+      // }
+      // Handle the response as needed
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -71,9 +119,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
   if (!task) {
     return null;
   }
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files ? e.target.files[0] : null);
-  };
+
   const updateTaskStatus = async (newStatus: string | null) => {
     if (newStatus === null) {
       newStatus = task.status;
@@ -98,30 +144,6 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     .toISOString()
     .split("T")[0];
   const formattedEndDate = new Date(task.endDate).toISOString().split("T")[0];
-
-  const handleCreateComment = async () => {
-    try {
-      const response = await axios.post(
-        `${config.backend}/api/tasks/${taskId}/comments`,
-        {
-          comment: newComment,
-          taskId: taskId,
-          userId: "user_id", // you need to provide this from your context or state
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.status === 200) {
-        setNewComment("");
-        setComments([...comments, response.data]);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -188,8 +210,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                 onChange={(e) => setNewComment(e.target.value)}
               />
             </InputGroup>
-            <input type="file" onChange={handleFileUpload} />{" "}
-            {/* File upload input */}
+            <input type="file" onChange={handleFileUpload} />
             <Button variant="primary" onClick={handleCreateComment}>
               Send
             </Button>
