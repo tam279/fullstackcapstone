@@ -1,6 +1,6 @@
 import React, { FC, ChangeEvent, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
-import "./ChangePasswordModal.css"; // Import the CSS file
+import "./ChangePasswordModal.css";
 import config from "../../config";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
@@ -19,6 +19,11 @@ const ChangePasswordModal: FC<ChangePasswordModalProps> = ({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  /**
+   * The function `handleConfirm` is used to change the password by making a POST request to the backend
+   * API with the new password and the user ID.
+   * @returns The function `handleConfirm` returns nothing.
+   */
   const handleConfirm = async () => {
     if (newPassword !== confirmPassword) {
       setErrorMessage("Passwords do not match");
@@ -33,17 +38,12 @@ const ChangePasswordModal: FC<ChangePasswordModalProps> = ({
     }
 
     try {
-      // Make an API call to change the password
       const response = await axios.post(`${config.backend}/changePassword`, {
         userId: userId,
         newPassword: newPassword,
       });
-
-      // Handle successful password change
-      console.log(response.data); // Assuming the API returns a success message
-      onHide(); // Close the modal
+      onHide();
     } catch (error) {
-      // Handle error
       console.error(error);
       setErrorMessage("An error occurred while changing the password");
     }

@@ -22,14 +22,14 @@ const LoginPage = () => {
       // Assuming the server responds with a JWT token and role
       const {
         token,
-        user: { role },
+        user: { role, id },
       } = response.data;
-
 
       console.log(response.data);
       // Store the JWT token and role in localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("userRole", role);
+      localStorage.setItem("userId", id);
 
       // Redirect to the ChangePasswordPage or any other desired page
       navigate("/projectlistpage");

@@ -13,7 +13,6 @@ const SidebarProject: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const userRole = localStorage.getItem("userRole") as Role;
 
-  // The local state for the SidebarProject
   const [show, setShow] = useState<{
     [key: string]: boolean;
   }>({
@@ -24,7 +23,6 @@ const SidebarProject: React.FC = () => {
     project: false,
   });
 
-  // Hook for programmatically navigate to different routes
   const navigate = useNavigate();
 
   const handleShow = (modal: string) => {
@@ -54,9 +52,9 @@ const SidebarProject: React.FC = () => {
       let userEmail = "";
       if (token) {
         const decodedToken: any = jwt_decode(token);
-        userEmail = decodedToken.sub; // Use 'sub' instead of 'userId'
+        userEmail = decodedToken.sub;
       }
-      const user = users.find((user: User) => user.email === userEmail); // Use 'email' instead of 'id'
+      const user = users.find((user: User) => user.email === userEmail); 
       setCurrentUser(user);
       handleShow("profile");
     } catch (error) {

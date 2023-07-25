@@ -38,8 +38,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-/* The `exports.createUser` function is a controller function that handles the logic for creating a new
-user in the database. */
+const bcrypt = require("bcrypt");
 exports.createUser = async (req, res) => {
   const {
     email,
@@ -142,7 +141,6 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 exports.changePassword = async (req, res) => {
   const { userId, newPassword } = req.body;
 
@@ -160,7 +158,6 @@ exports.changePassword = async (req, res) => {
       .json({ error: "An error occurred while changing the password" });
   }
 };
-
 
 // Ian need for User Login
 // exports.getUserByEmail = async (email) => {

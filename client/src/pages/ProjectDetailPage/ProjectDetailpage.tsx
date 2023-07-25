@@ -400,16 +400,19 @@ const ProjectDetailPage: React.FC = () => {
             addNewTask={addNewTask} // pass the new function here
           />
         )}
-        <TaskDetailModal
-          show={show}
-          handleClose={handleClose}
-          task={selectedTask} // make sure selectedTask is defined
-          projectId={projectId || ""} // use a default value to ensure projectId is always a string
-          taskId={selectedTask?.id || ""} // Provide taskId prop according to its type and requirement
-          onTaskUpdated={(updatedTask: Task) => {
-            // Do something with the updatedTask
-          }}
-        />
+<TaskDetailModal
+  show={show}
+  handleClose={handleClose}
+  task={selectedTask} 
+  projectId={projectId || ""}
+  taskId={selectedTask?.id || ""}
+  onTaskUpdated={(updatedTask: Task) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+  }}
+/>
+
         {editTask && (
           <EditTaskModal
             show={editModalShow}

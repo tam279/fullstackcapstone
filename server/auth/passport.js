@@ -27,7 +27,6 @@ passport.use(
             const token = jwt.sign({ sub: user.email }, "your-secret-key");
             user.token = token;
             delete user.password;
-            delete user.id;
             delete user.deleted;
             return done(null, user);
           } else {
