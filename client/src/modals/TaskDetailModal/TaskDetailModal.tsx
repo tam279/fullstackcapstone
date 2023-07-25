@@ -199,6 +199,21 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                   comment.User.lastName
                 } - ${moment(comment.timeStamp).format("LLL")}`}</p>
                 <p>{comment.comment}</p>
+                <ul>
+                  {comment.files.map((file, index) => (
+                    <li key={index}>
+                      <span>File Name: {file.name}</span>
+                      <span>
+                        <a
+                          href={`/download/${file.id}`} // Replace this with your actual API endpoint
+                          download={file.name} // Set the download attribute to the file name
+                        >
+                          Download
+                        </a>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
             <h4>Enter a Comment:</h4>

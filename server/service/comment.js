@@ -30,7 +30,6 @@ async function createComment(req, res) {
         timeStamp: new Date(), // Use the current timestamp
       },
     });
-    console.log("Comment created:", comment);
 
     // You can handle the received data here and send a response if needed
     res.json({ message: "Received data successfully!" });
