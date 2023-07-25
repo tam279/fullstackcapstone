@@ -32,9 +32,18 @@ app.use(
 //DEV ONLY CORS remove localhost from deployment
 //use cors middleware to only allow our front end to use this api
 // Enable CORS for all routes
+let allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:3000"];
+
+// Checking if the array has only one item or is null,
+// if it is, it will return the first item in the array or a default value
+allowedOrigins =
+  allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins;
+
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS.split(","),
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     preflightContinue: false,
