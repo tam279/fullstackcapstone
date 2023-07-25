@@ -26,7 +26,7 @@ const LoginPage = () => {
       } = response.data;
 
 
-      console.log(response.data);
+      // console.log(response.data);
       // Store the JWT token and role in localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("userRole", role);

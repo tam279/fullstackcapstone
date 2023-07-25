@@ -44,8 +44,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       setJobTitle(user.jobTitle);
       setRole(user.role);
       setCompany(user.company ? user.company.id : "");
-      console.log("user:", user);
-      console.log("user.id:", user.id);
+      // console.log("user:", user);
+      // console.log("user.id:", user.id);
     }
   }, [user, companies, roles]);
 

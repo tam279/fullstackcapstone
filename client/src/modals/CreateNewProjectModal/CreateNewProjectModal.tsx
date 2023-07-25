@@ -101,7 +101,7 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
 
 const handleCompanyChange = (e: ChangeEvent<HTMLSelectElement>) => {
   setCompanyId(e.target.value);
-  console.log(e.target.value); // Add this line
+  // console.log(e.target.value); // Add this line
 };
 
 

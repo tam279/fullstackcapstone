@@ -40,7 +40,7 @@ const ChangePasswordModal: FC<ChangePasswordModalProps> = ({
       });
 
       // Handle successful password change
-      console.log(response.data); // Assuming the API returns a success message
+      // console.log(response.data); // Assuming the API returns a success message
       onHide(); // Close the modal
     } catch (error) {
       // Handle error

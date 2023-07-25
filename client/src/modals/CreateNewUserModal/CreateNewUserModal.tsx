@@ -28,7 +28,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
   useEffect(() => {
     fetchCompanyData()
       .then((data) => {
-        console.log("Companies:", data);
+        // console.log("Companies:", data);
         setCompanies(data);
       })
       .catch((error) => console.error("Error:", error));
@@ -75,7 +75,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         onUserCreated(data);
       })
       .catch((error) => {
@@ -149,11 +149,11 @@ const NewUserModal: FC<NewUserModalProps> = ({
                   value={company ? company.id : ""}
                   onChange={(e) => {
                     const selectedCompanyId = e.target.value;
-                    console.log("Selected company ID:", selectedCompanyId);
+                    // console.log("Selected company ID:", selectedCompanyId);
                     const selectedCompany = companies.find(
                       (company) => company.id === selectedCompanyId
                     );
-                    console.log("Selected company:", selectedCompany);
+                    // console.log("Selected company:", selectedCompany);
                     setCompany(selectedCompany || null);
                   }}
                 >

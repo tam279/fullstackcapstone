@@ -40,6 +40,7 @@ exports.getUsers = async (req, res) => {
 
 /* The `exports.createUser` function is a controller function that handles the logic for creating a new
 user in the database. */
+const bcrypt = require("bcrypt");
 exports.createUser = async (req, res) => {
   const {
     email,
@@ -54,12 +55,15 @@ exports.createUser = async (req, res) => {
   } = req.body;
 
   try {
+    // Hash the password before saving it
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
       data: {
         email,
         firstName,
         lastName,
-        password,
+        password: hashedPassword, // Store the hashed password in the database
         role,
         company: { connect: { id: companyId } },
         phoneNumber,
@@ -142,7 +146,6 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 exports.changePassword = async (req, res) => {
   const { userId, newPassword } = req.body;
 
@@ -160,7 +163,6 @@ exports.changePassword = async (req, res) => {
       .json({ error: "An error occurred while changing the password" });
   }
 };
-
 
 // Ian need for User Login
 // exports.getUserByEmail = async (email) => {

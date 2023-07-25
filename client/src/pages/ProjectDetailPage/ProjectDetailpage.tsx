@@ -116,7 +116,7 @@ const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
-      console.log("fetchProjects is called");
+      // console.log("fetchProjects is called");
 
       if (projectId) {
         const response = await axios.get(
