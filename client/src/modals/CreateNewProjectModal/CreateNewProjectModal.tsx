@@ -11,6 +11,8 @@ import {
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
 
+/* The `CreateNewProjectModalProps` interface defines the props that are passed to the
+`CreateNewProjectModal` component. */
 interface CreateNewProjectModalProps {
   show: boolean;
   handleClose: () => void;
@@ -18,6 +20,8 @@ interface CreateNewProjectModalProps {
   refetchProjects: () => void;
 }
 
+/* The code block is defining a functional component called `CreateNewProjectModal` that takes in props
+of type `CreateNewProjectModalProps`. */
 const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
   show,
   handleClose,
@@ -28,16 +32,21 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
   const [technicians, setTechnicians] = useState<string[]>([]);
   const [viewers, setViewers] = useState<string[]>([]);
   const [description, setDescription] = useState("");
-
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
   const [companyId, setCompanyId] = useState("");
   const [isDeleted, setIsDeleted] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [companies, setCompanies] = useState<CompanyInterface[]>([]);
 
 
+  /**
+   * The function converts a given date string to an ISO string with full precision.
+   * @param {string} dateString - The `dateString` parameter is a string representing a date. It is
+   * used to create a new `Date` object.
+   * @returns The function `toISOStringWithFullPrecision` returns a string representation of the given
+   * date in ISO 8601 format with full precision.
+   */
   const toISOStringWithFullPrecision = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toISOString();
@@ -58,6 +67,13 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
     fetchData();
   }, []);
 
+ /**
+  * The handleSubmit function is used to handle form submission in a TypeScript React application,
+  * where it sends a POST request to create a new project with the provided data.
+  * @param event - The event parameter is of type React.FormEvent<HTMLFormElement>. It represents the
+  * form submission event triggered by the user.
+  * @returns The function does not explicitly return anything.
+  */
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -99,9 +115,15 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
     }
   };
 
+/**
+ * The function "handleCompanyChange" is a TypeScript function that handles the change event of a HTML
+ * select element and updates the state variable "companyId" with the selected value.
+ * @param e - The parameter `e` is of type `ChangeEvent<HTMLSelectElement>`. This means it is an event
+ * object that is triggered when the value of a `<select>` element changes.
+ */
 const handleCompanyChange = (e: ChangeEvent<HTMLSelectElement>) => {
   setCompanyId(e.target.value);
-  console.log(e.target.value); // Add this line
+  console.log(e.target.value); 
 };
 
 

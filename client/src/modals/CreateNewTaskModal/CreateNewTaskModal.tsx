@@ -119,16 +119,11 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
         projectId: formValues.projectId,
       };
 
-      // Make the POST request to create the task
       const response = await axios.post(
         `${config.backend}/api/project/${formValues.projectId}/tasks`,
         taskData
       );
-
-      // If successful, the API should return the new task
       const newTask = response.data;
-
-      // Update the parent component's state with the new task
       addNewTask(newTask);
 
       handleClose();

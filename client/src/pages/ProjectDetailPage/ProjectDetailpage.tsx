@@ -77,7 +77,7 @@ const ProjectDetailPage: React.FC = () => {
   const updateTask = async (task: Task) => {
     try {
       const response = await axios.put(
-        `${config.backend}/api/tasks/${task.id}`,
+        `${config.backend}/api/project/${projectId}/task/${task.id}`,
         task
       );
       if (response.status === 200) {
@@ -255,8 +255,10 @@ const ProjectDetailPage: React.FC = () => {
                     </td>
                     <td>
                       {task.technicians
-                        .map((tech) => `${tech.firstName} ${tech.lastName}`)
-                        .join(", ")}
+                        ? task.technicians
+                            .map((tech) => `${tech.firstName} ${tech.lastName}`)
+                            .join(", ")
+                        : ""}
                     </td>
 
                     {/* <td>{task.duration} hours</td> */}
