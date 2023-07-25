@@ -42,7 +42,10 @@ const ChangePasswordModal: FC<ChangePasswordModalProps> = ({
         userId: userId,
         newPassword: newPassword,
       });
-      onHide();
+
+      // Handle successful password change
+      // console.log(response.data); // Assuming the API returns a success message
+      onHide(); // Close the modal
     } catch (error) {
       console.error(error);
       setErrorMessage("An error occurred while changing the password");

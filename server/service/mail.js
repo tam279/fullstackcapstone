@@ -27,7 +27,7 @@ async function sendContactEmail(formData, recipientEmail) {
     // Send the email
     const info = await transporter.sendMail(mailOptions);
 
-    console.log("Email sent:", info.messageId);
+    // console.log("Email sent:", info.messageId);
   } catch (error) {
     console.error("Error sending email:", error);
   }

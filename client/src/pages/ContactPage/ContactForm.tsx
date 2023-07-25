@@ -28,7 +28,7 @@ const ContactForm = () => {
     axios
       .post(`${config.backend}/contact`, formData)
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         // Handle success response (if needed)
 
         // Clear the form and show "Message Sent" confirmation

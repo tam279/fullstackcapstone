@@ -14,7 +14,18 @@ exports.getCommentsByTaskId = async (req, res) => {
       // Get comments of the task
       const comments = await prisma.comment.findMany({
         where: { taskId: taskId, deleted: false },
-        include: { User: true, files: true },
+        include: {
+          User: true,
+          files: {
+            select: {
+              id: true,
+              name: true,
+              taskId: true,
+              commentId: true,
+              deleted: true,
+            },
+          },
+        },
       });
 
       res.status(200).json(comments);
@@ -27,7 +38,6 @@ exports.getCommentsByTaskId = async (req, res) => {
     res.status(500).send({ message: "An error occurred", error: err.message });
   }
 };
-
 
 exports.createComment = async (req, res) => {
   const { comment, taskId, userId } = req.body;

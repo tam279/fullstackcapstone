@@ -97,7 +97,7 @@ exports.createProject = async (req, res) => {
       description,
       company,
     } = req.body;
-    console.log(req.body); // Add this line
+    // console.log(req.body); // Add this line
 
     const newProject = await prisma.project.create({
       data: {

@@ -53,12 +53,15 @@ exports.createUser = async (req, res) => {
   } = req.body;
 
   try {
+    // Hash the password before saving it
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
       data: {
         email,
         firstName,
         lastName,
-        password,
+        password: hashedPassword, // Store the hashed password in the database
         role,
         company: { connect: { id: companyId } },
         phoneNumber,
