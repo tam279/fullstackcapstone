@@ -1,208 +1,153 @@
-import React, { FC, useEffect, useState, ChangeEvent } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
+import {
+  User,
+  Task,
+  Project,
+  Status,
+} from "../../problemdomain/Interface/Interface";
+import { fetchUserData } from "../../problemdomain/DataService/DataService";
 
 interface EditTaskModalProps {
   show: boolean;
   handleClose: () => void;
-  taskId: any;
-}
-
-interface User {
-  EMAIL: string;
-  FIRSTNAME: string;
-  LASTNAME: string;
-}
-
-interface FormValues {
-  NAME: string;
-  STARTDATE: string;
-  TECHNICIANS: string[];
-  TECHNICIAN_EMAIL: string[]; // Add TECHNICIAN_EMAIL property
-  DESCRIPTION: string;
-  PRIORITY: string;
-  ENDDATE: string;
-  TAG: string;
-  FILTER: string;
-  STATUS: string;
-  DEPENDENCY: any;
-  ISACTIVE: boolean;
+  task: Task;
+  projectId: string;
+  onTaskUpdated: (updatedTask: Task) => void; // Added this line
 }
 
 const EditTaskModal: FC<EditTaskModalProps> = ({
   show,
   handleClose,
-  taskId,
+  task,
+  onTaskUpdated,
 }) => {
-  const [task, setTask] = useState<any>(null);
+  // Added onTaskUpdated here
   const [users, setUsers] = useState<User[]>([]);
-
   const [formValues, setFormValues] = useState({
-    NAME: "",
-    STARTDATE: "",
-    TECHNICIANS: [] as string[], // Update the type of TECHNICIANS to string[]
-    DESCRIPTION: "",
-    PRIORITY: "",
-    ENDDATE: "",
-    TAG: "",
-    FILTER: "",
-    STATUS: "",
-    DEPENDENCY: "",
-    ISACTIVE: false,
+    name: task.name,
+    description: task.description,
+    status: task.status,
+    priorityLevel: task.priorityLevel,
+    startDate: new Date(task.startDate).toISOString().slice(0, 16),
+    endDate: new Date(task.endDate).toISOString().slice(0, 16),
+    technicians: task.technicians.map((tech) => tech.email),
+    dependencies: task.dependencies || [], // if task.dependencies is undefined, use an empty array instead
+    projectId: task.projectId,
   });
 
+  const [lastFetchedProjectId, setLastFetchedProjectId] = useState<
+    string | null
+  >(null);
+
   useEffect(() => {
-    const getTask = async () => {
-      try {
-        const response = await axios.get(
-          `${config.backend}/api/tasks/${taskId}`
+    const fetchProjectTechnicians = async () => {
+      if (task.projectId !== lastFetchedProjectId) {
+        const userData = await fetchUserData();
+        const projectTechnicians = userData.filter((user: User) =>
+          user.projectsAsTechnician.some(
+            (project: Project) => project.id === task.projectId
+          )
         );
-        setTask(response.data);
-      } catch (error) {
-        console.error("Error getting task:", error);
-        // handle error as needed
+        setUsers(projectTechnicians);
+        setLastFetchedProjectId(task.projectId);
       }
     };
 
-    getTask();
-  }, [taskId]);
-
-  useEffect(() => {
-    const fetchTaskDetails = async () => {
-      try {
-        const res = await axios.get(`${config.backend}/api/tasks/${taskId}`);
-        const taskData = res.data;
-
-        let startDate = new Date(taskData.STARTDATE);
-        let formattedStartDate = startDate.toISOString().substring(0, 16);
-
-        let endDate = new Date(taskData.ENDDATE);
-        let formattedEndDate = endDate.toISOString().substring(0, 16);
-
-        setFormValues({
-          NAME: taskData.NAME,
-          STARTDATE: formattedStartDate,
-          TECHNICIANS: [], // Since API doesn't provide technicians, initialize as empty
-          DESCRIPTION: taskData.DESCRIPTION,
-          PRIORITY: taskData.PRIORITY,
-          ENDDATE: formattedEndDate,
-          TAG: taskData.TAG,
-          FILTER: taskData.FILTER,
-          STATUS: taskData.STATUS,
-          DEPENDENCY: taskData.DEPENDENCY || "", // Set the current dependency value
-          ISACTIVE: taskData.ISACTIVE || false, // initialize ISACTIVE if it's not provided by API
-        });
-        setTask(res.data);
-        const fetchUsers = async () => {
-          try {
-            const response = await axios.get(
-              `${config.backend}/api/project/${taskData.PROJECTID}/technicians`
-            );
-            setUsers(response.data);
-          } catch (err) {
-            console.error(err);
-          }
-        };
-
-        fetchUsers();
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (taskId) {
-      fetchTaskDetails();
-    }
-  }, [taskId]);
+    fetchProjectTechnicians();
+  }, [task.projectId, lastFetchedProjectId]); // Depend on task.projectId and lastFetchedProjectId
 
   const handleFormChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type } = event.target;
-    setFormValues((prevFormValues) => ({
-      ...prevFormValues,
-      [name]:
-        type === "checkbox"
-          ? (event.target as HTMLInputElement).checked
-          : value,
-    }));
+    if (event.target.name === "technicians") {
+      const selectedOptions = Array.from(
+        (event.target as HTMLSelectElement).selectedOptions,
+        (option) => (option as HTMLOptionElement).value
+      );
+      setFormValues({
+        ...formValues,
+        technicians: selectedOptions,
+      });
+    } else if (event.target.name === "dependencies") {
+      setFormValues({
+        ...formValues,
+        dependencies: event.target.value.split(","),
+      });
+    } else {
+      let value: string | number = event.target.value;
+      if (event.target.name === "priorityLevel") {
+        value = parseInt(value);
+      }
+      setFormValues({
+        ...formValues,
+        [event.target.name]: value,
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(
+        `${config.backend}/api/project/${task.projectId}/task/${task.id}`
+      );
+      handleClose();
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      // create a copy of formValues
-      const updatedFormValues: FormValues = {
-        ...formValues,
-        TECHNICIAN_EMAIL: formValues.TECHNICIANS,
-        DEPENDENCY: formValues.DEPENDENCY,
+      const technicianIds = users
+        .filter((user) => formValues.technicians.includes(user.email))
+        .map((user) => user.id);
+
+      const taskData = {
+        name: formValues.name,
+        description: formValues.description,
+        status: formValues.status,
+        priorityLevel: formValues.priorityLevel,
+        startDate: new Date(formValues.startDate).toISOString(),
+        endDate: new Date(formValues.endDate).toISOString(),
+        technicians: technicianIds,
+        dependencies: formValues.dependencies,
+        projectId: formValues.projectId,
       };
-      delete (updatedFormValues as any).TECHNICIANS;
 
-      updatedFormValues.TECHNICIAN_EMAIL = updatedFormValues.TECHNICIANS;
-      delete (updatedFormValues as any).TECHNICIANS;
-
-      // Calculate the progress based on the formula (EndDate - today) / (EndDate - StartDate)
-      const endDate = new Date(updatedFormValues.ENDDATE);
-      const startDate = new Date(updatedFormValues.STARTDATE);
-      const today = new Date();
-      const totalDuration = endDate.getTime() - startDate.getTime();
-      const remainingDuration = endDate.getTime() - today.getTime();
-      const progress = (remainingDuration / totalDuration) * 100;
-
-      // Set the progress value in updatedFormValues
-      (updatedFormValues as any).PROGRESS = progress.toFixed(2);
-
-      await axios.put(
-        `${config.backend}/api/updateTasks/${taskId}`,
-        updatedFormValues
+      const response = await axios.put(
+        `${config.backend}/api/project/${formValues.projectId}/task/${task.id}`,
+        taskData
       );
+
+      if (response.status === 200) {
+        onTaskUpdated(response.data);
+      }
+
       handleClose();
     } catch (error) {
       console.error("Error updating task:", error);
     }
   };
 
-  const handleDeleteTask = async () => {
-    try {
-      const response = await axios.delete(
-        `${config.backend}/api/tasks/${taskId}`
-      );
-      if (response.status === 200) {
-        handleClose(); // Close the modal
-        // Optional: add code here to refresh the list of tasks in the parent component
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleActivateTask = async () => {
-    try {
-      await axios.put(`${config.backend}/api/tasks/${taskId}/activate`);
-      setFormValues((prevFormValues) => ({
-        ...prevFormValues,
-        ISACTIVE: true,
-      }));
-    } catch (error) {
-      console.error("Error activating task:", error);
-    }
-  };
-
-  const handleDeactivateTask = async () => {
-    try {
-      await axios.put(`${config.backend}/api/tasks/${taskId}/deactivate`);
-      setFormValues((prevFormValues) => ({
-        ...prevFormValues,
-        ISACTIVE: false,
-      }));
-    } catch (error) {
-      console.error("Error deactivating task:", error);
-    }
-  };
+  useEffect(() => {
+    setFormValues({
+      name: task.name,
+      description: task.description,
+      status: task.status,
+      priorityLevel: task.priorityLevel,
+      startDate: new Date(task.startDate).toISOString().slice(0, 16),
+      endDate: new Date(task.endDate).toISOString().slice(0, 16),
+      technicians: task.technicians.map((tech) => tech.email),
+      dependencies: task.dependencies || [],
+      projectId: task.projectId,
+    });
+  }, [task]);
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -210,167 +155,130 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
         <Modal.Title>Edit Task</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {task && (
-          <Form onSubmit={handleFormSubmit}>
-            <Row>
-              {/* Left Column */}
-              <Col xs={12} md={6}>
-                <Form.Group>
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="NAME"
-                    value={formValues.NAME}
-                    onChange={handleFormChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Technicians</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="TECHNICIANS"
-                    value={formValues.TECHNICIANS}
-                    onChange={handleFormChange}
-                    multiple
-                  >
-                    {users.map((user) => (
-                      <option key={user.EMAIL} value={user.EMAIL}>
-                        {`${user.FIRSTNAME} ${user.LASTNAME}`}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Status</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="STATUS"
-                    value={formValues.STATUS}
-                    onChange={handleFormChange}
-                    required
-                  >
-                    <option value="">Select Status</option>
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Delayed">Delayed</option>
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Tag</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="TAG"
-                    value={formValues.TAG}
-                    onChange={handleFormChange}
-                  />
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Dependencies</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="DEPENDENCY"
-                    value={formValues.DEPENDENCY}
-                    onChange={handleFormChange}
-                  />
-                </Form.Group>
-              </Col>
+        <Form onSubmit={handleFormSubmit}>
+          <Row>
+            <h2>Details</h2>
+            <Col>
+              <Form.Group>
+                <Form.Label>Task Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  placeholder="Enter task name"
+                  onChange={handleFormChange}
+                  value={formValues.name}
+                />
+              </Form.Group>
 
-              {/* Right Column */}
-              <Col xs={12} md={6}>
-                <Row>
-                  <Col>
-        
-                    <Form.Group>
-                      <Form.Label>Start Date</Form.Label>
-                      <Form.Control
-                        type="datetime-local"
-                        name="STARTDATE"
-                        value={formValues.STARTDATE}
-                        onChange={handleFormChange}
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group>
-                      <Form.Label>End Date</Form.Label>
-                      <Form.Control
-                        type="datetime-local"
-                        name="ENDDATE"
-                        value={formValues.ENDDATE}
-                        onChange={handleFormChange}
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Form.Group>
-                  <Form.Label>Priority</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="PRIORITY"
-                    value={formValues.PRIORITY}
-                    onChange={handleFormChange}
-                    required
-                  >
-                    <option value="">Select Priority</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Active</Form.Label>
-                  <Form.Check
-                    type="checkbox"
-                    name="ISACTIVE"
-                    checked={formValues.ISACTIVE}
-                    onChange={handleFormChange}
-                  />
-                  {!formValues.ISACTIVE ? (
-                    <Button variant="success" onClick={handleActivateTask}>
-                      Activate Task
-                    </Button>
-                  ) : (
-                    <Button variant="warning" onClick={handleDeactivateTask}>
-                      Deactivate Task
-                    </Button>
-                  )}
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="DESCRIPTION"
-                    value={formValues.DESCRIPTION}
-                    onChange={handleFormChange}
-                  />
-                </Form.Group>
+              <Form.Control
+                type="datetime-local"
+                name="startDate"
+                onChange={handleFormChange}
+                value={formValues.startDate}
+              />
+
+              <Form.Group>
+                <Form.Label>End Date</Form.Label>
+                <Form.Control
+                  type="datetime-local"
+                  name="endDate"
+                  onChange={handleFormChange}
+                  value={formValues.endDate}
+                />
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Priority Level</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={formValues.priorityLevel}
+                  onChange={handleFormChange}
+                  name="priorityLevel"
+                >
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                </Form.Control>
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Status</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={formValues.status}
+                  onChange={handleFormChange}
+                  name="status"
+                >
+                  <option value={Status.NOT_STARTED}>Not Started</option>
+                  <option value={Status.IN_PROGRESS}>In Progress</option>
+                  <option value={Status.COMPLETED}>Completed</option>
+                </Form.Control>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group>
+                <Form.Label>Technician</Form.Label>
+                <Form.Control
+                  as="select"
+                  multiple
+                  name="technicians"
+                  value={formValues.technicians}
+                  onChange={handleFormChange}
+                >
+                  {users.map((user, index) => (
+                    <option key={index} value={user.email}>
+                      {user.firstName + " " + user.lastName}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Dependencies</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  placeholder="Task dependencies. Enter the task id, follow by the comma..."
+                  name="dependencies"
+                  onChange={handleFormChange}
+                  value={formValues.dependencies.join(",")}
+                />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  name="description"
+                  placeholder="Task description..."
+                  onChange={handleFormChange}
+                  value={formValues.description}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Modal.Footer>
+            <Row className="w-100">
+              <Col xs={4}>
+                <Button variant="danger" onClick={handleDelete}>
+                  Delete
+                </Button>
+              </Col>
+              <Col xs={8} className="d-flex justify-content-end">
+                <Button variant="primary" type="submit">
+                  Update
+                </Button>
+                <Button variant="secondary" onClick={handleClose}>
+                  Cancel
+                </Button>
               </Col>
             </Row>
-          </Form>
-        )}
+          </Modal.Footer>
+        </Form>
       </Modal.Body>
-      <Modal.Footer>
-        <Row className="w-100">
-          <Col xs={12} className="d-flex justify-content-start">
-            <Button variant="danger" onClick={handleDeleteTask}>
-              Delete Task
-            </Button>
-          </Col>
-          <Col xs={12} className="d-flex justify-content-end">
-            <Button variant="primary" type="submit">
-              Update Task
-            </Button>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-          </Col>
-        </Row>
-      </Modal.Footer>
     </Modal>
   );
 };

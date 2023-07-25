@@ -1,27 +1,33 @@
 // userController.js
 
-const mysql = require("mysql2/promise");
-const bcrypt = require("bcrypt");
-const db = require("../db/database");
-
-// getUsers will get email, firstname, lastname, company,role, phoneNumber, jobTitle, deleted
+/* The code `const { PrismaClient } = require("@prisma/client");` is importing the `PrismaClient` class
+from the `@prisma/client` package. */
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+/* The `exports.getUsers` function is a controller function that handles the logic for retrieving users
+from the database. */
 exports.getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: {
+        id: true,
         email: true,
         firstName: true,
         lastName: true,
         company: {
-          select: { name: true },
+          select: { id: true, name: true },
         },
         role: true,
         phoneNumber: true,
         jobTitle: true,
         deleted: true,
+        projectsAsTechnician: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
@@ -32,6 +38,8 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+const bcrypt = require("bcrypt");
+const { sendWelcomeEmail } = require("../service/new-user-mail");
 exports.createUser = async (req, res) => {
   const {
     email,
@@ -45,13 +53,23 @@ exports.createUser = async (req, res) => {
     deleted,
   } = req.body;
 
+  const user = {
+    email: email,
+    name: `${firstName} ${lastName}`,
+    password: password,
+  };
+
+  sendWelcomeEmail(user);
   try {
+    // Hash the password before saving it
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
       data: {
         email,
         firstName,
         lastName,
-        password,
+        password: hashedPassword, // Store the hashed password in the database
         role,
         company: { connect: { id: companyId } },
         phoneNumber,
@@ -69,8 +87,11 @@ exports.createUser = async (req, res) => {
   }
 };
 
+/* The `exports.updateUser` function is a controller function that handles the logic for updating a
+user in the database. */
 exports.updateUser = async (req, res) => {
-  const id = req.params.id; // Extract the id parameter correctly
+  const id = req.params.id;
+
   const {
     email,
     firstName,
@@ -112,6 +133,8 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+/* The `exports.deleteUser` function is a controller function that handles the logic for deleting a
+user from the database. */
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -129,7 +152,23 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+exports.changePassword = async (req, res) => {
+  const { userId, newPassword } = req.body;
 
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { password: newPassword },
+    });
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while changing the password" });
+  }
+};
 
 // Ian need for User Login
 // exports.getUserByEmail = async (email) => {

@@ -1,4 +1,4 @@
-// companyController.js
+// activityController.js
 
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
@@ -7,6 +7,37 @@ const db = require("../db/database");
 // getUsers will get email, firstname, lastname, company,role, phoneNumber, jobTitle, deleted
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+
+exports.getUserActivityByProjectId = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    const activities = await prisma.activity.findMany({
+      where: {
+        projectId: projectId,
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (activities.length === 0) {
+      return res.status(404).send({
+        message: `No user activities found for project with id: ${projectId}`,
+      });
+    }
+
+    res.status(200).send(activities);
+  } catch (error) {
+    console.error("Error: ", error);
+    return res.status(500).send({
+      error: `Failed to fetch user activities for project with id: ${projectId}, error: ${error.message}`,
+    });
+  }
+};
 
 exports.getUserActivity = async (req, res) => {
   try {
@@ -37,34 +68,5 @@ exports.createUserActivity = async (req, res) => {
     res.status(201).json(newActivity);
   } catch (err) {
     res.status(500).json({ message: err.message });
-  }
-};
-
-exports.getUserActivityByProjectId = async (req, res) => {
-  try {
-    const { projectId } = req.params;
-
-    const activities = await prisma.activityLog.findMany({
-      where: {
-        projectId: parseInt(projectId),
-      },
-      orderBy: {
-        timestamp: "desc",
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    if (activities.length === 0) {
-      return res
-        .status(404)
-        .send({ message: "No user activities found for this project" });
-    }
-
-    res.status(200).send(activities);
-  } catch (error) {
-    console.error("Error: ", error);
-    return res.status(500).send({ error: error.message });
   }
 };

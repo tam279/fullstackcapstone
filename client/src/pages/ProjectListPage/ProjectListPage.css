@@ -20,3 +20,9 @@
   font-size: 32px;
   color: #32324D;
 }
+
+@media (max-width: 768px) {
+  .ProjectListPage {
+    flex-direction: column;
+  }
+}

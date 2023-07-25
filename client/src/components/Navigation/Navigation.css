@@ -1,4 +1,6 @@
 /* Navigation.css */
+
+/* Logo styles */
 #logo.logo-custom {
   width: 80px;
   height: auto;
@@ -6,68 +8,58 @@
   /* Update border color */
   cursor: pointer;
   /* Change cursor to hand */
-}
 
-.nav-link.text-primary {
-  font-size: 1rem;
-  /* Replace pixel sizes with rem for scalability */
-  padding: .5rem 1rem;
-  /* Replace pixel sizes with rem for scalability */
-  color: #0d6efd !important;
-  /* Important to override Bootstrap's .nav-link color */
-}
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    width: 60px;
+  }
 
-.nav-link.text-primary:hover {
-  color: #0b5ed7 !important;
-  /* Darken link on hover */
-}
+  @media (max-width: 768px) {
+    width: 40px;
+  }
 
-.nav-link.text-primary:last-child {
-  margin-left: auto;
-}
-
-.nav-link.active {
-  /* Add .active to enhance the current page link */
-  font-weight: bold !important;
-  /* Make the text bold */
-  color: #0b5ed7 !important;
-  /* Use a darker color */
-}
-
-/* Responsive styles */
-@media (max-width: 1200px) {
-  .nav-link.text-primary {
-    font-size: .875rem;
+  @media (max-width: 576px) {
+    width: 30px;
   }
 }
 
-@media (max-width: 992px) {
-  .nav-link.text-primary {
+/* Primary link styles */
+.nav-link.text-primary {
+  font-size: 1rem;
+  padding: .5rem 1rem;
+  color: #0d6efd !important;
+
+  /* On hover effect */
+  &:hover {
+    color: #0b5ed7 !important;
+  }
+
+  /* Positioning for the last element */
+  &:last-child {
+    margin-left: auto;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    font-size: .875rem;
+  }
+
+  @media (max-width: 992px) {
     font-size: .75rem;
   }
 
-  #logo.logo-custom {
-    width: 60px;
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-link.text-primary {
+  @media (max-width: 768px) {
     font-size: .625rem;
     padding: .25rem .5rem;
   }
 
-  #logo.logo-custom {
-    width: 40px;
+  @media (max-width: 576px) {
+    font-size: .5rem;
   }
 }
 
-@media (max-width: 576px) {
-  .nav-link.text-primary {
-    font-size: .5rem;
-  }
-
-  #logo.logo-custom {
-    width: 30px;
-  }
+/* Active link styles */
+.nav-link.active {
+  font-weight: bold !important;
+  color: #0b5ed7 !important;
 }

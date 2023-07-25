@@ -1,9 +1,12 @@
+/* The CSS code `body { display: flex; flex-direction: column; min-height: 100vh; }` is styling the
+`body` element of an HTML document. */
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
   }
   
+/* The CSS code `.footer` is styling an element with the class "footer". */
   .footer {
     margin-top: auto;
     background: #EBF2FF;
@@ -12,39 +15,58 @@ body {
     padding: 5px 20px;
     width: 100%;
   }
+
+
+/* The CSS code `.footer-content` is styling an element with the class "footer-content". It is setting
+the display property to flex, which allows the element to be flexible and adjust its size based on
+the available space. The flex-direction property is set to column, which arranges the child elements
+vertically. The align-items property is set to flex-start, which aligns the child elements to the
+start of the flex container. */
   .footer-content {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
   }
   
+/* The CSS code `.footer-title` is styling an element with the class "footer-title". It is setting the
+following properties: */
   .footer-title {
     font-family: 'Source Sans Pro';
     font-style: normal;
     font-weight: 700;
-    font-size: 20px; /* Reduce font size to decrease height */
-    line-height: 24px; /* Reduce line height to match font size */
+    font-size: 20px; 
+    line-height: 24px; 
     text-transform: uppercase;
     color: #000000;
-    margin-bottom: 5px; /* Reduce margin to decrease space between elements */
+    margin-bottom: 5px; 
   }
   
+/* The CSS code `.footer-bottom` is styling an element with the class "footer-bottom". It is setting
+the display property to flex, which allows the element to be flexible and adjust its size based on
+the available space. The justify-content property is set to space-between, which evenly distributes
+the child elements along the horizontal axis, with the first element aligned to the start and the
+last element aligned to the end. The width property is set to 100%, which makes the element take up
+the full width of its container. */
   .footer-bottom {
     display: flex;
     justify-content: space-between;
     width: 100%;
   }
   
+/* The CSS code `.footer-copyright, .footer-links` is styling elements with the classes
+"footer-copyright" and "footer-links". It is setting the following properties for these elements: */
   .footer-copyright, .footer-links {
     font-family: 'Source Sans Pro';
     font-style: normal;
     font-weight: 400;
-    font-size: 10px; /* Reduce font size to decrease height */
-    line-height: 14px; /* Reduce line height to match font size */
+    font-size: 10px; 
+    line-height: 14px; 
     color: #000000;
     margin: 0 10px;
   }
   
+/* The code `@media (max-width: 768px)` is a media query in CSS. It is used to apply specific styles to
+elements when the viewport width is less than or equal to 768 pixels. */
   @media (max-width: 768px) {
     .footer-title {
       font-size: 16px;

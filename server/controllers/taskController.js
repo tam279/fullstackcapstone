@@ -1,9 +1,12 @@
-// taskController.js . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\server\controllers\taskController.js
+/* The code provided is a JavaScript file that contains the controller functions for managing tasks in
+a project management website. */
+// taskController.js . 
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Get all tasks of a project
+/* The `exports.getTasks` function is a controller function that retrieves all tasks of a project from
+the database. */
 exports.getTasks = async (req, res) => {
   const { projectId } = req.params;
 
@@ -20,7 +23,8 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-// Create a new task for a project
+/* The `exports.createTask` function is a controller function that is responsible for creating a new
+task for a project in the database. */
 exports.createTask = async (req, res) => {
   const { projectId } = req.params;
   const {
@@ -60,30 +64,45 @@ exports.createTask = async (req, res) => {
   }
 };
 
-// Update task
+
+/* The `exports.updateTask` function is a controller function that is responsible for updating a
+specific task in the database. */
 exports.updateTask = async (req, res) => {
   const { projectId, taskId } = req.params;
-  const { name, description, status, priorityLevel, startDate, endDate, technicians } = req.body;
+  const {
+    name,
+    description,
+    status,
+    priorityLevel,
+    startDate,
+    endDate,
+    technicians,
+  } = req.body;
 
   try {
+    let updatedTaskData = {
+      name,
+      description,
+      status,
+      priorityLevel,
+      startDate,
+      endDate,
+    };
+
+    if (technicians) {
+      updatedTaskData["technicians"] = {
+        connect: technicians.map((techId) => ({
+          id: techId,
+        })),
+      };
+    }
+
     const updatedTask = await prisma.task.update({
       where: {
-        id: taskId,  // Ensure the task ID matches
-        projectId,  // Ensure the project ID matches
+        id: taskId, 
+        projectId, 
       },
-      data: {
-        name,
-        description,
-        status,
-        priorityLevel,
-        startDate,
-        endDate,
-        technicians: {
-          connect: technicians.map((techId) => ({
-            id: techId,
-          })),
-        },
-      },
+      data: updatedTaskData,
     });
 
     res.status(200).json(updatedTask);
@@ -95,6 +114,9 @@ exports.updateTask = async (req, res) => {
   }
 };
 
+/* The `exports.deleteTask` function is a controller function that is responsible for deleting a
+specific task from the database. It takes in the `req` (request) and `res` (response) objects as
+parameters. */
 exports.deleteTask = async (req, res) => {
   const { projectId, taskId } = req.params;
 
@@ -115,17 +137,20 @@ exports.deleteTask = async (req, res) => {
   }
 };
 
+/* The `exports.getTask` function is a controller function that is responsible for retrieving a
+specific task from the database. It takes in the `req` (request) and `res` (response) objects as
+parameters. */
 exports.getTask = async (req, res) => {
   const { projectId, taskId } = req.params;
 
   try {
     const task = await prisma.task.findFirst({
-      where: { 
+      where: {
         id: taskId,
         projectId,
         deleted: false,
       },
-      include: { technicians: true }
+      include: { technicians: true },
     });
 
     if (!task) {

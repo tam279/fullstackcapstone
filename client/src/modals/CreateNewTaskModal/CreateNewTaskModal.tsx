@@ -2,58 +2,77 @@ import React, { FC, useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
+import {
+  User,
+  Project,
+  Status,
+  Task,
+} from "../../problemdomain/Interface/Interface";
+import { fetchUserData } from "../../problemdomain/DataService/DataService";
 
 interface CreateTaskModalProps {
   show: boolean;
   handleClose: () => void;
-  projectId: number;
-}
-
-interface User {
-  EMAIL: string;
-  FIRSTNAME: string;
-  LASTNAME: string;
-  // Add other properties if they exist
+  projectId: string;
+  addNewTask: (task: Task) => void; // Add this line
 }
 
 const CreateTaskModal: FC<CreateTaskModalProps> = ({
   show,
   handleClose,
   projectId,
+  addNewTask,
 }) => {
   const [users, setUsers] = useState<User[]>([]);
+
   const [formValues, setFormValues] = useState({
     name: "",
-    startDate: "",
-    technicians: [] as string[], // Update the type here
     description: "",
-    PRIORITY: "", // change this from priorityLevel
+    status: Status.NOT_STARTED,
+    priorityLevel: 1,
+    startDate: "",
     endDate: "",
-    tags: "",
-    dependencies: "",
+    technicians: [] as string[],
+    dependencies: [] as string[],
     projectId: projectId,
-    status: "", // Add this line
   });
 
+  const toISOStringWithFullPrecision = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toISOString();
+  };
+
   useEffect(() => {
+    // Fetch technicians when the component mounts
     const fetchProjectTechnicians = async () => {
-      const response = await axios.get(
-        `${config.backend}/api/project/${projectId}/technicians`
+      const userData = await fetchUserData();
+      const projectTechnicians = userData.filter((user: User) =>
+        user.projectsAsTechnician.some(
+          (project: Project) => project.id === projectId
+        )
       );
-      setUsers(response.data);
+      setUsers(projectTechnicians);
     };
 
     fetchProjectTechnicians();
-  }, [projectId]);
+  }, []); // Add empty dependency array to run only once when component mounts
 
-  // ...existing code
+  useEffect(() => {
+    // Clear selected technicians when the modal closes
+    if (!show) {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        technicians: [],
+      }));
+    }
+  }, [show]);
 
   const handleFormChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    if (event.target.name === "users") {
+    if (event.target.name === "technicians") {
       const selectedOptions = Array.from(
         (event.target as HTMLSelectElement).selectedOptions,
         (option) => (option as HTMLOptionElement).value
@@ -65,60 +84,53 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     } else if (event.target.name === "dependencies") {
       setFormValues({
         ...formValues,
-        dependencies: event.target.value,
-      });
-    } else if (event.target.name === "PRIORITY") {
-      setFormValues({
-        ...formValues,
-        PRIORITY: event.target.value,
-      });
-    } else if (event.target.name === "status") {
-      // Add this condition
-      setFormValues({
-        ...formValues,
-        status: event.target.value,
-      });
-    } else if (event.target.name === "name") {
-      setFormValues({
-        ...formValues,
-        [event.target.name]: event.target.value,
-      });
-    } else if (event.target.name === "tags") {
-      setFormValues({
-        ...formValues,
-        [event.target.name]: event.target.value,
+        dependencies: event.target.value.split(","),
       });
     } else {
+      let value: string | number = event.target.value;
+      // Parse priorityLevel as integer
+      if (event.target.name === "priorityLevel") {
+        value = parseInt(value);
+      }
       setFormValues({
         ...formValues,
-        [event.target.name]: event.target.value,
+        [event.target.name]: value,
       });
     }
   };
 
-  // ...existing code
-
   const handleFormSubmit = async () => {
     try {
+      // Extract technician ids from the users state
+      const technicianIds = users
+        .filter((user) => formValues.technicians.includes(user.email))
+        .map((user) => user.id);
+
+      // Create the task data with the correct structure
       const taskData = {
-        ...formValues,
-        PROJECTID: projectId,
-        TECHNICIAN_EMAIL: formValues.technicians,
-        NAME: formValues.name,
-        PRIORITY: formValues.PRIORITY,
-        TAG: formValues.tags,
-        STATUS: formValues.status,
-        DEPENDENCY: formValues.dependencies, // Add this line
+        name: formValues.name,
+        description: formValues.description,
+        status: formValues.status,
+        priorityLevel: formValues.priorityLevel,
+        startDate: toISOStringWithFullPrecision(formValues.startDate), // Access startDate from formValues
+        endDate: toISOStringWithFullPrecision(formValues.endDate), // Access endDate from formValues
+        technicians: technicianIds, // Pass the array of technician ids directly
+        dependencies: formValues.dependencies,
+        projectId: formValues.projectId,
       };
 
-      await axios.post(`${config.backend}/api/createTasks`, taskData);
+      const response = await axios.post(
+        `${config.backend}/api/project/${formValues.projectId}/tasks`,
+        taskData
+      );
+      const newTask = response.data;
+      addNewTask(newTask);
+
       handleClose();
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
-
-  const [status, setStatus] = useState("");
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -130,64 +142,47 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
           <Row>
             <h2>Details</h2>
             <Col>
-              <Form.Control
-                type="text"
-                name="name"
-                placeholder="Enter task name"
-                onChange={handleFormChange}
-              />
+              <Form.Group>
+                <Form.Label>Task Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  placeholder="Enter task name"
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
 
               <Form.Group>
                 <Form.Label>Start Date</Form.Label>
                 <Form.Control
                   type="datetime-local"
-                  name="STARTDATE"
+                  name="startDate"
                   onChange={handleFormChange}
                 />
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>Technician</Form.Label>
+                <Form.Label>End Date</Form.Label>
                 <Form.Control
-                  as="select"
-                  multiple
-                  name="users"
-                  value={formValues.technicians}
-                  onChange={handleFormChange}
-                >
-                  {users.map((user, index) => (
-                    <option key={index} value={user.EMAIL}>
-                      {user.FIRSTNAME + " " + user.LASTNAME}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-
-              <Form.Group>
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="DESCRIPTION"
-                  placeholder="Task description..."
+                  type="datetime-local"
+                  name="endDate"
                   onChange={handleFormChange}
                 />
               </Form.Group>
-            </Col>
 
-            <Col>
               <Form.Group>
                 <Form.Label>Priority Level</Form.Label>
                 <Form.Control
                   as="select"
-                  value={formValues.PRIORITY}
+                  value={formValues.priorityLevel}
                   onChange={handleFormChange}
-                  name="PRIORITY"
+                  name="priorityLevel"
                 >
-                  <option value="">Select Priority Level</option>
-                  <option value="High">High</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Low">Low</option>
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
                 </Form.Control>
               </Form.Group>
 
@@ -199,21 +194,31 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
                   onChange={handleFormChange}
                   name="status"
                 >
-                  <option value="">Select Status</option>
-                  <option value="Not Started">Not Started</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
+                  <option value={Status.NOT_STARTED}>Not Started</option>
+                  <option value={Status.IN_PROGRESS}>In Progress</option>
+                  <option value={Status.COMPLETED}>Completed</option>
+                </Form.Control>
+              </Form.Group>
+            </Col>
+
+            <Col>
+              <Form.Group>
+                <Form.Label>Technician</Form.Label>
+                <Form.Control
+                  as="select"
+                  multiple
+                  name="technicians"
+                  value={formValues.technicians}
+                  onChange={handleFormChange}
+                >
+                  {users.map((user, index) => (
+                    <option key={index} value={user.email}>
+                      {user.firstName + " " + user.lastName}
+                    </option>
+                  ))}
                 </Form.Control>
               </Form.Group>
 
-              <Form.Group>
-                <Form.Label>End Date</Form.Label>
-                <Form.Control
-                  type="datetime-local"
-                  name="ENDDATE"
-                  onChange={handleFormChange}
-                />
-              </Form.Group>
               <Form.Group>
                 <Form.Label>Dependencies</Form.Label>
                 <Form.Control
@@ -221,6 +226,17 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
                   rows={3}
                   placeholder="Task dependencies. Enter the task name, follow by the comma..."
                   name="dependencies"
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  name="description"
+                  placeholder="Task description..."
                   onChange={handleFormChange}
                 />
               </Form.Group>

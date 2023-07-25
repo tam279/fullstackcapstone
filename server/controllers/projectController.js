@@ -10,28 +10,35 @@ exports.getProjects = async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
       select: {
+        id: true,
         name: true,
         startDate: true,
+        description: true,
         endDate: true,
+        deleted: true,
         company: {
           select: {
             name: true,
+            id: true,
           },
         },
         technicians: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
           },
         },
         viewers: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
           },
         },
         manager: {
           select: {
+            id: true,
             firstName: true,
             lastName: true,
           },
@@ -52,10 +59,10 @@ exports.getProjects = async (req, res) => {
             },
             comments: {
               select: {
+                id: true,
                 comment: true,
                 timeStamp: true,
                 User: {
-                  // Changed from 'user' to 'User'
                   select: {
                     firstName: true,
                     lastName: true,
@@ -85,19 +92,21 @@ exports.createProject = async (req, res) => {
       startDate,
       endDate,
       manager,
-      technicians,
-      viewer,
+      technicians, // Assuming this is an array
+      viewers, // Assuming this is an array
       description,
       company,
     } = req.body;
+    // console.log(req.body); // Add this line
+
     const newProject = await prisma.project.create({
       data: {
         name,
         startDate,
         endDate,
         manager: { connect: { id: manager } },
-        technicians: { connect: technicians.map((tech) => ({ id: tech })) },
-        viewers: { connect: { id: viewer } },
+        technicians: { connect: technicians.map((tech) => ({ id: tech })) }, // Still mapping even if there's only one technician
+        viewers: { connect: viewers.map((viewer) => ({ id: viewer })) }, // Still mapping even if there's only one viewer
         description,
         company: { connect: { id: company } },
         deleted: false,
@@ -112,25 +121,24 @@ exports.createProject = async (req, res) => {
   }
 };
 
-// Update Project
 exports.updateProject = async (req, res) => {
-  const id = req.params.id; // make sure to get the id from the params
+  const id = req.params.id;
 
   const {
     name,
     startDate,
     endDate,
-    manager,
-    technicians,
-    viewer,
+    managerId, // changed manager to managerId
+    technicianIds,
+    viewerIds,
     description,
-    company,
+    companyId, // changed company to companyId
   } = req.body;
 
   try {
     const updatedProject = await prisma.project.update({
       where: {
-        id: id, 
+        id: id,
       },
       data: {
         name,
@@ -138,23 +146,23 @@ exports.updateProject = async (req, res) => {
         endDate,
         manager: {
           connect: {
-            id: manager,
+            id: managerId, // changed manager to managerId
           },
         },
         technicians: {
-          set: technicians.map((techId) => ({
+          set: technicianIds.map((techId) => ({
             id: techId,
           })),
         },
         viewers: {
-          connect: {
-            id: viewer,
-          },
+          set: viewerIds.map((viewerId) => ({
+            id: viewerId,
+          })),
         },
         description,
         company: {
           connect: {
-            id: company,
+            id: companyId, // changed company to companyId
           },
         },
       },
@@ -198,6 +206,7 @@ exports.getProject = async (req, res) => {
         name: true,
         startDate: true,
         endDate: true,
+        description: true,
         company: {
           select: {
             name: true,

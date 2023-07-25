@@ -1,6 +1,12 @@
-import React, { FC } from 'react';
-import './Footer.css';
+import React, { FC } from "react";
+import "./Footer.css";
 
+/**
+ * The `Footer` component is a functional component in TypeScript React that renders a footer with a
+ * title, copyright information, and links.
+ * @returns The Footer component is returning a JSX element representing the footer section of a
+ * website.
+ */
 const Footer: FC = () => {
   return (
     <footer className="footer">
@@ -13,6 +19,6 @@ const Footer: FC = () => {
       </div>
     </footer>
   );
-}
+};
 
 export default Footer;

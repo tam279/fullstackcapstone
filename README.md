@@ -1,85 +1,40 @@
-# Project Description
+Project Management Web App
+Overview
+This User Management Web App is a full-stack application that serves as a platform for managing users within an organization, and managing tasks assigned to them. This project was developed using Typescript and ReactJS for the frontend, and Prisma, Node.js, and Express.js in the backend.
 
-This README.md file provides a quick description of our system and its functionality.
+Frontend
+The frontend of the app is located in the client folder. It contains several components and pages which collectively make up the User Interface of the application.
 
-## Landing Page
+Here is a brief description of the primary directories:
 
-Our platform begins with a landing page that features a navigation bar and a footer.
+components: This directory contains the reusable components that make up the different parts of the web pages. It includes Footer, Navigation, PrivateRoute, SidebarProject.
 
-### Navigation Bar
+modals: This directory contains the modal components that are used across the application. They include ChangePasswordModal, CreateNewCompanyModal, CreateNewProjectModal, CreateNewTaskModal, CreateNewUserModal, EditCompanyModal, EditProjectModal, EditTaskModal, EditUserModal, LogoutModal, ProfileModal, TaskDetailModal.
 
-The navigation bar includes the following options:
-- Vitra Icon (redirects to Landing Page)
-- Services
-- Contact
-- About
-- Log In
+pages: This directory includes the code for the web pages. Each subdirectory corresponds to a different page in the application, such as AboutPage, ContactPage, LandingPage, LoginPage, ProjectDetailPage, ProjectListPage, ServicesPage, UserManagementPage.
 
-### Footer
+To run the frontend locally, navigate to the client directory and run npm install followed by npm start.
 
-The footer contains the following information:
-- Vitra Services © 2022 - 2023
-- Privacy
-- Terms
+Backend
+The backend of the app is located in the server folder. It contains several controllers for handling different types of requests, as well as the database schema for Prisma.
 
-## User Management
+Here is a brief description of the primary directories:
 
-Our system focuses on user management to prevent unauthorized access and control account creation.
+auth: This directory contains the Passport.js configurations and the auth-related API routes.
 
-### Access Request
+controllers: This directory contains the controller functions that handle the various HTTP requests related to activities, comments, companies, projects, tasks, and users.
 
-Admins handle access requests based on a user list from the client. New users are required to sign a privacy policy to acknowledge our system's policies.
+db/prisma: This directory contains the Prisma client setup file and the Prisma schema.
 
-### User Information
+service: This directory contains services that provide features such as file handling and email sending.
 
-We collect the following user information:
-- EMAIL (Primary Key)
-- FIRSTNAME
-- LASTNAME
-- LOGIN METHOD (Google, Microsoft, Custom Passwords)
-- COMPANY NAME
-- TAGS
+To run the backend locally, navigate to the server directory and run npm install followed by npm start.
 
-### Login Method
+Documentation
+Please refer to api-documentation.md for a detailed description of the API endpoints and their responses.
 
-Users can log in using Google, Microsoft, or custom passwords. Those opting for custom passwords receive a temporary password via email, which they can change through the 'Settings' sidebar.
+Contributing
+When contributing to this repository, please discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
 
-## Project Management
-
-Upon logging in, admins gain access to the "Project List," while other roles can only view their assigned projects. The project list displays a table with columns for Name, Status, Progress, Deadline, Company, Manager, and options for filtering/sorting. Only admins can click "+ New Project," but managers can edit projects.
-
-Clicking a project name directs users to its task list under "Task Management."
-
-## Task Management
-
-The task list is divided into four tabs.
-
-### Task Tab
-
-The "Task" tab provides information on tasks, including Name, Priority, Technician, Duration, Tag, and filter options. Managers and IT Technicians can edit tasks, while admins, project managers, or IT technicians can delete tasks, moving them to a backup database.
-
-### Task Details and Comments
-
-Clicking a task name opens the task details and comments section. Users with task access can comment and upload files, which are deletable but stored in a backup database.
-
-### Task Priority
-
-Tasks can be assigned priority levels such as High, Medium, or Low. A "Start Task" button allows users to change the task status to Not Started, Start Task, or Complete.
-
-### Gantt Tab
-
-The "Gantt" tab displays the task list alongside a Gantt chart, providing a visual representation of tasks with their respective dates and durations.
-
-### Details Tab
-
-The "Details" tab contains additional project information, including Project, Manager, Description, Start Date, End Date, Technicians, Viewers, Status, Total Tasks, and Completed Tasks.
-
-### User Activity Tab
-
-The "User Activity" tab tracks user activities, listing the Date, Time, User, and Detail. This tab is accessible only to admins.
-
----
-
-This README.md file serves as a quick reference for understanding the system's functionality, including user management, project management, and task management. It provides an overview of the user roles, their capabilities, and the features they can utilize.
-
-For more detailed information and implementation instructions, please refer to the relevant documentation and codebase.
+License
+This project is licensed under the MIT License - see the LICENSE.md file for details.

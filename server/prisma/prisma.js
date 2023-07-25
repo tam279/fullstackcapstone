@@ -28,7 +28,7 @@ async function getUsers() {
       deleted: true,
     },
   });
-  console.log(users);
+  // console.log(users);
 }
 
 getUsers();

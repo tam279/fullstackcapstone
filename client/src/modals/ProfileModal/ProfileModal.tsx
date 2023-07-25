@@ -1,12 +1,26 @@
-import React, { FC } from 'react';
-import { Modal, Button, Form, Alert } from 'react-bootstrap';
+import React, { FC } from "react";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
+import { User } from "../../problemdomain/Interface/Interface";
+import jwt_decode from "jwt-decode";
+
 
 interface ProfileModalProps {
   show: boolean;
   onHide: () => void;
+  user: User | null;
 }
+const ProfileModal: FC<ProfileModalProps> = ({ show, onHide, user }) => {
+  if (!user) {
+    return null;
+  }
 
-const ProfileModal: FC<ProfileModalProps> = ({ show, onHide }) => {
+   const token = localStorage.getItem("jwtToken");
+   let userId = "";
+   if (token) {
+     const decodedToken: any = jwt_decode(token);
+     userId = decodedToken.userId;
+   }
+
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
@@ -16,17 +30,25 @@ const ProfileModal: FC<ProfileModalProps> = ({ show, onHide }) => {
         <Form>
           <Form.Group>
             <Form.Label>Email</Form.Label>
-            <Form.Control type="email" defaultValue="john.doe@mail.com" readOnly />
+            <Form.Control type="email" defaultValue={user.email} readOnly />
           </Form.Group>
 
           <Form.Group>
             <Form.Label>Full Name</Form.Label>
-            <Form.Control type="text" defaultValue="John Doe" readOnly />
+            <Form.Control
+              type="text"
+              defaultValue={`${user.firstName} ${user.lastName}`}
+              readOnly
+            />
           </Form.Group>
 
           <Form.Group>
             <Form.Label>Company</Form.Label>
-            <Form.Control type="text" defaultValue="Vitra Service" readOnly />
+            <Form.Control
+              type="text"
+              defaultValue={user.company.name}
+              readOnly
+            />
           </Form.Group>
         </Form>
         <Alert variant="info">

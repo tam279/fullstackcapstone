@@ -18,15 +18,18 @@ import {
   fetchUserData,
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
-// import EditUserModal from "../../modals/EditUserModal/EditUserModal";
+import EditUserModal from "../../modals/EditUserModal/EditUserModal";
+import EditCompanyModal from "../../modals/EditCompanyModal/EditCompanyModal";
 
 const UserManagementPage = () => {
   const [userData, setUserData] = useState<User[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>("userlist");
   const [showModal, setShowModal] = useState(false);
-  const [showEditUserModal, setShowEditUserModal] = useState(false); // to control EditUserModal visibility
-  const [editingUser, setEditingUser] = useState<User | null>(null); // to hold the user that is being edited
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showEditCompanyModal, setShowEditCompanyModal] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -65,19 +68,31 @@ const UserManagementPage = () => {
 
     fetchData();
   }, []);
+
   const handleShowEditUserModal = (user: User) => {
-    setEditingUser(user); // set the user that is being edited
-    setShowEditUserModal(true); // show the EditUserModal
+    setEditingUser(user);
+    setShowEditUserModal(true);
   };
 
   const handleCloseEditUserModal = () => {
-    setEditingUser(null); // reset the user that is being edited
-    setShowEditUserModal(false); // hide the EditUserModal
+    setEditingUser(null);
+    setShowEditUserModal(false);
   };
+
+  const handleShowEditCompanyModal = (company: Company) => {
+    setEditingCompany(company);
+    setShowEditCompanyModal(true);
+  };
+
+  const handleCloseEditCompanyModal = () => {
+    setEditingCompany(null);
+    setShowEditCompanyModal(false);
+  };
+
   return (
-    <Container>
+    <Container fluid>
       <Row>
-        <Col xs={3} md={2} lg={2} className="p-0 offset-lg-0">
+        <Col xs={1} md={1} lg={2} className="p-0 vh-100">
           <SidebarProject />
         </Col>
 
@@ -139,6 +154,7 @@ const UserManagementPage = () => {
               <Table striped bordered hover>
                 <thead>
                   <tr>
+                    <th>Edit</th>
                     <th>Name</th>
                     <th>Address</th>
                     <th>Phone Number</th>
@@ -149,6 +165,14 @@ const UserManagementPage = () => {
                 <tbody>
                   {companies.map((company) => (
                     <tr key={company.id}>
+                      <td>
+                        <Button
+                          variant="link"
+                          onClick={() => handleShowEditCompanyModal(company)}
+                        >
+                          Edit
+                        </Button>{" "}
+                      </td>
                       <td>{company.name}</td>
                       <td>{company.address}</td>
                       <td>{company.phoneNumber}</td>
@@ -175,15 +199,32 @@ const UserManagementPage = () => {
           onSuccess={fetchAndSetCompanyData}
         />
       )}
-
-      {/* {editingUser && (
+      {editingUser && (
         <EditUserModal
           show={showEditUserModal}
           onHide={handleCloseEditUserModal}
           user={editingUser}
           onUserUpdated={fetchAndSetUserData}
+          updateUser={function (email: string, updatedUser: User): void {
+            throw new Error("Function not implemented.");
+          }}
+          deleteUser={function (email: string): void {
+            throw new Error("Function not implemented.");
+          }}
+          fetchUsers={fetchAndSetUserData}
+          companies={companies}
+          roles={[]}
         />
-      )} */}
+      )}
+
+      {editingCompany && (
+        <EditCompanyModal
+          show={showEditCompanyModal}
+          onHide={handleCloseEditCompanyModal}
+          company={editingCompany}
+          fetchCompanies={fetchAndSetCompanyData}
+        />
+      )}
     </Container>
   );
 };

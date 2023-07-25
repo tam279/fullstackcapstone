@@ -32,13 +32,18 @@ app.use(
 //DEV ONLY CORS remove localhost from deployment
 //use cors middleware to only allow our front end to use this api
 // Enable CORS for all routes
+let allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:3000"];
+
+// Checking if the array has only one item or is null,
+// if it is, it will return the first item in the array or a default value
+allowedOrigins =
+  allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins;
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://capdep-1vfm28xyt-azriee.vercel.app",
-      "https://capdep.vercel.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     preflightContinue: false,
@@ -93,6 +98,7 @@ app.get("/api/users", userController.getUsers);
 app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
+app.post("/changePassword", userController.changePassword);
 
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);
@@ -122,42 +128,35 @@ app.put("/api/project/:id", projectController.updateProject);
 app.delete("/api/project/:id", projectController.deleteProject);
 app.get("/api/project/:id", projectController.getProject);
 
+// tasks
 app.get("/api/project/:projectId/tasks", taskController.getTasks);
-app.post("/api/project/:projectId/tasks", taskController.createTask); // Creating a new task doesn't require a task ID
-app.put("/api/project/:projectId/task/:taskId", taskController.updateTask); // Use :taskId instead of :id for clarity
-app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask); // Use :taskId instead of :id for clarity
-app.get("/api/project/:projectId/task/:taskId", taskController.getTask); // To get a specific task of a project
+app.post("/api/project/:projectId/tasks", taskController.createTask);
+app.put("/api/project/:projectId/task/:taskId", taskController.updateTask);
+app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask);
+/* The code `app.get("/api/project/:projectId/task/:taskId", taskController.getTask);` is defining a
+GET route for retrieving a specific task within a project. */
+app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
+
+// Comment routes
+app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
+// app.post("/api/tasks/:taskId/comments", commentController.createComment);
+app.delete(
+  "/api/tasks/:taskId/comments/:commentId",
+  commentController.deleteComment
+);
 
 // User activity routes
-app.get("/api/userActivity", activityController.getUserActivity);
-app.post("/api/createUserActivity", activityController.createUserActivity);
 app.get(
   "/api/userActivity/:projectId",
   activityController.getUserActivityByProjectId
 );
 
-// Comment routes
-app.get("/api/comments", commentController.getComments);
-app.get("/api/comments/task", commentController.getCommentsByTaskId);
-app.post("/api/comments", commentController.createComment);
-// app.put(
-//   "/api/comments/:id/file",
-//   upload.single("file"),
-//   commentController.updateComment
-// );
-app.delete("/api/comments/:id", commentController.deleteComment);
-// app.put(
-//   "/api/comments/:id",
-//   upload.single("file"),
-//   commentController.updateComment
-// );
-
-const { sendContactEmail } = require("./service/mail");
+const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint
 app.post("/contact", (req, res) => {
   // Here you can access the form data sent from the frontend
   const formData = req.body;
-  console.log(formData);
+  // console.log(formData);
 
   // Specify the recipient's email address for the contact form submission
   const recipientEmail = process.env.CONTACT_EMAIL; // Replace with the recipient's email address
@@ -167,16 +166,6 @@ app.post("/contact", (req, res) => {
   // Respond to the client
   res.status(200).json({ message: "Form data received successfully." });
 });
-
-//email service
-const { sendEmail } = require("./service/mail");
-
-app.get("/api/sendmail", (req, res) => {
-  sendEmail();
-  const message = "Email attempted.";
-  res.json({ message }); // Send the response as JSON
-});
-//email end
 
 //upload feature
 const { createFileEntry, getFileById } = require("./service/file-feature/file");
@@ -238,10 +227,15 @@ app.get("/download/:fileId", async (req, res) => {
 });
 //upload feature end
 
+//comment feature
+const comment = require("./service/comment");
+app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
+//comment end
+
 app.use((req, res, next) => {
   const error = new Error("Route not found");
   error.status = 404;
-  console.log(req.url); // Log the requested URL
+  // console.log(req.url); // Log the requested URL
   next(error);
 });
 
