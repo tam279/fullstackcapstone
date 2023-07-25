@@ -97,11 +97,11 @@ const ProjectListPage = () => {
           <thead>
             <tr>
               <th>
-                {currentUser && currentUser.role === "ADMIN" && (
+                {/* {currentUser && currentUser.role === "ADMIN" && ( */}
                   <Button variant="primary" onClick={handleShow}>
                     + New Project
                   </Button>
-                )}
+                {/* )} */}
               </th>
 
               <th>Name</th>

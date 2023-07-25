@@ -38,9 +38,9 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     projectId: task.projectId,
   });
 
-const [lastFetchedProjectId, setLastFetchedProjectId] = useState<string | null>(
-  null
-);
+  const [lastFetchedProjectId, setLastFetchedProjectId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const fetchProjectTechnicians = async () => {
@@ -134,6 +134,20 @@ const [lastFetchedProjectId, setLastFetchedProjectId] = useState<string | null>(
       console.error("Error updating task:", error);
     }
   };
+
+  useEffect(() => {
+    setFormValues({
+      name: task.name,
+      description: task.description,
+      status: task.status,
+      priorityLevel: task.priorityLevel,
+      startDate: new Date(task.startDate).toISOString().slice(0, 16),
+      endDate: new Date(task.endDate).toISOString().slice(0, 16),
+      technicians: task.technicians.map((tech) => tech.email),
+      dependencies: task.dependencies || [],
+      projectId: task.projectId,
+    });
+  }, [task]);
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
