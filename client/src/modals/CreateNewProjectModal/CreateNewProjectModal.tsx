@@ -39,7 +39,6 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
   const [users, setUsers] = useState<User[]>([]);
   const [companies, setCompanies] = useState<CompanyInterface[]>([]);
 
-
   /**
    * The function converts a given date string to an ISO string with full precision.
    * @param {string} dateString - The `dateString` parameter is a string representing a date. It is
@@ -67,13 +66,13 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
     fetchData();
   }, []);
 
- /**
-  * The handleSubmit function is used to handle form submission in a TypeScript React application,
-  * where it sends a POST request to create a new project with the provided data.
-  * @param event - The event parameter is of type React.FormEvent<HTMLFormElement>. It represents the
-  * form submission event triggered by the user.
-  * @returns The function does not explicitly return anything.
-  */
+  /**
+   * The handleSubmit function is used to handle form submission in a TypeScript React application,
+   * where it sends a POST request to create a new project with the provided data.
+   * @param event - The event parameter is of type React.FormEvent<HTMLFormElement>. It represents the
+   * form submission event triggered by the user.
+   * @returns The function does not explicitly return anything.
+   */
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -115,18 +114,16 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
     }
   };
 
-/**
- * The function "handleCompanyChange" is a TypeScript function that handles the change event of a HTML
- * select element and updates the state variable "companyId" with the selected value.
- * @param e - The parameter `e` is of type `ChangeEvent<HTMLSelectElement>`. This means it is an event
- * object that is triggered when the value of a `<select>` element changes.
- */
-const handleCompanyChange = (e: ChangeEvent<HTMLSelectElement>) => {
-  setCompanyId(e.target.value);
-
+  /**
+   * The function "handleCompanyChange" is a TypeScript function that handles the change event of a HTML
+   * select element and updates the state variable "companyId" with the selected value.
+   * @param e - The parameter `e` is of type `ChangeEvent<HTMLSelectElement>`. This means it is an event
+   * object that is triggered when the value of a `<select>` element changes.
+   */
+  const handleCompanyChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setCompanyId(e.target.value);
+  };
   // console.log(e.target.value); // Add this line
-
-
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
