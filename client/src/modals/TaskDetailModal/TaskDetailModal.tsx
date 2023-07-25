@@ -205,7 +205,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                       <span>File Name: {file.name}</span>
                       <span>
                         <a
-                          href={`/download/${file.id}`} // Replace this with your actual API endpoint
+                          href={`${config.backend}/download/${file.id}`} // Replace this with your actual API endpoint
                           download={file.name} // Set the download attribute to the file name
                         >
                           Download
