@@ -39,6 +39,7 @@ exports.getUsers = async (req, res) => {
 };
 
 const bcrypt = require("bcrypt");
+const { sendWelcomeEmail } = require("../service/new-user-mail");
 exports.createUser = async (req, res) => {
   const {
     email,
@@ -52,6 +53,13 @@ exports.createUser = async (req, res) => {
     deleted,
   } = req.body;
 
+  const user = {
+    email: email,
+    name: `${firstName} ${lastName}`,
+    password: password,
+  };
+
+  sendWelcomeEmail(user);
   try {
     // Hash the password before saving it
     const hashedPassword = await bcrypt.hash(password, 10);

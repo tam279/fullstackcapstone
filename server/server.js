@@ -34,11 +34,7 @@ app.use(
 // Enable CORS for all routes
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://capdep-1vfm28xyt-azriee.vercel.app",
-      "https://capdep.vercel.app",
-    ],
+    origin: process.env.ALLOWED_ORIGINS.split(","),
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     preflightContinue: false,
@@ -146,7 +142,7 @@ app.get(
   activityController.getUserActivityByProjectId
 );
 
-const { sendContactEmail } = require("./service/mail");
+const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint
 app.post("/contact", (req, res) => {
   // Here you can access the form data sent from the frontend
@@ -161,16 +157,6 @@ app.post("/contact", (req, res) => {
   // Respond to the client
   res.status(200).json({ message: "Form data received successfully." });
 });
-
-//email service
-const { sendEmail } = require("./service/mail");
-
-app.get("/api/sendmail", (req, res) => {
-  sendEmail();
-  const message = "Email attempted.";
-  res.json({ message }); // Send the response as JSON
-});
-//email end
 
 //upload feature
 const { createFileEntry, getFileById } = require("./service/file-feature/file");
@@ -233,12 +219,8 @@ app.get("/download/:fileId", async (req, res) => {
 //upload feature end
 
 //comment feature
-const comment = require("./service/comment")
-app.post(
-  "/api/tasks/:taskId/comments",
-  upload.any(),
-  comment.createComment
-);
+const comment = require("./service/comment");
+app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
 //comment end
 
 app.use((req, res, next) => {
