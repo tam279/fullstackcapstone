@@ -22,6 +22,7 @@ exports.getUsers = async (req, res) => {
         phoneNumber: true,
         jobTitle: true,
         deleted: true,
+        tags: true,
         projectsAsTechnician: {
           select: {
             id: true,
@@ -40,6 +41,7 @@ exports.getUsers = async (req, res) => {
 
 const bcrypt = require("bcrypt");
 const { sendWelcomeEmail } = require("../service/new-user-mail");
+
 exports.createUser = async (req, res) => {
   const {
     email,
@@ -51,6 +53,7 @@ exports.createUser = async (req, res) => {
     jobTitle,
     role,
     deleted,
+    tags,
   } = req.body;
 
   const user = {
@@ -75,6 +78,7 @@ exports.createUser = async (req, res) => {
         phoneNumber,
         jobTitle,
         deleted,
+        tags,
       },
     });
 
@@ -102,6 +106,7 @@ exports.updateUser = async (req, res) => {
     jobTitle,
     role,
     deleted,
+    tags,
   } = req.body;
 
   let companyUpdate = companyId
@@ -121,6 +126,7 @@ exports.updateUser = async (req, res) => {
         phoneNumber,
         jobTitle,
         deleted,
+        tags,
       },
     });
 

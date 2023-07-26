@@ -35,6 +35,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [role, setRole] = useState(user.role);
   const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
   const [jobTitle, setJobTitle] = useState(user.jobTitle);
+  const [tags, setTags] = useState(user.tags);
 
   useEffect(() => {
     if (user) {
@@ -44,6 +45,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       setJobTitle(user.jobTitle);
       setRole(user.role);
       setCompany(user.company ? user.company.id : "");
+      setTags(user.tags || ""); // update 'tags' state whenever 'user' prop changes
+
       // console.log("user:", user);
       // console.log("user.id:", user.id);
     }
@@ -66,6 +69,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       phoneNumber: phoneNumber,
       jobTitle: jobTitle,
       role: role,
+      tags: tags, // add 'tags' field to the 'updatedUser' object
     };
 
     try {
@@ -195,6 +199,19 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     placeholder="Job Title"
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Tags:</strong>
+                </td>
+                <td colSpan={5}>
+                  <Form.Control
+                    type="text"
+                    placeholder="Tags (separate with comma)"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
                   />
                 </td>
               </tr>

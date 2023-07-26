@@ -8,6 +8,8 @@ export interface Company {
   users: User[];
   projects: Project[];
   deleted: boolean;
+    [key: string]: any;
+
 }
 
 export interface User {
@@ -21,7 +23,7 @@ export interface User {
   companyId: string;
   phoneNumber: string;
   jobTitle: string;
-  tags: Tag[];
+  tags: string; // Tag[];
   tasks: Task[];
   comments: Comment[];
   activity: Activity[];
@@ -29,6 +31,8 @@ export interface User {
   projectsAsViewer: Project[];
   projectsAsManager: Project[];
   deleted: boolean;
+    [key: string]: any;
+
 }
 
 export enum Role {
@@ -36,13 +40,13 @@ export enum Role {
   ADMIN = "ADMIN",
 }
 
-export interface Tag {
-  id: string;
-  name: string;
-  users: User[];
-  projects: Project[];
-  deleted: boolean;
-}
+// export interface Tag {
+//   id: string;
+//   name: string;
+//   users: User[];
+//   projects: Project[];
+//   deleted: boolean;
+// }
 
 export interface Project {
   id: string;
@@ -52,7 +56,7 @@ export interface Project {
   description: string;
   startDate: Date;
   endDate: Date;
-  tag: Tag[];
+ // tag: Tag[];
   technicians: User[];
   viewers: User[];
   manager: User;

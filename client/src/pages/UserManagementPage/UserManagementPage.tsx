@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Button,
   Container,
@@ -33,6 +33,44 @@ const UserManagementPage = () => {
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  const [userFilter, setUserFilter] = useState("");
+  const [userSort, setUserSort] = useState<"asc" | "desc">("asc");
+
+  const [companyFilter, setCompanyFilter] = useState("");
+  const [companySort, setCompanySort] = useState<"asc" | "desc">("asc");
+
+  const filterAndSortUsers = (users: User[]) => {
+    return users
+      .filter((user) =>
+        user.email.toLowerCase().includes(userFilter.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (a.email < b.email) {
+          return userSort === "asc" ? -1 : 1;
+        } else if (a.email > b.email) {
+          return userSort === "asc" ? 1 : -1;
+        } else {
+          return 0;
+        }
+      });
+  };
+
+  const filterAndSortCompanies = (companies: Company[]) => {
+    return companies
+      .filter((company) =>
+        company.name.toLowerCase().includes(companyFilter.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (a.name < b.name) {
+          return companySort === "asc" ? -1 : 1;
+        } else if (a.name > b.name) {
+          return companySort === "asc" ? 1 : -1;
+        } else {
+          return 0;
+        }
+      });
+  };
 
   const fetchAndSetUserData = async () => {
     try {
@@ -103,6 +141,7 @@ const UserManagementPage = () => {
               {activeTab === "userlist" ? "+ New User" : "+ New Company"}
             </Button>
           </div>
+
           <Tabs
             defaultActiveKey="userlist"
             id="user-management-tabs"
@@ -110,6 +149,29 @@ const UserManagementPage = () => {
             onSelect={(k) => k !== null && setActiveTab(k)}
           >
             <Tab eventKey="userlist" title="User List">
+              <InputGroup className="mb-3">
+                <InputGroup.Text id="inputGroup-sizing-default">
+                  Filter
+                </InputGroup.Text>
+                <FormControl
+                  aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default"
+                  onChange={(e) => setUserFilter(e.target.value)}
+                />
+                <InputGroup.Text id="inputGroup-sizing-default">
+                  Sort
+                </InputGroup.Text>
+                <select
+                  onChange={(e) =>
+                    setUserSort(e.target.value as "asc" | "desc")
+                  }
+                  value={userSort}
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </InputGroup>
+
               <Table striped bordered hover>
                 <thead>
                   <tr>
@@ -121,14 +183,14 @@ const UserManagementPage = () => {
                     <th>Role</th>
                     <th>Phone Number</th>
                     <th>Job Title</th>
-                    <th>User status</th>
+                    <th>Is deleted</th>
+                    <th>Tags</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {userData.map((user) => (
+                  {filterAndSortUsers(userData).map((user, index) => (
                     <tr key={user.id}>
                       <td>
-                        {" "}
                         <Button
                           variant="link"
                           onClick={() => handleShowEditUserModal(user)}
@@ -144,6 +206,7 @@ const UserManagementPage = () => {
                       <td>{user.phoneNumber}</td>
                       <td>{user.jobTitle}</td>
                       <td>{user.deleted ? "True" : "False"}</td>
+                      <td>{user.tags}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -151,6 +214,32 @@ const UserManagementPage = () => {
             </Tab>
 
             <Tab eventKey="companies" title="Companies">
+              <InputGroup className="mb-3">
+                <InputGroup.Text>
+                  <InputGroup.Text id="inputGroup-sizing-default">
+                    Filter
+                  </InputGroup.Text>
+                </InputGroup.Text>
+                <FormControl
+                  aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default"
+                  onChange={(e) => setCompanyFilter(e.target.value)}
+                />
+                <InputGroup.Text>
+                  <InputGroup.Text id="inputGroup-sizing-default">
+                    Sort
+                  </InputGroup.Text>
+                </InputGroup.Text>
+                <select
+                  onChange={(e) =>
+                    setCompanySort(e.target.value as "asc" | "desc")
+                  }
+                  value={companySort}
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </InputGroup>
               <Table striped bordered hover>
                 <thead>
                   <tr>
@@ -163,7 +252,7 @@ const UserManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {companies.map((company) => (
+                  {filterAndSortCompanies(companies).map((company, index) => (
                     <tr key={company.id}>
                       <td>
                         <Button
