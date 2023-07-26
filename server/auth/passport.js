@@ -84,7 +84,7 @@ passport.use(
       session: false,
     },
     async function send(user, token) {
-      var link = "http://localhost:3000/login/email/verify?token=" + token;
+      var link = `${process.env.FRONTEND_URL}/login?token=` + token;
       var mailOptions = {
         from: process.env.EMAIL, // Replace with the from email address
         to: user.email,

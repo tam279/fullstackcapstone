@@ -116,7 +116,7 @@ app.post(
     failureRedirect: "/login",
   }),
   function (req, res, next) {
-    res.redirect("/login/email/check");
+    res.redirect("/login");
   }
 );
 
