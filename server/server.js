@@ -98,7 +98,47 @@ app.get("/api/users", userController.getUsers);
 app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
-app.post("/changePassword", userController.changePassword);
+app.post("/changepassword", userController.changePassword);
+
+// app.post("/forgotpassword", (req, res) => {
+//   const { email } = req.body;
+//   console.log("Received data:", email);
+//   // Add your password reset logic here
+//   // For simplicity, we're just logging the received data
+//   // In a real application, you would send a password reset email to the provided email address
+//   res.status(200).json({ message: "Password reset email sent." });
+// });
+
+app.post(
+  "/forgotpassword",
+  passport.authenticate("magiclink", {
+    action: "requestToken",
+    failureRedirect: "/login",
+  }),
+  function (req, res, next) {
+    res.redirect("/login/email/check");
+  }
+);
+
+app.get(
+  "/login/email/verify",
+  passport.authenticate("magiclink", {
+    session: false,
+  }),
+  async (req, res) => {
+    // The user data is now available in req.user, so you can directly access it
+    const user = req.user;
+
+    // Check if the user exists
+    if (user) {
+      // Send the user data in the response as JSON
+      res.json({ user });
+    } else {
+      // User not found or invalid token
+      res.status(401).json({ error: "Invalid token or user not found." });
+    }
+  }
+);
 
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);

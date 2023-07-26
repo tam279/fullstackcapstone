@@ -34,7 +34,7 @@ model User {
   comments             Comment[]
   projectsAsManager    Project[]  @relation("manager")
   company              Company    @relation(fields: [companyId], references: [id])
-  tags                String     @default("")
+  tags                 String     @default("")
   tasks                Task[]     @relation("TaskToUser")
   projectsAsTechnician Project[]  @relation("Technicians")
   projectsAsViewer     Project[]  @relation("Viewers")

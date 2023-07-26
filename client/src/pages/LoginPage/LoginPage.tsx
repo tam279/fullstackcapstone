@@ -10,6 +10,23 @@ const LoginPage = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetEmail, setResetEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleForgotPassword = async () => {
+    // Send the email to the backend API for password reset
+    try {
+      await axios.post(`${config.backend}/forgotpassword`, {
+        email: resetEmail,
+      });
+      alert("Password reset email sent. Check your inbox for instructions.");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(
+        "An error occurred while sending the password reset email."
+      );
+    }
+  };
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,12 +42,10 @@ const LoginPage = () => {
         user: { role, id },
       } = response.data;
 
-
       // console.log(response.data);
       // Store the JWT token and role in localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("userRole", role);
-      localStorage.setItem("userId", id);
       localStorage.setItem("userId", id);
 
       // Redirect to the ChangePasswordPage or any other desired page
@@ -110,7 +125,26 @@ const LoginPage = () => {
                 Log in
               </button>
             </form>
-
+            <div className="forgot-password-container">
+              <h5 className="text-center">Forgot your password?</h5>
+              <form onSubmit={handleForgotPassword}>
+                <div className="mb-3">
+                  <label htmlFor="resetEmail" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="resetEmail"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="btn btn-link">
+                  Reset Password
+                </button>
+              </form>
+            </div>
             {/* <div className="text-center mt-3">
               <p>Or log in with:</p>
               <button className="btn btn-secondary me-2">Microsoft</button>

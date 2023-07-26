@@ -158,13 +158,30 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+const saltRounds = 10;
+
 exports.changePassword = async (req, res) => {
-  const { userId, newPassword } = req.body;
+  const { userId, newPassword, password } = req.body;
 
   try {
-    const user = await prisma.user.update({
+    // First, check if the current password matches the user's existing password
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Incorrect current password" });
+    }
+
+    // Hash the new password using bcrypt with saltRounds
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update the user's password with the hashed new password
+    await prisma.user.update({
       where: { id: userId },
-      data: { password: newPassword },
+      data: { password: hashedNewPassword },
     });
 
     res.status(200).json({ message: "Password changed successfully" });
