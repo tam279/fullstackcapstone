@@ -203,6 +203,13 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+
+      <NewPasswordModal
+        show={showModal}
+        userId={user?.id || null}
+        token={user?.token || null}
+      />
+
       <Footer />
     </div>
   );
