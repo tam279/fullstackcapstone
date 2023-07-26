@@ -27,6 +27,7 @@ const ProjectListPage = () => {
   const [showEdit, setShowEdit] = useState(false); // Added this line
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {

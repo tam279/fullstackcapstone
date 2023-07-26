@@ -108,6 +108,12 @@ passport.use(
             email: user.email,
           },
         });
+        if (existingUser) {
+          const token = jwt.sign({ sub: user.email }, "your-secret-key");
+          existingUser.token = token;
+          delete existingUser.password;
+          delete existingUser.deleted;
+        }
         // If the user exists, resolve with the existing user data
         return existingUser;
       } catch (error) {

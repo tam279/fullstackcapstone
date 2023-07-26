@@ -140,6 +140,35 @@ app.get(
   }
 );
 
+const changeUserPassword = require("./service/reset-password");
+app.post("/newpassword", async (req, res) => {
+  const { userId, newPassword } = req.body;
+
+  try {
+    const updatedUser = await changeUserPassword(userId, newPassword);
+    console.log("User's password updated:", updatedUser);
+    res.status(200).json({ message: "Password updated successfully!" });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the password." });
+  }
+});
+
+// Define the function to handle the /newpassword POST request
+function handleNewPassword(req, res) {
+  // Get the user ID and password from the request body
+  const { userId, password } = req.body;
+
+  // Log the data (you can handle the password update logic here)
+  console.log("User ID:", userId);
+  console.log("New Password:", password);
+
+  // Respond with a success message or any other desired response
+  res.status(200).json({ message: "Password updated successfully!" });
+}
+
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);
 app.post("/api/companies", companyController.createCompany);
