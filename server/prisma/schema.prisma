@@ -34,10 +34,16 @@ model User {
   comments             Comment[]
   projectsAsManager    Project[]  @relation("manager")
   company              Company    @relation(fields: [companyId], references: [id])
-  tags                String     @default("")
+  tags                 Tag[]
   tasks                Task[]     @relation("TaskToUser")
   projectsAsTechnician Project[]  @relation("Technicians")
   projectsAsViewer     Project[]  @relation("Viewers")
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String
+  users User[]
 }
 
 model Project {
