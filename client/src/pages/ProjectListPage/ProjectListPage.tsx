@@ -27,6 +27,33 @@ const ProjectListPage = () => {
   const [showEdit, setShowEdit] = useState(false); // Added this line
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  // States for filter and sort
+  const [displayedProjects, setDisplayedProjects] = useState<Project[]>([]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState("name");
+
+    useEffect(() => {
+    const filteredProjects = projects
+      .filter((project) =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        switch (sortKey) {
+          case "name":
+            return a.name.localeCompare(b.name);
+          case "startDate":
+            return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+          // Add similar cases for other properties
+          default:
+            return 0;
+        }
+      });
+
+    setDisplayedProjects(filteredProjects);
+  }, [searchTerm, sortKey, projects]);
+
+
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
@@ -90,6 +117,29 @@ const ProjectListPage = () => {
         <div className="project-header d-flex justify-content-between">
           <div className="project-info">
             <h1 className="title">Projects List</h1>
+            {/* Add this section for filtering and sorting */}
+            <div className="filter-sort">
+              <Form.Control
+                type="text"
+                placeholder="Filter projects"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Form.Control
+                as="select"
+                value={sortKey}
+                onChange={(e) => setSortKey(e.target.value)}
+              >
+                <option value="name">Name</option>
+                <option value="startDate">Start Date</option>
+                <option value="endDate">End Date</option>
+                <option value="managerName">Manager Name</option>
+                <option value="description">Description</option>
+                <option value="companyName">Company Name</option>
+                <option value="status">Status</option>
+              </Form.Control>
+            </div>
+            {/* End of filtering and sorting section */}
           </div>
         </div>
 
@@ -98,9 +148,9 @@ const ProjectListPage = () => {
             <tr>
               <th>
                 {/* {currentUser && currentUser.role === "ADMIN" && ( */}
-                  <Button variant="primary" onClick={handleShow}>
-                    + New Project
-                  </Button>
+                <Button variant="primary" onClick={handleShow}>
+                  + New Project
+                </Button>
                 {/* )} */}
               </th>
 
@@ -114,7 +164,7 @@ const ProjectListPage = () => {
             </tr>
           </thead>
           <tbody>
-            {projects.map((project) => (
+            {displayedProjects.map((project) => (
               <tr key={project.id}>
                 <td>
                   <Button
