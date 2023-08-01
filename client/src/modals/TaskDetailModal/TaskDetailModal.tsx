@@ -18,14 +18,15 @@ import {
   Status,
 } from "../../problemdomain/Interface/Interface";
 import moment from "moment";
+import "./TaskDetailModal.css";
 
 interface TaskDetailModalProps {
   show: boolean;
   handleClose: () => void;
-  task: Task | null; // make sure this is correctly defined
+  task: Task | null;
   projectId: string;
   taskId: string;
-  onTaskUpdated: (updatedTask: Task) => void; // define type for updatedTask
+  onTaskUpdated: (updatedTask: Task) => void;
 }
 
 const TaskComponent: FC<TaskDetailModalProps> = ({
@@ -77,10 +78,13 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
           },
         }
       );
-      // if (response.status === 200) {
-      //   setNewComment("");
-      //   setComments([...comments, response.data]);
-      // }
+
+      // If the request was successful, clear the comment box and the selected file
+      if (response.status === 200) {
+        setNewComment("");
+        setSelectedFile(null);
+      }
+
       // Handle the response as needed
       console.log("Response:", response.data);
     } catch (error) {
@@ -105,45 +109,63 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
         const commentsResponse = await axios.get(
           `${config.backend}/api/tasks/${taskId}/comments`
         );
-        setComments(commentsResponse.data);
+
+        const sortedComments = commentsResponse.data.sort(
+          (a: Comment, b: Comment) => {
+            return (
+              new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime()
+            );
+          }
+        );
+
+        setComments(sortedComments.reverse());
       } catch (error) {
         console.error(error);
       }
     };
+
     if (show) {
       fetchTask();
       fetchComments();
     }
-  }, [show, taskId, projectId]);
 
-  if (!task) {
-    return null;
-  }
+    const intervalId = setInterval(fetchComments, 5000); // Fetches comments every 5 seconds
+
+    return () => {
+      clearInterval(intervalId); // Clears the interval on component unmount
+    };
+  }, [show, taskId, projectId]);
 
   const updateTaskStatus = async (newStatus: string | null) => {
     if (newStatus === null) {
-      newStatus = task.status;
+      newStatus = task?.status || "";
     }
 
-    try {
-      await axios.put(
-        `${config.backend}/api/project/${projectId}/task/${taskId}`,
-        { status: Status[newStatus as keyof typeof Status] }
-      );
-      const updatedTask = {
-        ...task,
-        status: Status[newStatus as keyof typeof Status],
-      };
-      setTask(updatedTask);
-      onTaskUpdated(updatedTask);
-    } catch (error) {
-      console.error(error);
+    if (task?.id) {
+      // ensure we have a task id before proceeding
+      try {
+        await axios.put(
+          `${config.backend}/api/project/${projectId}/task/${taskId}`,
+          { status: Status[newStatus as keyof typeof Status] }
+        );
+        const updatedTask: Task = {
+          ...task,
+          status: Status[newStatus as keyof typeof Status],
+          id: task.id,
+        };
+        setTask(updatedTask);
+        onTaskUpdated(updatedTask);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
-  const formattedStartDate = new Date(task.startDate)
-    .toISOString()
-    .split("T")[0];
-  const formattedEndDate = new Date(task.endDate).toISOString().split("T")[0];
+  const formattedStartDate = task?.startDate
+    ? new Date(task.startDate).toISOString().split("T")[0]
+    : "";
+  const formattedEndDate = task?.endDate
+    ? new Date(task.endDate).toISOString().split("T")[0]
+    : "";
 
   return (
     <Modal show={show} onHide={handleClose} size="lg">
@@ -155,19 +177,27 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
           <Col>
             <Form.Group>
               <Form.Label>Task Name</Form.Label>
-              <Form.Control type="text" value={task.name} disabled />
+              <Form.Control type="text" value={task?.name || ""} disabled />
             </Form.Group>
             <Form.Group>
               <Form.Label>Description</Form.Label>
-              <Form.Control type="text" value={task.description} disabled />
+              <Form.Control
+                type="text"
+                value={task?.description || ""}
+                disabled
+              />
             </Form.Group>
             <Form.Group>
               <Form.Label>Status</Form.Label>
-              <Form.Control type="text" value={task.status} disabled />
+              <Form.Control type="text" value={task?.status || ""} disabled />
             </Form.Group>
             <Form.Group>
               <Form.Label>Priority Level</Form.Label>
-              <Form.Control type="text" value={task.priorityLevel} disabled />
+              <Form.Control
+                type="text"
+                value={task?.priorityLevel || ""}
+                disabled
+              />
             </Form.Group>
             <Form.Group>
               <Form.Label>Start Date</Form.Label>
@@ -177,45 +207,47 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
               <Form.Label>End Date</Form.Label>
               <Form.Control type="text" value={formattedEndDate} disabled />
             </Form.Group>
-            {task.technicians && (
+            {task?.technicians && (
               <Form.Group>
                 <Form.Label>Technicians</Form.Label>
-                {task.technicians.map((tech, i) => (
+                {task.technicians.map((tech: User, i: number) => (
                   <Form.Control
                     key={i}
                     type="text"
-                    value={`${tech.firstName} ${tech.lastName}`} // Concatenate first name and last name
+                    value={tech.name}
                     disabled
-                  />
+                  /> // assuming 'name' is a valid property of User
                 ))}
               </Form.Group>
             )}
           </Col>
           <Col>
             <h3>Comments</h3>
-            {comments.map((comment: Comment, index: number) => (
-              <div key={index}>
-                <p>{`${comment.User.firstName} ${
-                  comment.User.lastName
-                } - ${moment(comment.timeStamp).format("LLL")}`}</p>
-                <p>{comment.comment}</p>
-                <ul>
-                  {comment.files.map((file, index) => (
-                    <li key={index}>
-                      <span>File Name: {file.name}</span>
-                      <span>
-                        <a
-                          href={`${config.backend}/download/${file.id}`} // Replace this with your actual API endpoint
-                          download={file.name} // Set the download attribute to the file name
-                        >
-                          Download
-                        </a>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <div className="comments-container">
+              {comments.map((comment: Comment, index: number) => (
+                <div key={index}>
+                  <p>{`${comment.User.firstName} ${
+                    comment.User.lastName
+                  } - ${moment(comment.timeStamp).format("LLL")}`}</p>
+                  <p>{comment.comment}</p>
+                  <ul>
+                    {comment.files.map((file, index) => (
+                      <li key={index}>
+                        <span>File Name: {file.name}</span>
+                        <span>
+                          <a
+                            href={`${config.backend}/download/${file.id}`}
+                            download={file.name}
+                          >
+                            Download
+                          </a>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
             <h4>Enter a Comment:</h4>
             <InputGroup>
               <FormControl
@@ -235,7 +267,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
       <Modal.Footer>
         <Dropdown onSelect={updateTaskStatus}>
           <Dropdown.Toggle variant="success" id="dropdown-basic">
-            {task.status}
+            {task?.status}
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
