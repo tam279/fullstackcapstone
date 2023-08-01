@@ -98,7 +98,76 @@ app.get("/api/users", userController.getUsers);
 app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
-app.post("/changePassword", userController.changePassword);
+app.post("/changepassword", userController.changePassword);
+
+// app.post("/forgotpassword", (req, res) => {
+//   const { email } = req.body;
+//   console.log("Received data:", email);
+//   // Add your password reset logic here
+//   // For simplicity, we're just logging the received data
+//   // In a real application, you would send a password reset email to the provided email address
+//   res.status(200).json({ message: "Password reset email sent." });
+// });
+
+app.post(
+  "/forgotpassword",
+  passport.authenticate("magiclink", {
+    action: "requestToken",
+    failureRedirect: "/login",
+  }),
+  function (req, res, next) {
+    res.redirect("/login");
+  }
+);
+
+app.get(
+  "/login/email/verify",
+  passport.authenticate("magiclink", {
+    session: false,
+  }),
+  async (req, res) => {
+    // The user data is now available in req.user, so you can directly access it
+    const user = req.user;
+
+    // Check if the user exists
+    if (user) {
+      // Send the user data in the response as JSON
+      res.json({ user });
+    } else {
+      // User not found or invalid token
+      res.status(401).json({ error: "Invalid token or user not found." });
+    }
+  }
+);
+
+const changeUserPassword = require("./service/reset-password");
+app.post("/newpassword", async (req, res) => {
+  const { userId, newPassword } = req.body;
+
+  try {
+    const updatedUser = await changeUserPassword(userId, newPassword);
+    console.log("User's password updated:", updatedUser);
+    res.status(200).json({ message: "Password updated successfully!" });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the password." });
+  }
+});
+
+// Define the function to handle the /newpassword POST request
+function handleNewPassword(req, res) {
+  // Get the user ID and password from the request body
+  const { userId, password } = req.body;
+
+  // Log the data (you can handle the password update logic here)
+  console.log("User ID:", userId);
+  console.log("New Password:", password);
+
+  // Respond with a success message or any other desired response
+  res.status(200).json({ message: "Password updated successfully!" });
+}
 
 // The Companies API routes:
 app.get("/api/companies", companyController.getCompanies);
@@ -121,7 +190,11 @@ app.delete("/api/company/:id", companyController.deleteCompany);
 // app.post('/api/createComments', upload.single('file'), commentController.createComment);
 
 // projects
-// app.get("/api/projects",passport.authenticate("jwt", { session: false }), projectController.getProjects);
+// app.get(
+//   "/api/projects",
+//   passport.authenticate("jwt", { session: false }),
+//   projectController.getProjects
+// );
 app.get("/api/projects", projectController.getProjects);
 app.post("/api/projects", projectController.createProject);
 app.put("/api/project/:id", projectController.updateProject);

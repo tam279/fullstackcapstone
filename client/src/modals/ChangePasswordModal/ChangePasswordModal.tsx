@@ -36,10 +36,12 @@ const ChangePasswordModal: FC<ChangePasswordModalProps> = ({
       const decodedToken: any = jwt_decode(token);
       userId = decodedToken.userId;
     }
+    const id = localStorage.getItem("userId");
 
     try {
-      const response = await axios.post(`${config.backend}/changePassword`, {
-        userId: userId,
+      const response = await axios.post(`${config.backend}/changepassword`, {
+        userId: id,
+        password: currentPassword,
         newPassword: newPassword,
       });
 

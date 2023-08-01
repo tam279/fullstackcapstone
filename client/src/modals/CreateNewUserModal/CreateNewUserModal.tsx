@@ -23,6 +23,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [jobTitle, setJobTitle] = useState("");
+  const [tags, setTags] = useState(""); // Add tags
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
@@ -52,13 +53,14 @@ const NewUserModal: FC<NewUserModalProps> = ({
     const newUser = {
       firstName: firstName,
       lastName: lastName,
-      companyId: company.id, // Change here
+      companyId: company.id,
       role: role,
       email: email,
       password: password,
       phoneNumber: phoneNumber,
       jobTitle: jobTitle,
       deleted: false,
+      tags: tags,
     };
 
     fetch(`${config.backend}/api/users`, {
@@ -91,6 +93,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
     setPassword("");
     setPhoneNumber("");
     setJobTitle("");
+    setTags("");
 
     onHide();
   };
@@ -215,6 +218,20 @@ const NewUserModal: FC<NewUserModalProps> = ({
                   placeholder="Enter job title"
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <strong>Tags:</strong>
+              </td>
+              <td>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter tags"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
                 />
               </td>
             </tr>

@@ -34,18 +34,16 @@ model User {
   comments             Comment[]
   projectsAsManager    Project[]  @relation("manager")
   company              Company    @relation(fields: [companyId], references: [id])
-  tags                 Tag[]      @relation("TagToUser")
+  tags                 Tag[]
   tasks                Task[]     @relation("TaskToUser")
   projectsAsTechnician Project[]  @relation("Technicians")
   projectsAsViewer     Project[]  @relation("Viewers")
 }
 
 model Tag {
-  id       String    @id @default(uuid())
-  name     String
-  deleted  Boolean   @default(false)
-  projects Project[] @relation("ProjectToTag")
-  users    User[]    @relation("TagToUser")
+  id    String @id @default(uuid())
+  name  String
+  users User[]
 }
 
 model Project {
@@ -61,7 +59,6 @@ model Project {
   company     Company    @relation(fields: [companyId], references: [id])
   manager     User       @relation("manager", fields: [managerId], references: [id])
   tasks       Task[]
-  tag         Tag[]      @relation("ProjectToTag")
   technicians User[]     @relation("Technicians")
   viewers     User[]     @relation("Viewers")
 }
@@ -100,7 +97,7 @@ model File {
   commentId String?
   deleted   Boolean  @default(false)
   data      Bytes
-  Comment   Comment? @relation(fields: [commentId], references: [id])
+  Comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 
 model Activity {

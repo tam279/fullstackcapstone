@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { prisma } = require("../prisma/prisma");
 
 /* The `exports.getCommentsByTaskId` function is a controller function that handles the logic for
 retrieving comments for a specific task. */
