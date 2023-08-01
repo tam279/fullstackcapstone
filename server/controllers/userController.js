@@ -1,9 +1,6 @@
 // userController.js
 
-/* The code `const { PrismaClient } = require("@prisma/client");` is importing the `PrismaClient` class
-from the `@prisma/client` package. */
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../prisma/prisma");
 
 /* The `exports.getUsers` function is a controller function that handles the logic for retrieving users
 from the database. */

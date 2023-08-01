@@ -1,8 +1,6 @@
 // activityController.js
 
-const mysql = require("mysql2/promise");
-const bcrypt = require("bcrypt");
-const db = require("../db/database");
+const prisma = require("../prisma/prisma");
 
 // getUsers will get email, firstname, lastname, company,role, phoneNumber, jobTitle, deleted
 const { PrismaClient } = require("@prisma/client");

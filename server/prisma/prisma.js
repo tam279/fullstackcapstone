@@ -1,17 +1,17 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-async function testdb() {
-  console.log(
-    await prisma.user.findMany({
-      include: {
-        PROJECT_MANAGER_BRIDGE: true,
-        PROJECT_TECHNICIAN_BRIDGE: true,
-        VIEWER_BRIDGE: true,
-      },
-    })
-  );
-}
+// async function testdb() {
+//   console.log(
+//     await prisma.user.findMany({
+//       include: {
+//         PROJECT_MANAGER_BRIDGE: true,
+//         PROJECT_TECHNICIAN_BRIDGE: true,
+//         VIEWER_BRIDGE: true,
+//       },
+//     })
+//   );
+// }
 
 async function getUsers() {
   const users = await prisma.user.findMany({
@@ -33,4 +33,5 @@ async function getUsers() {
 
 getUsers();
 
-module.exports = { prisma, testdb };
+// module.exports = { prisma, testdb };
+module.exports = prisma;

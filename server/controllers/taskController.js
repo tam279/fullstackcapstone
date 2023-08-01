@@ -1,9 +1,8 @@
 /* The code provided is a JavaScript file that contains the controller functions for managing tasks in
 a project management website. */
-// taskController.js . 
+// taskController.js .
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../prisma/prisma");
 
 /* The `exports.getTasks` function is a controller function that retrieves all tasks of a project from
 the database. */
@@ -64,7 +63,6 @@ exports.createTask = async (req, res) => {
   }
 };
 
-
 /* The `exports.updateTask` function is a controller function that is responsible for updating a
 specific task in the database. */
 exports.updateTask = async (req, res) => {
@@ -99,8 +97,8 @@ exports.updateTask = async (req, res) => {
 
     const updatedTask = await prisma.task.update({
       where: {
-        id: taskId, 
-        projectId, 
+        id: taskId,
+        projectId,
       },
       data: updatedTaskData,
     });
