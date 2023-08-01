@@ -1,18 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// async function testdb() {
-//   console.log(
-//     await prisma.user.findMany({
-//       include: {
-//         PROJECT_MANAGER_BRIDGE: true,
-//         PROJECT_TECHNICIAN_BRIDGE: true,
-//         VIEWER_BRIDGE: true,
-//       },
-//     })
-//   );
-// }
-
 async function getUsers() {
   const users = await prisma.user.findMany({
     select: {
@@ -28,10 +16,18 @@ async function getUsers() {
       deleted: true,
     },
   });
-  // console.log(users);
+
+  return users; // You probably want to return the users here
 }
 
-getUsers();
+process.on("SIGINT", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
 
-// module.exports = { prisma, testdb };
-module.exports = prisma;
+process.on("SIGTERM", async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+module.exports = { prisma, getUsers };

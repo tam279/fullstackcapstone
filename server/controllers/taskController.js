@@ -2,7 +2,7 @@
 a project management website. */
 // taskController.js .
 
-const prisma = require("../prisma/prisma");
+const { prisma } = require("../prisma/prisma");
 
 /* The `exports.getTasks` function is a controller function that retrieves all tasks of a project from
 the database. */

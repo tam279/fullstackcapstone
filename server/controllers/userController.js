@@ -1,6 +1,6 @@
 // userController.js
 
-const prisma = require("../prisma/prisma");
+const { prisma } = require("../prisma/prisma");
 
 /* The `exports.getUsers` function is a controller function that handles the logic for retrieving users
 from the database. */

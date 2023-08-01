@@ -1,10 +1,7 @@
 // projectController.js
 
-const prisma = require("../prisma/prisma");
-
+const { prisma } = require("../prisma/prisma");
 // getProjects will get name, startDate,endDate, company, technicians, viewers, manager, tasks
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 exports.getProjects = async (req, res) => {
   try {
     const projects = await prisma.project.findMany({

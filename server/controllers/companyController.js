@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const db = require("../db/database");
 
 // getUsers will get email, firstname, lastname, company,role, phoneNumber, jobTitle, deleted
-const prisma = require("../prisma/prisma");
+const { prisma } = require("../prisma/prisma");
 
 // getCompanies will get name, address, phoneNumber, website, deleted from Company.
 exports.getCompanies = async (req, res) => {

@@ -1,4 +1,4 @@
-const prisma = require("../prisma/prisma");
+const { prisma } = require("../prisma/prisma");
 
 /* The `exports.getCommentsByTaskId` function is a controller function that handles the logic for
 retrieving comments for a specific task. */
