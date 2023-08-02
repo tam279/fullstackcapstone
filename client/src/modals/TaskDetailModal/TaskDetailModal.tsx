@@ -40,6 +40,12 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [editComment, setEditComment] = useState<{
+    id: string;
+    value: string;
+  } | null>(null);
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -82,7 +88,8 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
       // If the request was successful, clear the comment box and the selected file
       if (response.status === 200) {
         setNewComment("");
-        setSelectedFile(null);
+        setSelectedFile(null); // Clear the selected file
+        fileInputRef.current && (fileInputRef.current.value = ""); // Clear the file input field
       }
 
       // Handle the response as needed
@@ -169,12 +176,40 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      await axios.delete(
-        `${config.backend}/api/tasks/${taskId}/comments/${commentId}`
-      );
+      await axios.delete(`${config.backend}/api/comments/${commentId}`);
 
       // Remove the deleted comment from local state
       setComments(comments.filter((comment) => comment.id !== commentId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUpdateComment = async (
+    commentId: string,
+    updatedComment: string
+  ) => {
+    try {
+      // API call to update the comment
+      const response = await axios.put(
+        `${config.backend}/api/comments/${commentId}`,
+        { text: updatedComment }, // Use 'text' instead of 'comment' to match the server's expected data format
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        // If successful, update the local state with the updated comment
+        setComments(
+          comments.map((comment) =>
+            comment.id === commentId
+              ? { ...comment, text: updatedComment }
+              : comment
+          )
+        );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -242,7 +277,59 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                   <p>{`${comment.User.firstName} ${
                     comment.User.lastName
                   } - ${moment(comment.timeStamp).format("LLL")}`}</p>
-                  <p>{comment.comment}</p>
+
+                  {editComment && editComment.id === comment.id ? (
+                    <InputGroup>
+                      <FormControl
+                        as="textarea"
+                        placeholder="Update comment"
+                        value={editComment.value}
+                        onChange={(e) =>
+                          setEditComment({
+                            id: comment.id,
+                            value: e.target.value, // Update the value here
+                          })
+                        }
+                      />
+                      <Button
+                        variant="success"
+                        onClick={() =>
+                          handleUpdateComment(comment.id, editComment.value)
+                        }
+                      >
+                        Update
+                      </Button>
+
+                      <Button
+                        variant="secondary"
+                        onClick={() => setEditComment(null)}
+                      >
+                        Cancel
+                      </Button>
+                    </InputGroup>
+                  ) : (
+                    <>
+                      <p>{comment.comment}</p>
+                      <Button
+                        variant="info"
+                        onClick={() =>
+                          setEditComment({
+                            id: comment.id,
+                            value: comment.comment,
+                          })
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => handleDeleteComment(comment.id)}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  )}
+
                   <ul>
                     {comment.files.map((file, index) => (
                       <li key={index}>
@@ -258,15 +345,10 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                       </li>
                     ))}
                   </ul>
-                  <Button
-                    variant="danger"
-                    onClick={() => handleDeleteComment(comment.id)}
-                  >
-                    Delete
-                  </Button>
                 </div>
               ))}
             </div>
+
             <h4>Enter a Comment:</h4>
             <InputGroup>
               <FormControl
@@ -276,7 +358,14 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                 onChange={(e) => setNewComment(e.target.value)}
               />
             </InputGroup>
-            <input type="file" onChange={handleFileUpload} />
+            {/* Use the ref for the file input */}
+            <input
+              type="file"
+              onChange={handleFileUpload}
+              ref={fileInputRef}
+              // Add an id for the file input element, if needed
+              // id="fileInput"
+            />
             <Button variant="primary" onClick={handleCreateComment}>
               Send
             </Button>

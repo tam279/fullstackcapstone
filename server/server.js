@@ -7,11 +7,17 @@ const companyController = require("./controllers/companyController");
 const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
 const activityController = require("./controllers/activityController");
-
 const commentController = require("./controllers/commentController");
 
-// const multer = require("multer");
-// const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
+const comment = require("./service/comment"); // Moved this line here
+
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB in bytes
+  },
+});
 
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -29,8 +35,8 @@ app.use(
   })
 );
 
-//DEV ONLY CORS remove localhost from deployment
-//use cors middleware to only allow our front end to use this api
+// DEV ONLY CORS remove localhost from deployment
+// use cors middleware to only allow our front end to use this api
 // Enable CORS for all routes
 let allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
@@ -212,23 +218,10 @@ app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 
 // Comment routes
 app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
-// app.post("/api/tasks/:taskId/comments", commentController.createComment);
-app.delete(
-  "/api/tasks/:taskId/comments/:commentId",
-  commentController.deleteComment
-);
+app.delete("/api/comments/:commentId", commentController.deleteComment);
+app.put("/api/comments/:commentId", commentController.updateComment);
 
-app.put(
-  "/api/tasks/:taskId/comments/:commentId",
-  upload.single("file"), // multer middleware to handle file uploading
-  commentController.updateComment
-);
-
-// User activity routes
-app.get(
-  "/api/userActivity/:projectId",
-  activityController.getUserActivityByProjectId
-);
+app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
 
 const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint
@@ -246,17 +239,7 @@ app.post("/contact", (req, res) => {
   res.status(200).json({ message: "Form data received successfully." });
 });
 
-//upload feature
-const { createFileEntry, getFileById } = require("./service/file-feature/file");
-const multer = require("multer");
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB in bytes
-  },
-});
-
-app.post("/upload", upload.single("file"), async (req, res) => {
+app.put("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file provided" });
   }
@@ -307,7 +290,7 @@ app.get("/download/:fileId", async (req, res) => {
 //upload feature end
 
 //comment feature
-const comment = require("./service/comment");
+
 app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
 
 app.use((req, res, next) => {
