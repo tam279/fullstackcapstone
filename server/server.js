@@ -223,6 +223,11 @@ app.put("/api/comments/:commentId", commentController.updateComment);
 
 app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
 
+
+// Define the API routes for user activity
+app.get("/api/useractivity/:projectId", activityController.getUserActivityByProjectId);
+app.post("/api/useractivity", activityController.createUserActivity);
+
 const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint
 app.post("/contact", (req, res) => {
