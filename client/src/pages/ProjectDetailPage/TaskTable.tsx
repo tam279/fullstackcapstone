@@ -104,6 +104,36 @@ const TaskTable: React.FC<TaskTableProps> = ({
     return null;
   };
 
+  // State variables for filters
+  const [nameFilter, setNameFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
+  const [technicianFilter, setTechnicianFilter] = useState<string>("");
+  const [dependencyFilter, setDependencyFilter] = useState<string>("");
+
+  // Filter the tasks based on the filter values
+  const filteredTasks = sortedTasks.filter((task) => {
+    return (
+      task.name.toLowerCase().includes(nameFilter.toLowerCase()) &&
+      task.status.toLowerCase().includes(statusFilter.toLowerCase()) &&
+      task.priorityLevel
+        .toString()
+        .toLowerCase()
+        .includes(priorityFilter.toLowerCase()) &&
+      task.technicians.some((tech) =>
+        `${tech.firstName} ${tech.lastName}`
+          .toLowerCase()
+          .includes(technicianFilter.toLowerCase())
+      ) &&
+      (task.dependencies
+        ? task.dependencies
+            .join(", ")
+            .toLowerCase()
+            .includes(dependencyFilter.toLowerCase())
+        : true)
+    );
+  });
+
   return (
     <>
       <Button variant="primary" onClick={handleEditModalShow}>
@@ -137,6 +167,39 @@ const TaskTable: React.FC<TaskTableProps> = ({
           </select>
         )}
       </div>
+
+      <div>
+        <label>Filter by Name:</label>
+        <input
+          type="text"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+        />
+        <label>Filter by Status:</label>
+        <input
+          type="text"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        />
+        <label>Filter by Priority:</label>
+        <input
+          type="text"
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+        />
+        <label>Filter by Technician:</label>
+        <input
+          type="text"
+          value={technicianFilter}
+          onChange={(e) => setTechnicianFilter(e.target.value)}
+        />
+        <label>Filter by Dependency:</label>
+        <input
+          type="text"
+          value={dependencyFilter}
+          onChange={(e) => setDependencyFilter(e.target.value)}
+        />
+      </div>
       <Table striped bordered hover className="mt-3">
         <thead>
           <tr>
@@ -158,7 +221,7 @@ const TaskTable: React.FC<TaskTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {sortedTasks.map((task) => (
+          {filteredTasks.map((task) => (
             <tr key={task.id} onClick={() => handleTaskClick(task)}>
               <td>
                 <Button
