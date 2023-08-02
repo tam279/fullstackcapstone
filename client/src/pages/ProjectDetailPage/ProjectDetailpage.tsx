@@ -400,18 +400,20 @@ const ProjectDetailPage: React.FC = () => {
             addNewTask={addNewTask} // pass the new function here
           />
         )}
-<TaskDetailModal
-  show={show}
-  handleClose={handleClose}
-  task={selectedTask} 
-  projectId={projectId || ""}
-  taskId={selectedTask?.id || ""}
-  onTaskUpdated={(updatedTask: Task) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-    );
-  }}
-/>
+        <TaskDetailModal
+          show={show}
+          handleClose={handleClose}
+          task={selectedTask}
+          projectId={projectId || ""}
+          taskId={selectedTask?.id || ""}
+          onTaskUpdated={(updatedTask: Task) => {
+            setTasks((prevTasks) =>
+              prevTasks.map((task) =>
+                task.id === updatedTask.id ? updatedTask : task
+              )
+            );
+          }}
+        />
 
         {editTask && (
           <EditTaskModal

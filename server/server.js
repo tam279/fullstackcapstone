@@ -218,6 +218,12 @@ app.delete(
   commentController.deleteComment
 );
 
+app.put(
+  "/api/tasks/:taskId/comments/:commentId",
+  upload.single("file"), // multer middleware to handle file uploading
+  commentController.updateComment
+);
+
 // User activity routes
 app.get(
   "/api/userActivity/:projectId",
@@ -303,7 +309,6 @@ app.get("/download/:fileId", async (req, res) => {
 //comment feature
 const comment = require("./service/comment");
 app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
-//comment end
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");

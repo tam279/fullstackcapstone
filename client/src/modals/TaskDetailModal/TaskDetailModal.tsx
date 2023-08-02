@@ -167,6 +167,19 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     ? new Date(task.endDate).toISOString().split("T")[0]
     : "";
 
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await axios.delete(
+        `${config.backend}/api/tasks/${taskId}/comments/${commentId}`
+      );
+
+      // Remove the deleted comment from local state
+      setComments(comments.filter((comment) => comment.id !== commentId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -245,6 +258,12 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                       </li>
                     ))}
                   </ul>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteComment(comment.id)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               ))}
             </div>
