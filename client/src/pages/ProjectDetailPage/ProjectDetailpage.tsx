@@ -22,6 +22,7 @@ import {
   fetchUserData,
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
+import TaskTable from "./TaskTable";
 
 interface UserActivity {
   id: string;
@@ -195,6 +196,17 @@ const ProjectDetailPage: React.FC = () => {
     setTasks((prevTasks) => [...prevTasks, task]);
   };
 
+  // Task table event handlers
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setShow(true);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditModalShow(true);
+    setEditTask(task);
+  };
+
   return (
     <div className="project1-container">
       <div className="sidebar-container">
@@ -212,68 +224,12 @@ const ProjectDetailPage: React.FC = () => {
           onSelect={(k) => setKey(k as TabKey)}
         >
           <Tab eventKey="Tasks" title="Tasks">
-            <Table striped bordered hover className="mt-3">
-              <thead>
-                <tr>
-                  <th>
-                    <Button variant="primary" onClick={handleShow}>
-                      + New Task
-                    </Button>
-                  </th>
-                  <th>Status</th>
-                  <th>Priority</th>
-                  <th>Technician name</th>
-                  <th>Dependency</th>
-                  {/* <th>Duration</th> */}
-
-                  <th>
-                    <button>Filter</button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.map((task) => (
-                  <tr key={task.id} onClick={() => handleTask5Click(task)}>
-                    <td>
-                      <Button
-                        variant="link"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleEditModalShow(); // Corrected function name
-                          setEditTask(task); // Set the task to be edited in the state
-                        }}
-                      >
-                        <AiFillEdit size={20} />
-                      </Button>
-                      {task.name}
-                    </td>
-                    <td>{task.status}</td>
-                    <td>
-                      <Form.Control as="select">
-                        <option>{task.priorityLevel}</option>
-                      </Form.Control>
-                    </td>
-                    <td>
-                      {task.technicians
-                        ? task.technicians
-                            .map((tech) => `${tech.firstName} ${tech.lastName}`)
-                            .join(", ")
-                        : ""}
-                    </td>
-
-                    {/* <td>{task.duration} hours</td> */}
-
-                    <td>
-                      {task.dependencies ? (
-                        <span>{task.dependencies.join(", ")}</span>
-                      ) : (
-                        <span>No Dependency</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <TaskTable
+              tasks={tasks}
+              handleTaskClick={handleTaskClick}
+              handleEditModalShow={handleShow}
+              handleEditTask={handleEditTask}
+            />
           </Tab>
           <Tab eventKey="Grantt" title="Grantt">
             <Chart

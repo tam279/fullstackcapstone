@@ -221,7 +221,11 @@ app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
 app.delete("/api/comments/:commentId", commentController.deleteComment);
 app.put("/api/comments/:commentId", commentController.updateComment);
 
-app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
+// User activity routes
+app.get(
+  "/api/userActivity/:projectId",
+  activityController.getUserActivityByProjectId
+);
 
 const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint
@@ -239,7 +243,16 @@ app.post("/contact", (req, res) => {
   res.status(200).json({ message: "Form data received successfully." });
 });
 
-app.put("/upload", upload.single("file"), async (req, res) => {
+//upload feature
+const { createFileEntry, getFileById } = require("./service/file-feature/file");
+
+app.put(
+  "/api/tasks/:taskId/comments/:commentId",
+  upload.single("file"), // multer middleware to handle file uploading
+  commentController.updateComment
+);
+
+app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file provided" });
   }
