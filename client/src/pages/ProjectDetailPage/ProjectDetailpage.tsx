@@ -180,18 +180,6 @@ const ProjectDetailPage: React.FC = () => {
     return tasks.filter((task) => task.status === Status.COMPLETED).length;
   };
 
-  const originalWarn = console.warn;
-  console.warn = function (...args) {
-    const arg = args && args[0];
-    if (
-      arg &&
-      arg.includes("Attempting to load version '51' of Google Charts")
-    ) {
-      return;
-    }
-    originalWarn(...args);
-  };
-
   const addNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
   };

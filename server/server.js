@@ -202,7 +202,14 @@ app.delete("/api/company/:id", companyController.deleteCompany);
 //   passport.authenticate("jwt", { session: false }),
 //   projectController.getProjects
 // );
-app.get("/api/projects", projectController.getProjects);
+// app.get("/api/projects", projectController.getProjects);
+
+app.get(
+  "/api/projects",
+  passport.authenticate("jwt", { session: false }),
+  projectController.getProjects
+);
+
 app.post("/api/projects", projectController.createProject);
 app.put("/api/project/:id", projectController.updateProject);
 app.delete("/api/project/:id", projectController.deleteProject);
@@ -211,6 +218,12 @@ app.get("/api/project/:id", projectController.getProject);
 // tasks
 app.get("/api/project/:projectId/tasks", taskController.getTasks);
 app.post("/api/project/:projectId/tasks", taskController.createTask);
+// app.post(
+//   "/api/project/:projectId/tasks",
+//   passport.authenticate("jwt", { session: false }),
+//   taskController.createTask
+// );
+
 app.put("/api/project/:projectId/task/:taskId", taskController.updateTask);
 app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask);
 /* The code `app.get("/api/project/:projectId/task/:taskId", taskController.getTask);` is defining a
@@ -221,12 +234,6 @@ app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
 app.delete("/api/comments/:commentId", commentController.deleteComment);
 app.put("/api/comments/:commentId", commentController.updateComment);
-
-// User activity routes
-app.get(
-  "/api/userActivity/:projectId",
-  activityController.getUserActivityByProjectId
-);
 
 // Define the API routes for user activity
 app.get(

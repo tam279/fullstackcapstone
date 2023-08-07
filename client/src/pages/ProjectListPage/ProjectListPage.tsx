@@ -92,7 +92,7 @@ const ProjectListPage = () => {
     axios
       .get(`${config.backend}/api/projects`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYW5hZ2VyQGNvbXBhbnkxLmNvbSIsImlhdCI6MTY4OTIyNDk5N30.W5GuZWhh3woOr87dUSk5VRz7Gy78Zt1R93OhRHC8tRE`,
+          Authorization: `Bearer  ${token}`,
         },
       })
       .then((response) => {

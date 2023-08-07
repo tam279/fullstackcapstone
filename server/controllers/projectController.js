@@ -3,8 +3,23 @@
 const { prisma } = require("../prisma/prisma");
 // getProjects will get name, startDate,endDate, company, technicians, viewers, manager, tasks
 exports.getProjects = async (req, res) => {
+  const loggedInUser = req.user;
+
+  let whereCondition = {}; // default condition
+
+  if (loggedInUser.role !== "ADMIN") {
+    whereCondition = {
+      OR: [
+        { manager: { id: loggedInUser.id } }, // the user is the manager of the project
+        { technicians: { some: { id: loggedInUser.id } } }, // the user is a technician for the project
+        { viewers: { some: { id: loggedInUser.id } } }, // the user is a viewer for the project
+      ],
+    };
+  }
+
   try {
     const projects = await prisma.project.findMany({
+      where: whereCondition,
       select: {
         id: true,
         name: true,
