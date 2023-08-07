@@ -105,6 +105,7 @@ app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
 app.post("/changepassword", userController.changePassword);
+app.get("/api/user/email/:email", userController.getUserByEmail);
 
 // app.post("/forgotpassword", (req, res) => {
 //   const { email } = req.body;
