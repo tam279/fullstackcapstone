@@ -73,28 +73,14 @@ exports.createComment = async (req, res) => {
 };
 
 exports.updateComment = async (req, res) => {
-  const { id } = req.params;
+  const { commentId } = req.params; // Getting commentId directly
   const { comment } = req.body;
 
   try {
     const updatedComment = await prisma.comment.update({
-      where: { id: id },
-      data: {
-        comment: comment,
-        files: req.file
-          ? {
-              create: {
-                name: req.file.originalname,
-                data: fs.readFileSync(req.file.path),
-                deleted: false,
-              },
-            }
-          : undefined,
-      },
+      where: { id: commentId },
+      data: { comment: comment }, // Update the 'comment' field with the new value
     });
-
-    // Remove the file from disk
-    if (req.file) fs.unlinkSync(req.file.path);
 
     res.status(200).json(updatedComment);
   } catch (err) {
@@ -104,11 +90,11 @@ exports.updateComment = async (req, res) => {
 };
 
 exports.deleteComment = async (req, res) => {
-  const { id } = req.params;
+  const { commentId } = req.params;
 
   try {
     const deletedComment = await prisma.comment.update({
-      where: { id: id },
+      where: { id: commentId },
       data: { deleted: true }, // Instead of deleting, we mark it as deleted
     });
     res.status(200).json(deletedComment);

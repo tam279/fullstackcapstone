@@ -39,7 +39,14 @@ const App: React.FC = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/project/:projectId" element={<ProjectDetailpage />} />
+          <Route
+            path="/project/:projectId"
+            element={
+              <PrivateRoute roles={[Role.ADMIN, Role.USER]}>
+                <ProjectDetailpage />
+              </PrivateRoute>
+            }
+          />{" "}
         </Routes>
       </div>
     </Router>

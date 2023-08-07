@@ -27,7 +27,14 @@ passport.use(
             return console.error(err);
           }
           if (isMatch) {
-            const token = jwt.sign({ sub: user.email }, "your-secret-key");
+            const token = jwt.sign(
+              {
+                sub: user.email,
+                id: user.id,
+                role: user.role,
+              },
+              "your-secret-key"
+            );
             user.token = token;
             delete user.password;
             delete user.deleted;

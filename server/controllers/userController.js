@@ -190,6 +190,46 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+exports.getUserByEmail = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        company: {
+          select: { id: true, name: true },
+        },
+        role: true,
+        phoneNumber: true,
+        jobTitle: true,
+        deleted: true,
+        tags: true,
+        projectsAsTechnician: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while retrieving the user" });
+  }
+};
+
 // Ian need for User Login
 // exports.getUserByEmail = async (email) => {
 //     if (typeof email !== 'string' || email === '') {

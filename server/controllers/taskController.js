@@ -34,6 +34,7 @@ exports.createTask = async (req, res) => {
     startDate,
     endDate,
     technicians,
+    dependencies, // Extract the dependencies from req.body
   } = req.body;
 
   try {
@@ -46,6 +47,7 @@ exports.createTask = async (req, res) => {
         startDate,
         endDate,
         projectId,
+        dependencies, // Add this line to include dependencies when creating a new task
         technicians: {
           connect: technicians.map((techId) => ({
             id: techId,
@@ -75,6 +77,7 @@ exports.updateTask = async (req, res) => {
     startDate,
     endDate,
     technicians,
+    dependencies, // Include the dependencies from req.body
   } = req.body;
 
   try {
@@ -85,6 +88,7 @@ exports.updateTask = async (req, res) => {
       priorityLevel,
       startDate,
       endDate,
+      dependencies, // Add this line to include dependencies in the data that will be updated
     };
 
     if (technicians) {

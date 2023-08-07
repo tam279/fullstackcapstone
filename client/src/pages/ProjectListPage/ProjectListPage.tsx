@@ -28,12 +28,30 @@ const ProjectListPage = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   // States for filter and sort
-  const [displayedProjects, setDisplayedProjects] = useState<Project[]>([]);
+  const [displayedProjects, setDisplayedProjects] = useState<Project[]>([]); // <-- Corrected state variable name
+  const token = localStorage.getItem("jwtToken");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState("name");
 
-    useEffect(() => {
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      const decodedToken: any = jwt_decode(token);
+
+      // Fetch user details using the email from the decoded token
+      axios
+        .get(`${config.backend}/api/user/email/${decodedToken.sub}`)
+        .then((response) => {
+          setCurrentUser(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user details:", error);
+        });
+    }
+  }, []);
+
+  useEffect(() => {
     const filteredProjects = projects
       .filter((project) =>
         project.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -43,16 +61,17 @@ const ProjectListPage = () => {
           case "name":
             return a.name.localeCompare(b.name);
           case "startDate":
-            return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+            return (
+              new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+            );
           // Add similar cases for other properties
           default:
             return 0;
         }
       });
 
-    setDisplayedProjects(filteredProjects);
+    setDisplayedProjects(filteredProjects); // <-- Use setDisplayedProjects instead of setFilteredProjects
   }, [searchTerm, sortKey, projects]);
-
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
@@ -73,10 +92,11 @@ const ProjectListPage = () => {
     axios
       .get(`${config.backend}/api/projects`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtYW5hZ2VyQGNvbXBhbnkxLmNvbSIsImlhdCI6MTY4OTIyNDk5N30.W5GuZWhh3woOr87dUSk5VRz7Gy78Zt1R93OhRHC8tRE`,
+          Authorization: `Bearer  ${token}`,
         },
       })
       .then((response) => {
+        console.log("API response:", response.data);
         setProjects(response.data);
       })
       .catch((error) => {
@@ -113,17 +133,20 @@ const ProjectListPage = () => {
       <div className="sidebar-container">
         <SidebarProject />
       </div>
+
       <div className="projects">
         <div className="project-header d-flex justify-content-between">
-          <div className="project-info">
+          <div className="left-section">
             <h1 className="title">Projects List</h1>
-            {/* Add this section for filtering and sorting */}
-            <div className="filter-sort">
+
+            {/* Filtering and sorting section */}
+            <div className="filter-sort d-flex">
               <Form.Control
                 type="text"
                 placeholder="Filter projects"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="mr-2"
               />
               <Form.Control
                 as="select"
@@ -139,8 +162,16 @@ const ProjectListPage = () => {
                 <option value="status">Status</option>
               </Form.Control>
             </div>
-            {/* End of filtering and sorting section */}
           </div>
+
+          {currentUser && (
+            <div className="user-info ml-auto">
+              <h3>
+                Logged in as: {currentUser.firstName} {currentUser.lastName} -
+                Role: {currentUser.role}
+              </h3>
+            </div>
+          )}
         </div>
 
         <Table striped bordered hover className="mt-3">

@@ -6,12 +6,17 @@ const userController = require("./controllers/userController");
 const companyController = require("./controllers/companyController");
 const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
-const activityController = require("./controllers/activityController");
-
 const commentController = require("./controllers/commentController");
 
-// const multer = require("multer");
-// const upload = multer({ dest: "uploads/" }); // This sets 'uploads/' as the destination folder for the uploaded files.
+const comment = require("./service/comment"); // Moved this line here
+
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB in bytes
+  },
+});
 
 const bodyParser = require("body-parser");
 const session = require("express-session");
@@ -29,8 +34,8 @@ app.use(
   })
 );
 
-//DEV ONLY CORS remove localhost from deployment
-//use cors middleware to only allow our front end to use this api
+// DEV ONLY CORS remove localhost from deployment
+// use cors middleware to only allow our front end to use this api
 // Enable CORS for all routes
 let allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
@@ -99,6 +104,7 @@ app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
 app.delete("/api/user/:id", userController.deleteUser);
 app.post("/changepassword", userController.changePassword);
+app.get("/api/user/email/:email", userController.getUserByEmail);
 
 // app.post("/forgotpassword", (req, res) => {
 //   const { email } = req.body;
@@ -195,7 +201,14 @@ app.delete("/api/company/:id", companyController.deleteCompany);
 //   passport.authenticate("jwt", { session: false }),
 //   projectController.getProjects
 // );
-app.get("/api/projects", projectController.getProjects);
+// app.get("/api/projects", projectController.getProjects);
+
+app.get(
+  "/api/projects",
+  passport.authenticate("jwt", { session: false }),
+  projectController.getProjects
+);
+
 app.post("/api/projects", projectController.createProject);
 app.put("/api/project/:id", projectController.updateProject);
 app.delete("/api/project/:id", projectController.deleteProject);
@@ -204,6 +217,12 @@ app.get("/api/project/:id", projectController.getProject);
 // tasks
 app.get("/api/project/:projectId/tasks", taskController.getTasks);
 app.post("/api/project/:projectId/tasks", taskController.createTask);
+// app.post(
+//   "/api/project/:projectId/tasks",
+//   passport.authenticate("jwt", { session: false }),
+//   taskController.createTask
+// );
+
 app.put("/api/project/:projectId/task/:taskId", taskController.updateTask);
 app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask);
 /* The code `app.get("/api/project/:projectId/task/:taskId", taskController.getTask);` is defining a
@@ -212,17 +231,8 @@ app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 
 // Comment routes
 app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
-// app.post("/api/tasks/:taskId/comments", commentController.createComment);
-app.delete(
-  "/api/tasks/:taskId/comments/:commentId",
-  commentController.deleteComment
-);
-
-// User activity routes
-app.get(
-  "/api/userActivity/:projectId",
-  activityController.getUserActivityByProjectId
-);
+app.delete("/api/comments/:commentId", commentController.deleteComment);
+app.put("/api/comments/:commentId", commentController.updateComment);
 
 const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint
@@ -242,13 +252,12 @@ app.post("/contact", (req, res) => {
 
 //upload feature
 const { createFileEntry, getFileById } = require("./service/file-feature/file");
-const multer = require("multer");
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB in bytes
-  },
-});
+
+app.put(
+  "/api/tasks/:taskId/comments/:commentId",
+  upload.single("file"), // multer middleware to handle file uploading
+  commentController.updateComment
+);
 
 app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) {
@@ -301,9 +310,8 @@ app.get("/download/:fileId", async (req, res) => {
 //upload feature end
 
 //comment feature
-const comment = require("./service/comment");
+
 app.post("/api/tasks/:taskId/comments", upload.any(), comment.createComment);
-//comment end
 
 app.use((req, res, next) => {
   const error = new Error("Route not found");
