@@ -120,6 +120,8 @@ const TaskTable: React.FC<TaskTableProps> = ({
         .toString()
         .toLowerCase()
         .includes(priorityFilter.toLowerCase()) &&
+      task.technicians &&
+      task.technicians.length > 0 &&
       task.technicians.some((tech) =>
         `${tech.firstName} ${tech.lastName}`
           .toLowerCase()
