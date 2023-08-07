@@ -19,6 +19,7 @@ import {
 } from "../../problemdomain/Interface/Interface";
 import moment from "moment";
 import "./TaskDetailModal.css";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 interface TaskDetailModalProps {
   show: boolean;
@@ -44,6 +45,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     id: string;
     value: string;
   } | null>(null);
+  const loggedInUserId = localStorage.getItem("userId");
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -287,7 +289,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                         onChange={(e) =>
                           setEditComment({
                             id: comment.id,
-                            value: e.target.value, // Update the value here
+                            value: e.target.value,
                           })
                         }
                       />
@@ -310,23 +312,24 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                   ) : (
                     <>
                       <p>{comment.comment}</p>
-                      <Button
-                        variant="info"
-                        onClick={() =>
-                          setEditComment({
-                            id: comment.id,
-                            value: comment.comment,
-                          })
-                        }
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => handleDeleteComment(comment.id)}
-                      >
-                        Delete
-                      </Button>
+                      {/* Check if the current user is the owner of the comment */}
+                      {localStorage.getItem("userId") === comment.User.id && (
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <FaEdit
+                            style={{ cursor: "pointer", marginRight: "10px" }}
+                            onClick={() =>
+                              setEditComment({
+                                id: comment.id,
+                                value: comment.comment,
+                              })
+                            }
+                          />
+                          <FaTrash
+                            style={{ cursor: "pointer", color: "red" }}
+                            onClick={() => handleDeleteComment(comment.id)}
+                          />
+                        </div>
+                      )}
                     </>
                   )}
 

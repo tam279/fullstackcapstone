@@ -6,7 +6,6 @@ const userController = require("./controllers/userController");
 const companyController = require("./controllers/companyController");
 const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
-const activityController = require("./controllers/activityController");
 const commentController = require("./controllers/commentController");
 
 const comment = require("./service/comment"); // Moved this line here
@@ -234,13 +233,6 @@ app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
 app.delete("/api/comments/:commentId", commentController.deleteComment);
 app.put("/api/comments/:commentId", commentController.updateComment);
-
-// Define the API routes for user activity
-app.get(
-  "/api/useractivity/:projectId",
-  activityController.getUserActivityByProjectId
-);
-app.post("/api/useractivity", activityController.createUserActivity);
 
 const { sendContactEmail } = require("./service/contact-mail");
 // Handle POST requests to '/contact' endpoint

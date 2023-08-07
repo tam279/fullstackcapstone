@@ -61,6 +61,7 @@ const UserManagementPage = () => {
       .filter((company) =>
         company.name.toLowerCase().includes(companyFilter.toLowerCase())
       )
+      .filter((company) => !company.deleted) // This line filters out the deleted companies
       .sort((a, b) => {
         if (a.name < b.name) {
           return companySort === "asc" ? -1 : 1;
@@ -188,27 +189,29 @@ const UserManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filterAndSortUsers(userData).map((user, index) => (
-                    <tr key={user.id}>
-                      <td>
-                        <Button
-                          variant="link"
-                          onClick={() => handleShowEditUserModal(user)}
-                        >
-                          Edit
-                        </Button>{" "}
-                      </td>
-                      <td>{user.email}</td>
-                      <td>{user.firstName}</td>
-                      <td>{user.lastName}</td>
-                      <td>{user.company.name}</td>
-                      <td>{user.role}</td>
-                      <td>{user.phoneNumber}</td>
-                      <td>{user.jobTitle}</td>
-                      <td>{user.deleted ? "True" : "False"}</td>
-                      <td>{user.tags}</td>
-                    </tr>
-                  ))}
+                  {filterAndSortUsers(userData)
+                    .filter((user) => !user.deleted)
+                    .map((user, index) => (
+                      <tr key={user.id}>
+                        <td>
+                          <Button
+                            variant="link"
+                            onClick={() => handleShowEditUserModal(user)}
+                          >
+                            Edit
+                          </Button>{" "}
+                        </td>
+                        <td>{user.email}</td>
+                        <td>{user.firstName}</td>
+                        <td>{user.lastName}</td>
+                        <td>{user.company.name}</td>
+                        <td>{user.role}</td>
+                        <td>{user.phoneNumber}</td>
+                        <td>{user.jobTitle}</td>
+                        <td>{user.deleted ? "True" : "False"}</td>
+                        <td>{user.tags}</td>
+                      </tr>
+                    ))}
                 </tbody>
               </Table>
             </Tab>

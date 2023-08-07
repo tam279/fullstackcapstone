@@ -76,7 +76,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     } else if (event.target.name === "dependencies") {
       setFormValues({
         ...formValues,
-        dependencies: event.target.value.split(","),
+        dependencies: event.target.value,
       });
     } else {
       let value: string | number = event.target.value;
@@ -144,7 +144,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
       startDate: new Date(task.startDate).toISOString().slice(0, 16),
       endDate: new Date(task.endDate).toISOString().slice(0, 16),
       technicians: task.technicians.map((tech) => tech.email),
-      dependencies: task.dependencies || [],
+      dependencies: task.dependencies || "",
       projectId: task.projectId,
     });
   }, [task]);
@@ -243,7 +243,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
                   placeholder="Task dependencies. Enter the task id, follow by the comma..."
                   name="dependencies"
                   onChange={handleFormChange}
-                  value={formValues.dependencies.join(",")}
+                  value={formValues.dependencies}
                 />
               </Form.Group>
 

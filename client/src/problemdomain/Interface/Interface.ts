@@ -26,7 +26,6 @@ export interface User {
   tags: string; // Tag[];
   tasks: Task[];
   comments: Comment[];
-  activity: Activity[];
   projectsAsTechnician: Project[];
   projectsAsViewer: Project[];
   projectsAsManager: Project[];
@@ -62,7 +61,6 @@ export interface Project {
   manager: User;
   managerId: string;
   tasks: Task[];
-  activity: Activity[];
   deleted: boolean;
 }
 
@@ -79,8 +77,7 @@ export interface Task {
   technicians: User[];
   comments: Comment[];
   files: File[];
-  dependencies: string[];
-  dependentTasks: Task[];
+  dependencies: string;
   deleted: boolean;
   label?: string;
 }
@@ -115,12 +112,3 @@ export interface File {
   deleted: boolean;
 }
 
-export interface Activity {
-  id: string;
-  user: User;
-  project: Project;
-  activity: string;
-  timestamp: Date | null;
-  userId: string;
-  projectId: string;
-}

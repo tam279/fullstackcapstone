@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Button, Tabs, Tab, Table, Form } from "react-bootstrap";
-import { AiFillEdit } from "react-icons/ai";
 import "./ProjectDetailPage.css";
 import { Chart } from "react-google-charts";
 import SidebarProject from "../../components/SidebarProject/SidebarProject";
@@ -14,7 +13,6 @@ import {
   User,
   Project,
   Task,
-  Activity,
   Company,
   Status, // Import Status enum
 } from "../../problemdomain/Interface/Interface";
@@ -24,40 +22,19 @@ import {
 } from "../../problemdomain/DataService/DataService";
 import TaskTable from "./TaskTable";
 
-interface UserActivity {
-  id: string;
-  activity: string;
-  timestamp: string;
-  userId: string;
-  projectId: string;
-  user: {
-    id: string;
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-    companyId: string;
-    phoneNumber: string;
-    jobTitle: string;
-    deleted: boolean;
-  };
-}
-
-type TabKey = "Tasks" | "Grantt" | "Details" | "User activity";
+type TabKey = "Tasks" | "Grantt" | "Details";
 
 const ProjectDetailPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
-  const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [editModalShow, setEditModalShow] = useState(false);
   const [status, setStatus] = useState("");
   const [key, setKey] = useState<TabKey>("Tasks");
   const [show, setShow] = useState(false);
   const [createTaskModalShow, setCreateTaskModalShow] = useState(false);
-  const [newTaskId, setNewTaskId] = useState<number | null>(null);
+  const [newTaskId, setNewTaskId] = useState<string | null>(null);
   const [editTask, setEditTask] = useState<Task | null>(null);
 
   const handleClose = () => {
@@ -130,23 +107,6 @@ const ProjectDetailPage: React.FC = () => {
     fetchProject();
   }, [projectId]);
 
-  useEffect(() => {
-    const fetchUserActivity = async () => {
-      if (projectId) {
-        try {
-          const response = await axios.get(
-            `${config.backend}/api/userActivity/${projectId}`
-          );
-          setUserActivity(response.data);
-        } catch (err) {
-          console.error("Error fetching user activities:", err);
-        }
-      }
-    };
-
-    fetchUserActivity();
-  }, [projectId]);
-
   const data = [
     [
       { type: "string", label: "Task ID" },
@@ -164,7 +124,7 @@ const ProjectDetailPage: React.FC = () => {
       new Date(task.endDate),
       null, // You need to provide duration here
       null, // You need to provide percent complete here
-      task.dependencies ? task.dependencies.join(", ") : null,
+      task.dependencies,
     ]),
   ];
 
@@ -182,6 +142,7 @@ const ProjectDetailPage: React.FC = () => {
 
   const addNewTask = (task: Task) => {
     setTasks((prevTasks) => [...prevTasks, task]);
+    setNewTaskId(task.id); // Set the new task id here
   };
 
   // Task table event handlers
@@ -306,42 +267,13 @@ const ProjectDetailPage: React.FC = () => {
               <p>Loading...</p>
             )}
           </Tab>
-          <Tab eventKey="User activity" title="User activity">
-            <div className="user-activity-mode">
-              <h2>User Activity</h2>
-              <table className="table table-striped">
-                <thead className="thead-dark">
-                  <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>User</th>
-                    <th>Detail</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userActivity.map((activity) => (
-                    <tr key={activity.id}>
-                      <td>
-                        {new Date(activity.timestamp).toLocaleDateString()}
-                      </td>
-                      <td>
-                        {new Date(activity.timestamp).toLocaleTimeString()}
-                      </td>
-                      <td>{activity.user.email}</td>
-                      <td>{activity.activity}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Tab>
         </Tabs>
         {projectId && (
           <CreateNewTaskModal
             show={createTaskModalShow}
             handleClose={() => setCreateTaskModalShow(false)}
             projectId={projectId}
-            addNewTask={addNewTask} // pass the new function here
+            addNewTask={addNewTask} // pass the function here
           />
         )}
         <TaskDetailModal

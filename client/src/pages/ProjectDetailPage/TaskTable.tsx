@@ -129,7 +129,6 @@ const TaskTable: React.FC<TaskTableProps> = ({
       ) &&
       (task.dependencies
         ? task.dependencies
-            .join(", ")
             .toLowerCase()
             .includes(dependencyFilter.toLowerCase())
         : true)
@@ -252,7 +251,7 @@ const TaskTable: React.FC<TaskTableProps> = ({
               </td>
               <td>
                 {task.dependencies ? (
-                  <span>{task.dependencies.join(", ")}</span>
+                  <span>{task.dependencies}</span>
                 ) : (
                   <span>No Dependency</span>
                 )}
