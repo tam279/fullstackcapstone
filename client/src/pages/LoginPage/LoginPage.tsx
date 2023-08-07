@@ -86,19 +86,23 @@ const LoginPage = () => {
         password,
       });
 
-      // Assuming the server responds with a JWT token and role
+      // Assuming the server responds with a JWT token, role, and id
       const {
         token,
         user: { role, id },
       } = response.data;
 
-      // console.log(response.data);
-      // Store the JWT token and role in localStorage
+      // Store the JWT token, role, and id in localStorage
       localStorage.setItem("jwtToken", token);
       localStorage.setItem("userRole", role);
       localStorage.setItem("userId", id);
 
-      // Redirect to the ChangePasswordPage or any other desired page
+      // Include the user's role and id in the request headers for subsequent API calls
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common["User-Id"] = id;
+      axios.defaults.headers.common["User-Role"] = role;
+
+      // Redirect to the ProjectListPage or any other desired page
       navigate("/projectlistpage");
     } catch (error) {
       // Handle login error
