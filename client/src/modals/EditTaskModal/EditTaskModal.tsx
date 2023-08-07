@@ -34,7 +34,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     startDate: new Date(task.startDate).toISOString().slice(0, 16),
     endDate: new Date(task.endDate).toISOString().slice(0, 16),
     technicians: task.technicians.map((tech) => tech.email),
-    dependencies: task.dependencies || [], // if task.dependencies is undefined, use an empty array instead
+    dependencies: task.dependencies || "",
     projectId: task.projectId,
   });
 
@@ -59,6 +59,22 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     fetchProjectTechnicians();
   }, [task.projectId, lastFetchedProjectId]); // Depend on task.projectId and lastFetchedProjectId
 
+  const handleStatusChange = (newStatus: string) => {
+    if (
+      task?.status === Status.NOT_STARTED &&
+      newStatus === Status.IN_PROGRESS &&
+      task.dependencies
+    ) {
+      const proceed = window.confirm(
+        `This task has dependencies: ${task.dependencies}. Are you sure you want to change its status to IN_PROGRESS?`
+      );
+      if (!proceed) {
+        return false; // If user says 'No', then exit and don't update status
+      }
+    }
+    return true;
+  };
+
   const handleFormChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -77,6 +93,17 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
       setFormValues({
         ...formValues,
         dependencies: event.target.value,
+      });
+    } else if (event.target.name === "status") {
+      const newStatus = event.target.value as Status;
+
+      if (!handleStatusChange(newStatus)) {
+        return; // Don't update the status in the form if handleStatusChange returns false
+      }
+
+      setFormValues({
+        ...formValues,
+        [event.target.name]: newStatus,
       });
     } else {
       let value: string | number = event.target.value;

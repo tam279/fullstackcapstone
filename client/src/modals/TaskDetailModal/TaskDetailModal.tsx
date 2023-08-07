@@ -149,7 +149,6 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     if (newStatus === null) {
       newStatus = task?.status || "";
     }
-
     if (task?.id) {
       // ensure we have a task id before proceeding
       try {
@@ -264,7 +263,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
                   <Form.Control
                     key={i}
                     type="text"
-                    value={tech.name}
+                    value={tech.firstName + " " + tech.lastName}
                     disabled
                   /> // assuming 'name' is a valid property of User
                 ))}

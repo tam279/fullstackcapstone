@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Tabs, Tab, Table, Form } from "react-bootstrap";
+import { AiFillEdit } from "react-icons/ai";
 import "./ProjectDetailPage.css";
 import { Chart } from "react-google-charts";
 import SidebarProject from "../../components/SidebarProject/SidebarProject";
@@ -155,6 +156,8 @@ const ProjectDetailPage: React.FC = () => {
     setEditModalShow(true);
     setEditTask(task);
   };
+
+
 
   return (
     <div className="project1-container">
