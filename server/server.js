@@ -196,12 +196,12 @@ app.delete("/api/company/:id", companyController.deleteCompany);
 // app.post('/api/createComments', upload.single('file'), commentController.createComment);
 
 // projects
-app.get(
-  "/api/projects",
-  passport.authenticate("jwt", { session: false }),
-  projectController.getProjects
-);
-// app.get("/api/projects", projectController.getProjects);
+// app.get(
+//   "/api/projects",
+//   passport.authenticate("jwt", { session: false }),
+//   projectController.getProjects
+// );
+app.get("/api/projects", projectController.getProjects);
 app.post("/api/projects", projectController.createProject);
 app.put("/api/project/:id", projectController.updateProject);
 app.delete("/api/project/:id", projectController.deleteProject);
