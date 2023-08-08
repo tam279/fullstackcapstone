@@ -33,7 +33,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     startDate: "",
     endDate: "",
     technicians: [] as string[],
-    dependencies: [] as string[],
+    dependencies: "",
     projectId: projectId,
   });
 
@@ -84,7 +84,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     } else if (event.target.name === "dependencies") {
       setFormValues({
         ...formValues,
-        dependencies: event.target.value.split(","),
+        dependencies: event.target.value,
       });
     } else {
       let value: string | number = event.target.value;
