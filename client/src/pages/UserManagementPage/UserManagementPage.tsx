@@ -184,7 +184,6 @@ const UserManagementPage = () => {
                     <th>Role</th>
                     <th>Phone Number</th>
                     <th>Job Title</th>
-                    <th>Is deleted</th>
                     <th>Tags</th>
                   </tr>
                 </thead>
@@ -208,7 +207,6 @@ const UserManagementPage = () => {
                         <td>{user.role}</td>
                         <td>{user.phoneNumber}</td>
                         <td>{user.jobTitle}</td>
-                        <td>{user.deleted ? "True" : "False"}</td>
                         <td>{user.tags}</td>
                       </tr>
                     ))}

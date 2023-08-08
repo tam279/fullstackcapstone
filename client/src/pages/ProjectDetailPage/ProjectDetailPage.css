@@ -1,40 +1,76 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-  
-  .project1-container {
-    display: flex;
-    height: 100%;
-  }
-  
-  .sidebar-container {
-    width: 250px;
-    height: 100%; 
-    overflow: auto;
-  }
-  .content-container-project1 {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .title {
-    font-weight: 700;
-    font-size: 32px;
-    color: #32324D;
-  }
-  
-  /* Rest of your CSS... */
-  
+/* Add your existing styles here */
+
+.priority-1 {
+  /* No specific background color for priority 1 */
+}
+
+.priority-2 {
+  background-color: #007bff; /* Blue or another color */
+}
+
+.priority-3 {
+  background-color: #28a745; /* Green or another color */
+}
+
+.priority-4 {
+  background-color: #ffa500; /* Orange or another color */
+}
+
+.priority-5 {
+  background-color: #ff4f4f; /* Red or another color for high priority */
+}
+
+/* Your existing styles here */
+
+td .status-completed {
+  background-color: #28a745; /* Green for Completed status */
+}
+
+td .status-not-started {
+  /* No specific background color for Not Started status */
+}
+
+td .status-in-progress {
+  background-color: #007bff; /* Blue for In Progress status */
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.project1-container {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar-container {
+  width: 250px;
+  height: 100%;
+  overflow: auto;
+}
+.content-container-project1 {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 32px;
+  color: #32324d;
+}
+
+/* Rest of your CSS... */

@@ -26,8 +26,8 @@ async function sendWelcomeEmail(user) {
    const mailOptions = {
      from: process.env.EMAIL,
      to: user.email, // Use user.email as the recipient's email address
-     subject: "Welcome to Our Website",
-     text: `Hello ${user.name},\n\nWelcome to our website! Your temporary password is: ${user.password}\n\nPlease make sure to change your password after logging in.\n\nBest regards,\nThe Website Team\n\nLogin Links:\n\n${loginLinks}`,
+     subject: "Welcome to VITRA SERVICES",
+     text: `Hello ${user.name},\n\nWelcome to VITRA SERVICES! Your temporary password is: ${user.password}\n\nPlease make sure to change your password after logging in.\n\nBest regards,\nThe Website Team\n\nLogin Links:\n\n${loginLinks}`,
    };
 
 

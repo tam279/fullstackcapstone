@@ -13,7 +13,7 @@ const ContactForm = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [messageSent, setMessageSent] = useState(false);
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -21,7 +21,7 @@ const ContactForm = () => {
     }));
   };
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     // Send form data to the backend using Axios
@@ -43,7 +43,7 @@ const ContactForm = () => {
 
   return (
     <form className="contact-form" onSubmit={handleSubmit}>
-      <h2>Contact Form:</h2>
+      <div className="contact-title">Message</div>
       <input
         type="text"
         name="name"
