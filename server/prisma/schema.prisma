@@ -64,7 +64,7 @@ model Task {
   priorityLevel Int
   startDate     DateTime
   endDate       DateTime
-  dependencies  String    @default("")
+  dependencies  String?   @default("")
   deleted       Boolean   @default(false)
   comments      Comment[]
   project       Project?  @relation(fields: [projectId], references: [id])
