@@ -125,7 +125,7 @@ const ProjectDetailPage: React.FC = () => {
       new Date(task.endDate),
       null, // You need to provide duration here
       null, // You need to provide percent complete here
-      task.dependencies,
+      console.log(task.dependencies),
     ]),
   ];
 
@@ -156,8 +156,6 @@ const ProjectDetailPage: React.FC = () => {
     setEditModalShow(true);
     setEditTask(task);
   };
-
-
 
   return (
     <div className="project1-container">
@@ -260,9 +258,9 @@ const ProjectDetailPage: React.FC = () => {
                       <strong>Completed Tasks:</strong>
                     </td>
                     <td>{countCompletedTasks(project.tasks)}</td>
-                    <td>
+                    {/* <td>
                       <Button variant="primary">Export data</Button>
-                    </td>
+                    </td> */}
                   </tr>
                 </tbody>
               </Table>
