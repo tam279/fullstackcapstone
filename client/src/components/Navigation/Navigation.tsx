@@ -22,7 +22,7 @@ const Navigation: FC = () => {
             <img
               id="logo"
               className="logo-custom align-self-center"
-              src="/vitralogo.png"
+              src="/vitraicon.png"
               alt="Logo"
             />
           </LinkContainer>

@@ -17,8 +17,8 @@ const AboutPage = () => {
                 <Row>
                     <Col md={6}>
                         <div className="about-facts">
-                            <h2 className="about-facts-title">8 Facts About Us:</h2>
-                            <ol type='1'>
+                            <h2 className="about-facts-title">8 Facts About Us</h2>
+                            <ol type='1' className="about-facts-list">
                                 <li>Vitra Service is a comprehensive IT solutions provider with over 12 years of industry experience.</li>
                                 <li>Specialization in providing tailored IT hardware and software solutions according to business needs.</li>
                                 <li>Their service suite encompasses Managed IT Solutions, Secure Remote Access Services, Proactive Maintenance, Active Directory & Exchange Management, and Disaster Recovery Planning.</li>
@@ -35,11 +35,11 @@ const AboutPage = () => {
                             <h2 className="it-services-title">Introduction to Vitra IT Services</h2>
                             <div className="it-services-description">
                                 <p>With 12 years of experience in Information Technology and the ability to resell IT hardware or software as needed, Vitra IT Services provides a range of consulting services, including:</p>
-                                <ol type='1'>
+                                <ul className="it-services-list">
                                     <li>Managed IT Solutions for Servers and Workstations</li>
                                     <li>Secure Remote Access Services SSL VPN</li>
                                     <li>Scheduled Proactive Maintenance</li>
-                                </ol>
+                                </ul>
                             </div>
                         </div>
                     </Col>
