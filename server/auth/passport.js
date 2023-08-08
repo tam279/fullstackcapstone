@@ -93,16 +93,17 @@ passport.use(
     async function send(user, token) {
       var link = `${process.env.FRONTEND_URL}/login?token=` + token;
       var mailOptions = {
-        from: process.env.EMAIL, // Replace with the from email address
+        from: "noreply@vitra-services.com", // Update with a suitable from email address
         to: user.email,
-        subject: "Sign in to Todos",
+        subject: "Password Reset for VITRA SERVICES",
         text:
-          "Hello! Click the link below to finish signing in to Todos.\r\n\r\n" +
-          link,
-        html:
-          '<h3>Hello!</h3><p>Click the link below to finish signing in to Todos.</p><p><a href="' +
+          "Hello!\r\n\r\nYou have requested a password reset for your VITRA SERVICES account. Click the link below to reset your password:\r\n\r\n" +
           link +
-          '">Sign in</a></p>',
+          "\r\n\r\nIf you did not request this reset, please ignore this email.\r\n\r\nBest regards,\r\nVITRA SERVICES Team",
+        html:
+          '<h3>Hello!</h3><p>You have requested a password reset for your VITRA SERVICES account. Click the link below to reset your password:</p><p><a href="' +
+          link +
+          '">Reset Password</a></p><p>If you did not request this reset, please ignore this email.</p><p>Best regards,<br>VITRA SERVICES Team</p>',
       };
 
       return transporter.sendMail(mailOptions);
