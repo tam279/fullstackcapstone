@@ -1,10 +1,21 @@
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the wrapper takes at least the viewport height */
+}
+
+.content-wrapper {
+  flex: 1; /* Let the content expand to fill the available space */
+}
+
 .container-custom {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 100vh;
-  padding: 20px;
+  margin-top: -170px;
 }
+
 
 .left-container {
   flex: 1;
@@ -23,11 +34,10 @@
 }
 
 .title-custom {
-  font-family: 'Lato';
+  font-family: 'Source Sans Pro', sans-serif;
   font-style: normal;
-  font-weight: 700;
-  font-size: 48px;
-  line-height: 40px;
+  font-weight: 600;
+  font-size: 49px;
   color: #000000;
 }
 
@@ -47,10 +57,11 @@
   margin-top: auto;
 }
 
-.logo-custom #biglogo {
+#biglogo {
   width: 200px;
   height: auto;
- }
+  border-radius: 5px; /* Add this line to round the corners */
+}
  
  
 .welcome-custom {

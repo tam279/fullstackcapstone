@@ -8,6 +8,8 @@ import Navigation from "../../components/Navigation/Navigation";
 import "./LoginPage.css";
 import config from "../../config";
 import NewPasswordModal from "../../modals/NewPasswordModal";
+import Card from "react-bootstrap/Card";
+import { Container } from "react-bootstrap";
 
 interface User {
   companyId: string;
@@ -30,6 +32,7 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [user, setUser] = useState<User | null>(null); // Use the User interface
   const [showModal, setShowModal] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   useEffect(() => {
     // Extract the magic link token from the URL query parameter
@@ -76,6 +79,7 @@ const LoginPage = () => {
         "An error occurred while sending the password reset email."
       );
     }
+    setShowForgotPassword(false);
   };
 
   const handleLogin = async (e: FormEvent) => {
@@ -130,12 +134,9 @@ const LoginPage = () => {
               alt="Vitra Logo"
               className="logo-custom-login"
             />
-            <h2>Welcome!</h2>
           </div>
 
           <div className="login-form mt-5">
-            <h3 className="text-center">Log in to Vitra Services</h3>
-
             <form onSubmit={handleLogin}>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
@@ -163,40 +164,54 @@ const LoginPage = () => {
                 />
               </div>
 
-              <div className="mb-3 form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="rememberMe"
-                />
-                <label className="form-check-label" htmlFor="rememberMe">
-                  Remember me
-                </label>
+              <div className="mb-3 form-check d-flex justify-content-between">
+                <div>
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="rememberMe"
+                  />
+                  <label className="form-check-label" htmlFor="rememberMe">
+                    Remember me
+                  </label>
+                </div>
+                <button
+                  className="btn btn-link"
+                  onClick={() => setShowForgotPassword(!showForgotPassword)}
+                >
+                  Forgot your password?
+                </button>
               </div>
-
               <button type="submit" className="btn btn-primary">
                 Log in
               </button>
             </form>
             <div className="forgot-password-container">
-              <h5 className="text-center">Forgot your password?</h5>
-              <form onSubmit={handleForgotPassword}>
-                <div className="mb-3">
-                  <label htmlFor="resetEmail" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="resetEmail"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                  />
-                </div>
-                <button type="submit" className="btn btn-link">
-                  Reset Password
-                </button>
-              </form>
+              {showForgotPassword && (
+                <Container className="mt-3">
+                  <Card>
+                    <Card.Body>
+                      <form onSubmit={handleForgotPassword}>
+                        <div className="mb-3">
+                          <label htmlFor="resetEmail" className="form-label">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            className="form-control"
+                            id="resetEmail"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                          />
+                        </div>
+                        <button type="submit" className="btn btn-link">
+                          Send reset password email.
+                        </button>
+                      </form>
+                    </Card.Body>
+                  </Card>
+                </Container>
+              )}
             </div>
             {/* <div className="text-center mt-3">
               <p>Or log in with:</p>

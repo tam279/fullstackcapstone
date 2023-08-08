@@ -1,10 +1,11 @@
 .services-content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
   padding: 20px;
-  text-align: left;
+  height: 100vh; /* Make sure the container takes up the full viewport height */
+  margin-top: -150px;
 }
 
 .services-title {
@@ -12,7 +13,7 @@
   font-family: 'Source Sans Pro', sans-serif;
   font-style: normal;
   font-weight: 600;
-  font-size: 96px;
+  font-size: 60px;
   line-height: 40px;
   color: #000000;
 }

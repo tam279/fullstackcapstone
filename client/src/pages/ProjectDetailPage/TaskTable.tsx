@@ -137,70 +137,43 @@ const TaskTable: React.FC<TaskTableProps> = ({
 
   return (
     <>
-      <Button variant="primary" onClick={handleEditModalShow}>
-        + New Task
-      </Button>
-      <button>Filter</button>
-      <div>
-        <label>Secondary Sort:</label>
-        <select
-          value={secondarySortField}
-          onChange={(e) =>
-            handleSecondarySort(e.target.value as keyof Task | "none")
-          }
-        >
-          <option value="none">None</option>
-          <option value="name">Name</option>
-          <option value="status">Status</option>
-          <option value="priorityLevel">Priority</option>
-          <option value="technicians">Technician name</option>
-          <option value="dependencies">Dependency</option>
-        </select>
-        {secondarySortField !== "none" && (
-          <select
-            value={secondarySortOrder}
-            onChange={(e) =>
-              handleSecondarySortOrder(e.target.value as "asc" | "desc")
-            }
-          >
-            <option value="asc">Asc</option>
-            <option value="desc">Desc</option>
-          </select>
-        )}
+      <div className="d-flex justify-content-between mb-3 mt-3">
+        <div>
+          <Button variant="primary" onClick={handleEditModalShow}>
+            + New Task
+          </Button>
+        </div>
+        <div className="d-flex align-items-center">
+          <span style={{ marginRight: "10px" }}>Secondary Sort:</span>
+          <div className="d-flex align-items-center">
+            <Form.Select
+              value={secondarySortField}
+              onChange={(e) =>
+                handleSecondarySort(e.target.value as keyof Task | "none")
+              }
+            >
+              <option value="none">None</option>
+              <option value="name">Name</option>
+              <option value="status">Status</option>
+              <option value="priorityLevel">Priority</option>
+              <option value="technicians">Technician name</option>
+              <option value="dependencies">Dependency</option>
+            </Form.Select>
+            {secondarySortField !== "none" && (
+              <Form.Select
+                value={secondarySortOrder}
+                onChange={(e) =>
+                  handleSecondarySortOrder(e.target.value as "asc" | "desc")
+                }
+              >
+                <option value="asc">Asc</option>
+                <option value="desc">Desc</option>
+              </Form.Select>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label>Filter by Name:</label>
-        <input
-          type="text"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
-        />
-        <label>Filter by Status:</label>
-        <input
-          type="text"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        />
-        <label>Filter by Priority:</label>
-        <input
-          type="text"
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-        />
-        <label>Filter by Technician:</label>
-        <input
-          type="text"
-          value={technicianFilter}
-          onChange={(e) => setTechnicianFilter(e.target.value)}
-        />
-        <label>Filter by Dependency:</label>
-        <input
-          type="text"
-          value={dependencyFilter}
-          onChange={(e) => setDependencyFilter(e.target.value)}
-        />
-      </div>
       <Table striped bordered hover className="mt-3">
         <thead>
           <tr>
@@ -222,6 +195,48 @@ const TaskTable: React.FC<TaskTableProps> = ({
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td>
+              <input
+                type="text"
+                value={nameFilter}
+                onChange={(e) => setNameFilter(e.target.value)}
+                placeholder="Filter by Name"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                placeholder="Filter by Status"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                placeholder="Filter by Priority"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                value={technicianFilter}
+                onChange={(e) => setTechnicianFilter(e.target.value)}
+                placeholder="Filter by Technician"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                value={dependencyFilter}
+                onChange={(e) => setDependencyFilter(e.target.value)}
+                placeholder="Filter by Dependency"
+              />
+            </td>
+          </tr>
           {filteredTasks.map((task) => (
             <tr key={task.id} onClick={() => handleTaskClick(task)}>
               <td>
@@ -236,9 +251,22 @@ const TaskTable: React.FC<TaskTableProps> = ({
                 </Button>
                 {task.name}
               </td>
-              <td>{task.status}</td>
               <td>
-                <Form.Control as="select">
+                <Form.Control
+                  as="select"
+                  className={`status-${task.status
+                    .toLowerCase()
+                    .replace(/ /g, "-")
+                    .replace(/_/g, "-")}`} // Replace underscores with hyphens
+                >
+                  <option>{task.status.replace(/_/g, " ")}</option>
+                </Form.Control>
+              </td>
+              <td>
+                <Form.Control
+                  as="select"
+                  className={`priority-${task.priorityLevel}`}
+                >
                   <option>{task.priorityLevel}</option>
                 </Form.Control>
               </td>
