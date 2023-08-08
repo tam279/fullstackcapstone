@@ -8,10 +8,12 @@
     flex: 1;
   }
   
-  .logo-custom-login {
-    width: 100px;  /* Adjust this value based on how big you want your logo to be */
-    height: auto;
-  }
+ 
+.logo-custom-login {
+  width: 250px; /* Increase the width for a slightly bigger image */
+  height: auto;
+  border-radius: 5px; /* Add rounded corners */
+}
   
   
   .login-form {

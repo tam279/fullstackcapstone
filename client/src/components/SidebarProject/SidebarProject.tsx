@@ -54,7 +54,7 @@ const SidebarProject: React.FC = () => {
         const decodedToken: any = jwt_decode(token);
         userEmail = decodedToken.sub;
       }
-      const user = users.find((user: User) => user.email === userEmail); 
+      const user = users.find((user: User) => user.email === userEmail);
       setCurrentUser(user);
       handleShow("profile");
     } catch (error) {
@@ -68,7 +68,11 @@ const SidebarProject: React.FC = () => {
       expand="lg"
     >
       <Navbar.Brand href="#" className="mb-3">
-        <Image src="/vitralogo.png" fluid />
+        <Image
+          src="/vitralogo.png"
+          fluid
+          style={{ borderRadius: "5px", width: "150px" }} // Adjust width as needed
+        />
       </Navbar.Brand>
 
       <h5
