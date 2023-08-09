@@ -1,3 +1,9 @@
+/* The above code is a TypeScript React component that represents a modal for editing a task. It is
+used to display a form with input fields for updating the details of a task, such as its name,
+description, status, priority level, start date, end date, technicians assigned to the task, and
+task dependencies. The component receives props such as the task to be edited, the project ID, and
+functions for handling the modal close event and task update event. The component also makes use of
+the React Bootstrap library for styling and form components. */
 import React, { FC, useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
@@ -10,12 +16,13 @@ import {
 } from "../../problemdomain/Interface/Interface";
 import { fetchUserData } from "../../problemdomain/DataService/DataService";
 
+// Props for the EditTaskModal component
 interface EditTaskModalProps {
   show: boolean;
   handleClose: () => void;
   task: Task;
   projectId: string;
-  onTaskUpdated: (updatedTask: Task) => void; // Added this line
+  onTaskUpdated: (updatedTask: Task) => void;
 }
 
 const EditTaskModal: FC<EditTaskModalProps> = ({
@@ -24,8 +31,10 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
   task,
   onTaskUpdated,
 }) => {
-  // Added onTaskUpdated here
+  // State for the list of users
   const [users, setUsers] = useState<User[]>([]);
+
+  // Form state to manage form inputs
   const [formValues, setFormValues] = useState({
     name: task.name,
     description: task.description,
@@ -38,10 +47,12 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     projectId: task.projectId,
   });
 
+  // State to remember the last fetched project ID to avoid re-fetching data
   const [lastFetchedProjectId, setLastFetchedProjectId] = useState<
     string | null
   >(null);
 
+  // Effect to fetch technicians related to a project
   useEffect(() => {
     const fetchProjectTechnicians = async () => {
       if (task.projectId !== lastFetchedProjectId) {
@@ -59,6 +70,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     fetchProjectTechnicians();
   }, [task.projectId, lastFetchedProjectId]); // Depend on task.projectId and lastFetchedProjectId
 
+  // Function to handle status changes with dependency checks
   const handleStatusChange = (newStatus: string) => {
     if (
       task?.status === Status.NOT_STARTED &&
@@ -75,6 +87,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     return true;
   };
 
+  // General form change handler
   const handleFormChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -117,6 +130,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     }
   };
 
+  // Function to handle deleting a task
   const handleDelete = async () => {
     try {
       await axios.delete(
@@ -128,6 +142,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     }
   };
 
+  // Function to handle form submission and task update
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
@@ -162,6 +177,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     }
   };
 
+  // Effect to reset form values when the task prop changes
   useEffect(() => {
     setFormValues({
       name: task.name,
@@ -176,6 +192,7 @@ const EditTaskModal: FC<EditTaskModalProps> = ({
     });
   }, [task]);
 
+  // Render the modal
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>

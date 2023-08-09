@@ -1,3 +1,12 @@
+/**
+ * The `Navigation` component is a functional component that renders a navigation bar with links to
+ * different pages and a login button.
+ * @returns The `Navigation` component is returning a JSX element that represents a navigation bar. The
+ * navigation bar consists of a Bootstrap Navbar component with a light background color. Inside the
+ * Navbar, there is a Container component that contains the logo and navigation links. The logo is
+ * wrapped in a LinkContainer component, which is a wrapper for React Router's Link component. The logo
+ * is an image with the id "logo"
+ */
 import React, { FC } from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";

@@ -1,3 +1,10 @@
+/* The above code is a TypeScript React component that represents a modal for editing a project. It is
+used to display a form with input fields for editing various properties of a project, such as name,
+start date, end date, manager, technicians, viewers, company, description, and active status. The
+component receives props such as the project to be edited, a function to close the modal, a function
+to refetch the projects after an update or deletion, and lists of users and companies for selecting
+managers, technicians, viewers, and companies. The component also includes functions to handle the
+update and deletion of */
 import React, { ChangeEvent, FC, useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
@@ -29,6 +36,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
   refetchProjects,
   companies,
 }) => {
+  // State initializations
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -39,6 +47,8 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
   const [isActive, setIsActive] = useState(false);
   const [description, setDescription] = useState("");
   const [users, setUsers] = useState<User[]>([]);
+
+  // Formatting project start and end dates
   const formattedStartDate = new Date(project.startDate)
     .toISOString()
     .split("T")[0];
@@ -46,6 +56,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
     .toISOString()
     .split("T")[0];
 
+  // Effect to set project data to component's state
   useEffect(() => {
     if (project) {
       setName(project.name);
@@ -73,11 +84,13 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
     }
   }, [project]);
 
+  // Fetch user data on component mount
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
+    // Fetching user data from DataService
     try {
       const userData = await fetchUserData();
       setUsers(userData);
@@ -87,6 +100,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
   };
 
   const handleUpdate = async () => {
+    // Function to handle project update
     try {
       const PROGRESS = 0;
       const ISOStartDate = new Date(startDate).toISOString();
@@ -115,6 +129,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
   };
 
   const handleDelete = async () => {
+    // Function to handle project deletion
     try {
       await axios.delete(`${config.backend}/api/project/${project?.id}`, {
         withCredentials: true,
@@ -130,6 +145,7 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
     e: ChangeEvent<unknown>,
     setState: React.Dispatch<React.SetStateAction<string[]>>
   ) => {
+    // Helper function to handle multiple select changes
     const selectedOptions = Array.from(
       (e.target as HTMLSelectElement).selectedOptions,
       (option) => option.value
@@ -142,9 +158,11 @@ const EditProjectModal: FC<EditProjectModalProps> = ({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
+    // Handler for company select change
     setCompanyId(e.target.value);
   };
 
+  // Render modal
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>

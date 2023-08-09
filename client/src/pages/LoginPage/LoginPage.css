@@ -1,3 +1,4 @@
+/* The CSS code you provided is defining styles for a login page. */
 .page-container {
     display: flex;
     flex-direction: column;
@@ -8,13 +9,11 @@
     flex: 1;
   }
   
- 
 .logo-custom-login {
-  width: 250px; /* Increase the width for a slightly bigger image */
+  width: 250px; 
   height: auto;
-  border-radius: 5px; /* Add rounded corners */
+  border-radius: 5px; 
 }
-  
   
   .login-form {
     display: flex;

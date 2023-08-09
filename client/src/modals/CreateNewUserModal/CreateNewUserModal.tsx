@@ -1,9 +1,12 @@
+/* The above code is a TypeScript React component that represents a modal for creating a new user. */
+// Import required modules and components from React and related libraries
 import React, { FC, useState, useEffect } from "react";
 import { Modal, Button, Form, Table } from "react-bootstrap";
 import { Company, User, Role } from "../../problemdomain/Interface/Interface";
 import { fetchCompanyData } from "../../problemdomain/DataService/DataService";
 import config from "../../config";
 
+// Define the type of props expected by NewUserModal component
 interface NewUserModalProps {
   show: boolean;
   onHide: () => void;
@@ -15,27 +18,30 @@ const NewUserModal: FC<NewUserModalProps> = ({
   onHide,
   onUserCreated,
 }) => {
+  // Define local states for user creation form
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [company, setCompany] = useState<Company | null>(null); // Change here
+  const [company, setCompany] = useState<Company | null>(null);
   const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [jobTitle, setJobTitle] = useState("");
-  const [tags, setTags] = useState(""); // Add tags
+  const [tags, setTags] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
 
+  // Fetch company data once when the component is mounted
   useEffect(() => {
     fetchCompanyData()
       .then((data) => {
-        // console.log("Companies:", data);
         setCompanies(data);
       })
       .catch((error) => console.error("Error:", error));
   }, []);
 
+  // Handle logic for user creation
   const handleCreateUser = () => {
+    // Ensure all required fields are filled
     if (
       !firstName ||
       !lastName ||
@@ -50,6 +56,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
       return;
     }
 
+    // Construct the user object
     const newUser = {
       firstName: firstName,
       lastName: lastName,
@@ -63,6 +70,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
       tags: tags,
     };
 
+    // Send the user data to the server for creation
     fetch(`${config.backend}/api/users`, {
       method: "POST",
       headers: {
@@ -85,6 +93,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
         console.error("Error:", error);
       });
 
+    // Reset the form fields
     setFirstName("");
     setLastName("");
     setCompany(null);
@@ -98,6 +107,7 @@ const NewUserModal: FC<NewUserModalProps> = ({
     onHide();
   };
 
+  // Render the user creation modal
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
@@ -250,4 +260,5 @@ const NewUserModal: FC<NewUserModalProps> = ({
   );
 };
 
+// Export the component for external use
 export default NewUserModal;

@@ -1,6 +1,7 @@
+/* The above code is a TypeScript React component for a login page. It imports necessary dependencies
+such as React, useState, useEffect, axios, and various components from react-bootstrap and
+react-router-dom. */
 import React, { useState, FormEvent, useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Footer from "../../components/Footer/Footer";
@@ -59,9 +60,6 @@ const LoginPage = () => {
         .catch((error) => {
           // Token verification failed or invalid token
           console.error("Error:", error.response.data.error);
-
-          // Redirect the user to the login page or display an error message
-          // navigate("/login");
         });
     }
   }, [navigate, location.search]);
@@ -113,15 +111,6 @@ const LoginPage = () => {
       console.error("Login failed:", error);
     }
   };
-
-  // const handleLogin = (e: FormEvent) => {
-  //   e.preventDefault();
-  //   navigate('/ChangePasswordPage');
-  // };
-
-  // const handleForgotPassword = () => {
-  //   navigate('/ForgotPasswordPage');
-  // };
 
   return (
     <div className="page-container">
@@ -213,12 +202,6 @@ const LoginPage = () => {
                 </Container>
               )}
             </div>
-            {/* <div className="text-center mt-3">
-              <p>Or log in with:</p>
-              <button className="btn btn-secondary me-2">Microsoft</button>
-              <button className="btn btn-secondary">Google</button>
-            </div> */}
-            {/* Implement forgot your password */}
           </div>
         </div>
       </div>

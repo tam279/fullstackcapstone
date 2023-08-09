@@ -1,10 +1,13 @@
+/* The code you provided is a TypeScript React component called `NewPasswordModal`. It is a modal
+component that allows the user to set a new password. */
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import axios from "axios"; // Import Axios library
+import axios from "axios";
 import config from "../config";
 
+// Type definition for the NewPasswordModal component's props
 interface NewPasswordModalProps {
   show: boolean;
   userId: string | null;
@@ -16,22 +19,28 @@ const NewPasswordModal: React.FC<NewPasswordModalProps> = ({
   userId,
   token,
 }) => {
+  // State variables
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(true);
 
+  // Handler for the password input change event
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
 
+  // Handler for the confirmPassword input change event
   const handleConfirmPasswordChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setConfirmPassword(event.target.value);
   };
 
+  // Handler for the form submission event
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Check if the passwords match
     if (password === confirmPassword) {
       setPasswordsMatch(true);
 
@@ -47,7 +56,7 @@ const NewPasswordModal: React.FC<NewPasswordModalProps> = ({
           Authorization: `Bearer ${token}`,
         };
 
-        // Make the POST request to the /newpassword endpoint with the user ID and password
+        // POST request to update the password
         const response = await axios.post(
           `${config.backend}/newpassword`, // Replace with your backend API endpoint URL
           requestData,
@@ -67,6 +76,7 @@ const NewPasswordModal: React.FC<NewPasswordModalProps> = ({
     }
   };
 
+  // Render the modal component
   return (
     <Modal show={show} backdrop="static" keyboard={false}>
       <Modal.Header style={{ borderBottom: "none" }}>

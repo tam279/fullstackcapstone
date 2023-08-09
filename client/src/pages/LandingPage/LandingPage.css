@@ -1,11 +1,13 @@
+/* The CSS code provided defines the styles for various elements in a web page. Here is a breakdown of
+what each class and ID does: */
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Ensure the wrapper takes at least the viewport height */
+  min-height: 100vh; 
 }
 
 .content-wrapper {
-  flex: 1; /* Let the content expand to fill the available space */
+  flex: 1; 
 }
 
 .container-custom {
@@ -60,7 +62,7 @@
 #biglogo {
   width: 200px;
   height: auto;
-  border-radius: 5px; /* Add this line to round the corners */
+  border-radius: 5px; 
 }
  
  

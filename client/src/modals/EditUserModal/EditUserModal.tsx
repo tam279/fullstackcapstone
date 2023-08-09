@@ -1,3 +1,8 @@
+/* The above code is a TypeScript React component that represents a modal for editing user details. It
+imports necessary modules from packages such as React, react-bootstrap, and axios. The component
+takes in various props such as the user to be edited, companies and roles dropdown values, and
+functions for updating and deleting users. */
+// Import necessary modules from their respective packages.
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Table } from "react-bootstrap";
 import axios from "axios";
@@ -8,6 +13,7 @@ import {
   Role,
 } from "../../problemdomain/Interface/Interface";
 
+// Define prop types for the EditUserModal component.
 interface EditUserModalProps {
   show: boolean;
   onHide: () => void;
@@ -20,6 +26,7 @@ interface EditUserModalProps {
   onUserUpdated: () => void;
 }
 
+// Define the EditUserModal functional component.
 const EditUserModal: React.FC<EditUserModalProps> = ({
   show,
   onHide,
@@ -29,6 +36,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   roles,
   onUserUpdated,
 }) => {
+  // State declarations for various user attributes.
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [company, setCompany] = useState(user.company ? user.company.id : "");
@@ -37,6 +45,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [jobTitle, setJobTitle] = useState(user.jobTitle);
   const [tags, setTags] = useState(user.tags);
 
+  // Side-effect to update local state whenever user prop or related dropdown values change.
   useEffect(() => {
     if (user) {
       setFirstName(user.firstName);
@@ -45,22 +54,20 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       setJobTitle(user.jobTitle);
       setRole(user.role);
       setCompany(user.company ? user.company.id : "");
-      setTags(user.tags || ""); // update 'tags' state whenever 'user' prop changes
-
-      // console.log("user:", user);
-      // console.log("user.id:", user.id);
+      setTags(user.tags || ""); // Safely handle potentially null or undefined tags.
     }
   }, [user, companies, roles]);
 
+  // Handler for form submission to update user details.
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // if companyId is null, handle it accordingly
+    // Guard clause for missing company.
     if (!company) {
-      // handle the situation here
       return;
     }
 
+    // Construct updated user object.
     const updatedUser: UserInterface = {
       ...user,
       firstName: firstName,
@@ -69,12 +76,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       phoneNumber: phoneNumber,
       jobTitle: jobTitle,
       role: role,
-      tags: tags, // add 'tags' field to the 'updatedUser' object
+      tags: tags,
     };
 
     try {
+      // Send updated user data to backend and refresh user list.
       await axios.put(`${config.backend}/api/user/${user.id}`, updatedUser);
-      await fetchUsers(); // it will now fetch and update the user data in the parent component
+      await fetchUsers();
       onHide();
       onUserUpdated();
     } catch (error) {
@@ -82,8 +90,10 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   };
 
+  // Handler for user deletion.
   const handleDelete = async () => {
     try {
+      // Delete user from backend and refresh user list.
       await axios.delete(`${config.backend}/api/user/${user.id}`);
       fetchUsers();
       onHide();
@@ -92,6 +102,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   };
 
+  // Return JSX for the modal.
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>

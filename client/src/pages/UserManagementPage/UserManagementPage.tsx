@@ -1,3 +1,5 @@
+/* The above code is a TypeScript React component for a User Management page. It includes functionality
+for displaying and managing user and company data. */
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Button,
@@ -22,9 +24,14 @@ import EditUserModal from "../../modals/EditUserModal/EditUserModal";
 import EditCompanyModal from "../../modals/EditCompanyModal/EditCompanyModal";
 
 const UserManagementPage = () => {
+  // State management for user and company data
   const [userData, setUserData] = useState<User[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
+
+  // State management for tab navigation
   const [activeTab, setActiveTab] = useState<string | null>("userlist");
+
+  // State management for showing/hiding modals
   const [showModal, setShowModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -34,12 +41,13 @@ const UserManagementPage = () => {
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
+  // State management for user and company filters/sorts
   const [userFilter, setUserFilter] = useState("");
   const [userSort, setUserSort] = useState<"asc" | "desc">("asc");
-
   const [companyFilter, setCompanyFilter] = useState("");
   const [companySort, setCompanySort] = useState<"asc" | "desc">("asc");
 
+  // Filtering and sorting functions for users and companies
   const filterAndSortUsers = (users: User[]) => {
     return users
       .filter((user) =>
@@ -72,7 +80,7 @@ const UserManagementPage = () => {
         }
       });
   };
-
+  // Fetching functions for user and company data
   const fetchAndSetUserData = async () => {
     try {
       const newUserData = await fetchUserData();
@@ -90,7 +98,7 @@ const UserManagementPage = () => {
       console.error("Error:", error);
     }
   };
-
+  // UseEffect to fetch initial user and company data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -128,6 +136,7 @@ const UserManagementPage = () => {
     setShowEditCompanyModal(false);
   };
 
+  // JSX render of the User Management page
   return (
     <Container fluid>
       <Row>

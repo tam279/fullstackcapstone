@@ -1,3 +1,5 @@
+/* The above code is a TypeScript React component that represents a modal for displaying task details
+and comments. It is used to view and interact with a specific task within a project. */
 import React, { FC, useEffect, useState } from "react";
 import {
   Modal,
@@ -21,6 +23,7 @@ import moment from "moment";
 import "./TaskDetailModal.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
+// Define the component props
 interface TaskDetailModalProps {
   show: boolean;
   handleClose: () => void;
@@ -37,6 +40,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
   projectId,
   onTaskUpdated,
 }) => {
+  // State setup for managing task and comments
   const [task, setTask] = useState<Task | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -47,11 +51,15 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
   } | null>(null);
   const loggedInUserId = localStorage.getItem("userId");
 
+  // Ref for handling file uploads
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // Handler for file uploads
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Extract files from event
     const files = e.target.files;
 
+    // Handle file selection or deselection
     if (files && files.length > 0) {
       // When the file input changes and there is at least one file, update the selectedFile state with the chosen file
       setSelectedFile(files[0]);
@@ -101,7 +109,9 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     }
   };
 
+  // Effect to fetch task details and comments when the modal is shown
   useEffect(() => {
+    // Fetch the specific task details
     const fetchTask = async () => {
       try {
         const taskResponse = await axios.get(
@@ -113,6 +123,7 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
       }
     };
 
+    // Fetch all comments for the specific task
     const fetchComments = async () => {
       try {
         const commentsResponse = await axios.get(
@@ -133,19 +144,24 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
       }
     };
 
+    // Only run fetch functions if the modal is shown
     if (show) {
       fetchTask();
       fetchComments();
     }
 
+    // Poll for new comments every 5 seconds
     const intervalId = setInterval(fetchComments, 5000); // Fetches comments every 5 seconds
 
+    // Cleanup interval on effect cleanup
     return () => {
       clearInterval(intervalId); // Clears the interval on component unmount
     };
   }, [show, taskId, projectId]);
 
+  // Function to update the status of the task
   const updateTaskStatus = async (newStatus: string | null) => {
+    // Fallback to current task status
     if (newStatus === null) {
       newStatus = task?.status || "";
     }
@@ -216,6 +232,8 @@ const TaskComponent: FC<TaskDetailModalProps> = ({
     }
   };
 
+ /* The above code is rendering a modal component in a TypeScript React application. The modal displays
+ task details and comments. */
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>

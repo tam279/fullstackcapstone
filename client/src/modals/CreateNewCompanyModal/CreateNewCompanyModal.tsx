@@ -3,37 +3,43 @@ import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
 
+// Type definition for the component's props
 interface NewCompanyModalProps {
   show: boolean;
   onHide: () => void;
 }
 
+// Component definition
 const NewCompanyModal: FC<NewCompanyModalProps & { onSuccess: () => void }> = ({
   show,
   onHide,
   onSuccess,
 }) => {
+  // Local state to manage form input values
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [website, setWebsite] = useState("");
 
+  // Handler to submit the form data
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent default form submission behavior
     try {
+      // Sending the data to the server using POST request
       await axios.post(`${config.backend}/api/companies`, {
         name,
         address,
         phoneNumber,
         website,
       });
-      onHide();
-      onSuccess(); // After successful creation, call the onSuccess function
+      onHide(); // Hide the modal after successful submission
+      onSuccess(); // Callback for successful data submission
     } catch (error) {
-      console.error(error);
+      console.error(error); // Log any errors encountered during submission
     }
   };
 
+  // Render the modal form
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
@@ -96,4 +102,5 @@ const NewCompanyModal: FC<NewCompanyModalProps & { onSuccess: () => void }> = ({
   );
 };
 
+// Exporting the component for use in other parts of the application
 export default NewCompanyModal;

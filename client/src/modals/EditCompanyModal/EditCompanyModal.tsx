@@ -1,9 +1,17 @@
+/**
+ * The above code is a TypeScript React component that renders a modal for editing company details,
+ * including name, address, phone number, and website, and allows for updating and deleting the
+ * company.
+ * @param  - - `onHide`: a function that will be called when the modal is closed or hidden
+ * @returns The EditCompanyModal component is being returned.
+ */
 import React, { useState } from "react";
 import { Form, Modal, Button } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
 import { Company } from "../../problemdomain/Interface/Interface";
 
+// Define properties for the EditCompanyModal component
 interface EditCompanyModalProps {
   onHide: () => void;
   show: boolean;
@@ -17,11 +25,13 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({
   company,
   fetchCompanies,
 }) => {
+  // State hooks for managing company details
   const [name, setName] = useState(company?.name || "");
   const [address, setAddress] = useState(company?.address || "");
   const [phoneNumber, setPhoneNumber] = useState(company?.phoneNumber || "");
   const [website, setWebsite] = useState(company?.website || "");
 
+  // Handler for updating the company details
   const handleUpdateCompany = async () => {
     const updatedCompany = {
       name,
@@ -30,6 +40,7 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({
       website,
     };
     try {
+      // API call to update the company details using axios
       await axios.put(
         `${config.backend}/api/company/${company.id}`,
         updatedCompany
@@ -40,9 +51,10 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({
       console.error(error);
     }
   };
-
+  // Handler for deleting the company
   const handleDeleteCompany = async () => {
     try {
+      // API call to delete the company using axios
       await axios.delete(`${config.backend}/api/company/${company.id}`);
       fetchCompanies();
       onHide();
@@ -51,6 +63,7 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({
     }
   };
 
+  // Return the EditCompanyModal component
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>

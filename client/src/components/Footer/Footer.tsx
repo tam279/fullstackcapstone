@@ -1,3 +1,9 @@
+/**
+ * The `Footer` component is a functional component in TypeScript React that renders a footer with a
+ * title, copyright information, and links.
+ * @returns The `Footer` component is returning a JSX element representing the footer section of a
+ * website.
+ */
 import React, { FC } from "react";
 import "./Footer.css";
 

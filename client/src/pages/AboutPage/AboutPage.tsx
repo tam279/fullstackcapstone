@@ -1,20 +1,40 @@
+/**
+ * The above code is a TypeScript React component that renders the content for an about page, including
+ * a navigation component, a title, two columns with information about Vitra IT Services, and a footer.
+ * @returns The AboutPage component is returning a JSX element. It consists of a parent div with the
+ * className "about-page" that contains the following components and elements:
+ */
+// Required modules and components
 import React from "react";
 import "./AboutPage.css";
 import Navigation from "../../components/Navigation/Navigation";
 import Footer from "../../components/Footer/Footer";
 import { Container, Row, Col } from "react-bootstrap";
 
+/**
+ * The AboutPage component is a React component that renders the content for an about page, including a
+ * navigation component, a title, two columns with information about Vitra IT Services, and a footer.
+ * @returns The AboutPage component is returning a JSX element. It consists of a parent div with the
+ * className "about-page" that contains the following components and elements:
+ */
+// AboutPage component definition
 const AboutPage = () => {
   return (
+    // Parent container for the about page
     <div className="about-page">
+      {/* Top navigation component */}
       <Navigation />
+      {/* Main content container */}
       <Container>
+        {/* Row to display the title of the page */}
         <Row>
           <Col>
             <h1 className="about-title">About Us</h1>
           </Col>
         </Row>
+        {/* Two columns layout for different sections */}
         <Row>
+          {/* First column - Introduction to Vitra IT Services */}
           <Col md={6}>
             <div className="it-services">
               <h2 className="it-services-title">
@@ -34,6 +54,7 @@ const AboutPage = () => {
               </div>
             </div>
           </Col>
+          {/* Second column - 8 Facts About Vitra IT Services */}
           <Col md={6}>
             <div className="about-facts">
               <h2 className="about-facts-title">8 Facts About Us</h2>
@@ -79,5 +100,5 @@ const AboutPage = () => {
     </div>
   );
 };
-
+// Export the AboutPage component for use in other parts of the application
 export default AboutPage;

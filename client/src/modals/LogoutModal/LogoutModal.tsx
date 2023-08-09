@@ -1,13 +1,19 @@
+/**
+ * The above code is a TypeScript React component that renders a logout confirmation modal.
+ */
 import React, { FC } from "react";
 import { Modal, Button } from "react-bootstrap";
 
+// Define the prop types for the LogoutModal component.
 interface LogoutModalProps {
-  show: boolean;
-  onHide: () => void;
-  logout: () => void;
+  show: boolean; // Boolean to indicate whether the modal should be shown or hidden.
+  onHide: () => void; // Callback function to hide the modal.
+  logout: () => void; // Callback function to execute additional logout logic.
 }
 
+// Define the LogoutModal functional component.
 const LogoutModal: FC<LogoutModalProps> = ({ show, onHide, logout }) => {
+  // Handler for the logout action.
   const handleLogout = () => {
     // Call the logout function to perform the logout logic
     logout();
@@ -17,6 +23,7 @@ const LogoutModal: FC<LogoutModalProps> = ({ show, onHide, logout }) => {
     localStorage.removeItem("userRole");
   };
 
+  // Return JSX for the logout confirmation modal.
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
@@ -35,4 +42,5 @@ const LogoutModal: FC<LogoutModalProps> = ({ show, onHide, logout }) => {
   );
 };
 
+// Export the LogoutModal component for use in other parts of the application.
 export default LogoutModal;

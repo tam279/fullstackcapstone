@@ -1,5 +1,8 @@
+/* The CSS code `.comments-container` is targeting an HTML element with the class name
+"comments-container". It is setting the height of the element to 400 pixels and applying the
+`overflow-y: auto;` property, which means that if the content inside the element exceeds the height,
+a vertical scrollbar will appear to allow scrolling through the content. */
 .comments-container {
     height: 400px;
-    /* adjust as needed */
     overflow-y: auto;
 }

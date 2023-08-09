@@ -1,3 +1,7 @@
+/* The code you provided is a CSS code block that defines the styles for a contact page. It includes
+various CSS selectors and properties to style different elements on the page. */
+/* The code you provided is a CSS code block that defines the styles for a contact page. It includes
+various CSS selectors and properties to style different elements on the page. */
 /* ContactPage.css */
 .contact-title {
     font-family: 'Source Sans Pro', sans-serif;
@@ -13,22 +17,22 @@
 }
 
 .contact-container {
-    margin-top: 50px; /* add some margin to the top of the container */
+    margin-top: 50px; 
 }
 
 .contact-details {
-    margin-top: 50px; /* reduce margin-top value */
+    margin-top: 50px; 
 }
 
 .contact-item h3 {
-    color: #2F5CAC; /* make your labels stand out */
+    color: #2F5CAC; 
 }
 
 .contact-form {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-top: 50px; /* reduce margin-top value */
+    margin-top: 50px; 
 }
 
 .contact-form input,
@@ -38,7 +42,7 @@
     margin-bottom: 15px;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #2F5CAC; /* Add a border to make your input fields stand out */
+    border: 1px solid #2F5CAC; 
 }
 
 .contact-form textarea {
@@ -52,6 +56,6 @@
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 10px; /* Add some margin to the top of the button */
-    width: 100%; /* Make the button fill the width of the form */
+    margin-top: 10px; 
+    width: 100%; 
 }

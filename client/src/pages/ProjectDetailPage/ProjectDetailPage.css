@@ -1,7 +1,7 @@
-/* Add your existing styles here */
+/* The CSS code provided is defining styles for various elements in a web page. */
 
 .priority-1 {
-  /* No specific background color for priority 1 */
+background-color:white;
 }
 
 .priority-2 {
@@ -27,8 +27,7 @@ td .status-completed {
 }
 
 td .status-not-started {
-  /* No specific background color for Not Started status */
-}
+background-color: white;}
 
 td .status-in-progress {
   background-color: #007bff; /* Blue for In Progress status */
@@ -73,4 +72,3 @@ body {
   color: #32324d;
 }
 
-/* Rest of your CSS... */

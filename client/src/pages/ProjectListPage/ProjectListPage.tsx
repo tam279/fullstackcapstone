@@ -1,4 +1,7 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+/* The above code is a TypeScript React component for a project list page. It imports necessary
+libraries and components, sets up state variables, and defines various functions and hooks. */
+// Importing necessary libraries and components
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SidebarProject from "../../components/SidebarProject/SidebarProject";
 import { Button, Table, Form } from "react-bootstrap";
@@ -20,26 +23,26 @@ import { Link } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 
 const ProjectListPage = () => {
+  // State for managing various pieces of data
   const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<User[]>([]); // Add this line to hold users
-  const [companies, setCompanies] = useState<Company[]>([]); // Add this line to hold companies
+  const [users, setUsers] = useState<User[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [show, setShow] = useState(false);
-  const [showEdit, setShowEdit] = useState(false); // Added this line
+  const [showEdit, setShowEdit] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  // States for filter and sort
-  const [displayedProjects, setDisplayedProjects] = useState<Project[]>([]); // <-- Corrected state variable name
-  const token = localStorage.getItem("jwtToken");
 
+  // States for filtering and sorting projects
+  const [displayedProjects, setDisplayedProjects] = useState<Project[]>([]);
+  const token = localStorage.getItem("jwtToken");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState("name");
 
+  // Decode JWT token and fetch user details
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
       const decodedToken: any = jwt_decode(token);
-
-      // Fetch user details using the email from the decoded token
       axios
         .get(`${config.backend}/api/user/email/${decodedToken.sub}`)
         .then((response) => {
@@ -51,6 +54,7 @@ const ProjectListPage = () => {
     }
   }, []);
 
+  // Filter and sort the projects based on user input
   useEffect(() => {
     const filteredProjects = projects
       .filter((project) =>
@@ -64,15 +68,15 @@ const ProjectListPage = () => {
             return (
               new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
             );
-          // Add similar cases for other properties
           default:
             return 0;
         }
       });
 
-    setDisplayedProjects(filteredProjects); // <-- Use setDisplayedProjects instead of setFilteredProjects
+    setDisplayedProjects(filteredProjects);
   }, [searchTerm, sortKey, projects]);
 
+  // Fetch the current user data using the decoded token
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
@@ -80,14 +84,18 @@ const ProjectListPage = () => {
       setCurrentUser(decodedToken.user);
     }
   }, []);
+
+  // Navigation hook
   const navigate = useNavigate();
 
+  // Fetch initial data for projects, users, and companies
   useEffect(() => {
     fetchProjects();
     fetchUsers();
     fetchCompanies();
   }, []);
 
+  // Fetch all projects from the API
   const fetchProjects = () => {
     axios
       .get(`${config.backend}/api/projects`, {
@@ -107,22 +115,27 @@ const ProjectListPage = () => {
         }
       });
   };
+
+  // Fetch all users using the provided service
   const fetchUsers = async () => {
     const fetchedUsers = await fetchUserData();
     setUsers(fetchedUsers);
   };
 
+  // Fetch all companies using the provided service
   const fetchCompanies = async () => {
     const fetchedCompanies = await fetchCompanyData();
     setCompanies(fetchedCompanies);
   };
 
+  // Handlers to control the visibility of modals
   const handleClose = () => {
     setShow(false);
     setShowEdit(false);
-  }; // Updated this line
+  };
   const handleShow = () => setShow(true);
 
+  // Handle clicking on a project to navigate to its details
   const handleProjectClick = (project: Project) => {
     const projectPath = `/project/${project.id}`;
     navigate(projectPath);

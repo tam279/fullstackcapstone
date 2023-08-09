@@ -1,5 +1,10 @@
+/* The above code is a TypeScript React component that represents a modal for creating a new project.
+It uses React Bootstrap components for the modal, form, and buttons. The component receives props
+such as `show` (to control the visibility of the modal), `handleClose` (a function to close the
+modal), `companies` (an array of company objects), and `refetchProjects` (a function to refresh the
+projects after successful creation). */
 import React, { FC, useState, useEffect, ChangeEvent } from "react";
-import { Modal, Button, Form, Row, Col, Table } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 import config from "../../config";
 import {
@@ -11,8 +16,7 @@ import {
   fetchCompanyData,
 } from "../../problemdomain/DataService/DataService";
 
-/* The `CreateNewProjectModalProps` interface defines the props that are passed to the
-`CreateNewProjectModal` component. */
+// Props type definition for the CreateNewProjectModal component
 interface CreateNewProjectModalProps {
   show: boolean;
   handleClose: () => void;
@@ -20,13 +24,12 @@ interface CreateNewProjectModalProps {
   refetchProjects: () => void;
 }
 
-/* The code block is defining a functional component called `CreateNewProjectModal` that takes in props
-of type `CreateNewProjectModalProps`. */
 const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
   show,
   handleClose,
   refetchProjects,
 }) => {
+  // Local state definitions for the form fields and fetched data
   const [name, setName] = useState("");
   const [manager, setManager] = useState("");
   const [technicians, setTechnicians] = useState<string[]>([]);
@@ -39,18 +42,13 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
   const [users, setUsers] = useState<User[]>([]);
   const [companies, setCompanies] = useState<CompanyInterface[]>([]);
 
-  /**
-   * The function converts a given date string to an ISO string with full precision.
-   * @param {string} dateString - The `dateString` parameter is a string representing a date. It is
-   * used to create a new `Date` object.
-   * @returns The function `toISOStringWithFullPrecision` returns a string representation of the given
-   * date in ISO 8601 format with full precision.
-   */
+  // Utility function to convert a date string to full ISO string
   const toISOStringWithFullPrecision = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toISOString();
   };
 
+  // Fetch users and companies on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -66,29 +64,27 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
     fetchData();
   }, []);
 
-  /**
-   * The handleSubmit function is used to handle form submission in a TypeScript React application,
-   * where it sends a POST request to create a new project with the provided data.
-   * @param event - The event parameter is of type React.FormEvent<HTMLFormElement>. It represents the
-   * form submission event triggered by the user.
-   * @returns The function does not explicitly return anything.
-   */
+  // Handler to process form submission
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Format the start and end date for proper server-side processing
     const formattedStartDate = toISOStringWithFullPrecision(startDate);
     const formattedEndDate = toISOStringWithFullPrecision(endDate);
 
+    // Find the manager's user object based on the selected manager name
     const managerUser = users.find(
       (user) => `${user.firstName} ${user.lastName}` === manager
     );
 
+    // Validate the manager selection
     if (!managerUser) {
       alert("Please select a manager before submitting");
       return;
     }
 
     try {
+      // Make a POST request to create a new project
       const response = await axios.post(
         `${config.backend}/api/projects`,
         {
@@ -107,6 +103,7 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
         }
       );
 
+      // Close the modal and refresh the projects after successful creation
       handleClose();
       refetchProjects();
     } catch (err) {
@@ -114,17 +111,12 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
     }
   };
 
-  /**
-   * The function "handleCompanyChange" is a TypeScript function that handles the change event of a HTML
-   * select element and updates the state variable "companyId" with the selected value.
-   * @param e - The parameter `e` is of type `ChangeEvent<HTMLSelectElement>`. This means it is an event
-   * object that is triggered when the value of a `<select>` element changes.
-   */
+  // Handler for when a company is selected
   const handleCompanyChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setCompanyId(e.target.value);
   };
-  // console.log(e.target.value); // Add this line
 
+  // Render the modal containing the project creation form
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -234,23 +226,6 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
               defaultValue="Welcome 👋This project involves developing a custom ERP (Enterprise Resource Planning) software solution for Acme Corporation. The ERP system will integrate various business functions, including finance, human resources, supply chain management, and customer relationship management, into a single, streamlined software platform. The project will encompass the full software development life cycle, from requirements gathering and system design to development, testing, deployment, and post-implementation support."
             />
           </Form.Group>
-          {/* <Form.Group>
-            <Form.Label>Status</Form.Label>
-            <Form.Control
-              type="text"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            />
-          </Form.Group> */}
-          {/* 
-          <Form.Group>
-            <Form.Label>Is Deleted</Form.Label>
-            <Form.Check
-              type="checkbox"
-              checked={isDeleted}
-              onChange={(e) => setIsDeleted(e.target.checked)}
-            />
-          </Form.Group> */}
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
@@ -263,4 +238,5 @@ const CreateNewProjectModal: FC<CreateNewProjectModalProps> = ({
   );
 };
 
+// Exporting the component for use in other parts of the application
 export default CreateNewProjectModal;

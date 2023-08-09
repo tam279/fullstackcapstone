@@ -1,3 +1,5 @@
+/* The code is defining a React component called `ChangePasswordModal`. This component is a modal that
+allows the user to change their password. */
 import React, { FC, ChangeEvent, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import "./ChangePasswordModal.css";

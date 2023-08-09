@@ -1,3 +1,7 @@
+/* The above code is a TypeScript React component that represents a modal for creating a new task. It
+imports necessary dependencies from React, react-bootstrap, axios, and a configuration file. It also
+imports interfaces for User, Project, Status, and Task from a problem domain folder. */
+// Import necessary dependencies
 import React, { FC, useEffect, useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
@@ -10,6 +14,7 @@ import {
 } from "../../problemdomain/Interface/Interface";
 import { fetchUserData } from "../../problemdomain/DataService/DataService";
 
+// Define the props type for the CreateTaskModal component
 interface CreateTaskModalProps {
   show: boolean;
   handleClose: () => void;
@@ -17,14 +22,17 @@ interface CreateTaskModalProps {
   addNewTask: (task: Task) => void; // Add this line
 }
 
+// CreateTaskModal component definition
 const CreateTaskModal: FC<CreateTaskModalProps> = ({
   show,
   handleClose,
   projectId,
   addNewTask,
 }) => {
+  // State for storing technicians (users) associated with a project
   const [users, setUsers] = useState<User[]>([]);
 
+  // State for form values
   const [formValues, setFormValues] = useState({
     name: "",
     description: "",
@@ -37,13 +45,14 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     projectId: projectId,
   });
 
+  // Utility function to convert a date string to ISO format with full precision
   const toISOStringWithFullPrecision = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toISOString();
   };
 
   useEffect(() => {
-    // Fetch technicians when the component mounts
+    // Fetch technicians associated with the current project when the component mounts
     const fetchProjectTechnicians = async () => {
       const userData = await fetchUserData();
       const projectTechnicians = userData.filter((user: User) =>
@@ -55,10 +64,10 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     };
 
     fetchProjectTechnicians();
-  }, []); // Add empty dependency array to run only once when component mounts
+  }, []); // Dependency array is empty so this useEffect runs once when component mounts
 
   useEffect(() => {
-    // Clear selected technicians when the modal closes
+    // Clear selected technicians from the form state when the modal closes
     if (!show) {
       setFormValues((prevValues) => ({
         ...prevValues,
@@ -67,6 +76,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     }
   }, [show]);
 
+  // Handle form field changes and update form state
   const handleFormChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -99,14 +109,15 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     }
   };
 
+  // Handle the form submission to create a new task
   const handleFormSubmit = async () => {
     try {
-      // Extract technician ids from the users state
+      // Extract technician ids based on selected emails from the form state
       const technicianIds = users
         .filter((user) => formValues.technicians.includes(user.email))
         .map((user) => user.id);
 
-      // Create the task data with the correct structure
+      // Construct the task data for submission
       const taskData = {
         name: formValues.name,
         description: formValues.description,
@@ -119,6 +130,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
         projectId: formValues.projectId,
       };
 
+      // Make a POST request to create the task
       const response = await axios.post(
         `${config.backend}/api/project/${formValues.projectId}/tasks`,
         taskData
@@ -132,6 +144,7 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
     }
   };
 
+  // Render the modal component with the form inside
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
@@ -256,4 +269,5 @@ const CreateTaskModal: FC<CreateTaskModalProps> = ({
   );
 };
 
+// Export the component for use in other parts of the application
 export default CreateTaskModal;

@@ -1,6 +1,6 @@
+// Importing necessary libraries and components
 import React, { useEffect, useState } from "react";
-import { Button, Tabs, Tab, Table, Form } from "react-bootstrap";
-import { AiFillEdit } from "react-icons/ai";
+import { Tabs, Tab, Table } from "react-bootstrap";
 import "./ProjectDetailPage.css";
 import { Chart } from "react-google-charts";
 import SidebarProject from "../../components/SidebarProject/SidebarProject";
@@ -10,23 +10,17 @@ import EditTaskModal from "../../modals/EditTaskModal/EditTaskModal";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import config from "../../config";
-import {
-  User,
-  Project,
-  Task,
-  Company,
-  Status, // Import Status enum
-} from "../../problemdomain/Interface/Interface";
-import {
-  fetchUserData,
-  fetchCompanyData,
-} from "../../problemdomain/DataService/DataService";
+import { Project, Task, Status } from "../../problemdomain/Interface/Interface";
 import TaskTable from "./TaskTable";
 
+// Define type for TabKey
 type TabKey = "Tasks" | "Grantt" | "Details";
 
 const ProjectDetailPage: React.FC = () => {
+  // Using React Router's useParams to get project ID from URL
   const { projectId } = useParams<{ projectId: string }>();
+
+  // State management for the component
   const [tasks, setTasks] = useState<Task[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -37,22 +31,25 @@ const ProjectDetailPage: React.FC = () => {
   const [createTaskModalShow, setCreateTaskModalShow] = useState(false);
   const [newTaskId, setNewTaskId] = useState<string | null>(null);
   const [editTask, setEditTask] = useState<Task | null>(null);
+  const [updatedTask, setUpdatedTask] = useState<Task | null>(null);
 
+  // Handler for closing the modal
   const handleClose = () => {
     setShow(false);
     setNewTaskId(null); // reset newTaskId state when modal is closed
   };
 
+  // Handlers for showing modals
   const handleShow = () => setCreateTaskModalShow(true);
   const handleEditModalShow = () => setEditModalShow(true);
 
+  // Handler for closing the edit modal
   const handleEditModalClose = () => {
     setEditModalShow(false);
-    setEditTask(null); // Reset editTask state when modal is closed
+    setEditTask(null);
   };
 
-  const [updatedTask, setUpdatedTask] = useState<Task | null>(null);
-
+  // Function to update a task
   const updateTask = async (task: Task) => {
     try {
       const response = await axios.put(
@@ -69,6 +66,7 @@ const ProjectDetailPage: React.FC = () => {
     }
   };
 
+  // useEffect to fetch tasks and handle task updates
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -93,10 +91,9 @@ const ProjectDetailPage: React.FC = () => {
     fetchTasks();
   }, [projectId, updatedTask, newTaskId]);
 
+  // useEffect to fetch project details
   useEffect(() => {
     const fetchProject = async () => {
-      // console.log("fetchProjects is called");
-
       if (projectId) {
         const response = await axios.get(
           `${config.backend}/api/project/${projectId}`
@@ -108,6 +105,17 @@ const ProjectDetailPage: React.FC = () => {
     fetchProject();
   }, [projectId]);
 
+  // Helper function to calculate percentage of completed tasks
+  const calculateCompletedPercentage = (tasks: Task[]): number => {
+    const completedTasks = tasks.filter(
+      (task) => task.status === Status.COMPLETED
+    ).length;
+    const totalTasks = tasks.length;
+
+    return (completedTasks / totalTasks) * 100;
+  };
+
+  // Data preparation for Gantt chart
   const data = [
     [
       { type: "string", label: "Task ID" },
@@ -118,17 +126,25 @@ const ProjectDetailPage: React.FC = () => {
       { type: "number", label: "Percent Complete" },
       { type: "string", label: "Dependencies" },
     ],
-    ...tasks.map((task) => [
-      task.id,
-      task.name,
-      new Date(task.startDate),
-      new Date(task.endDate),
-      null, // You need to provide duration here
-      null, // You need to provide percent complete here
-      console.log(task.dependencies),
-    ]),
+    ...tasks.map((task) => {
+      console.log("task", task);
+      const durationInDays =
+        (new Date(task.endDate).getTime() -
+          new Date(task.startDate).getTime()) /
+        (1000 * 3600 * 24);
+      return [
+        task.id,
+        task.name,
+        new Date(task.startDate),
+        new Date(task.endDate),
+        durationInDays,
+        calculateCompletedPercentage(tasks),
+        console.log(task.dependencies),
+      ];
+    }),
   ];
 
+  // Handlers and functions for various modals and interactions
   const [task5ModalShow, setTask5ModalShow] = useState(false);
   const handleTask5ModalClose = () => setTask5ModalShow(false);
   const handleTask5ModalShow = () => setTask5ModalShow(true);

@@ -1,20 +1,30 @@
-/* AboutPage.css */
+/* The given code is a CSS code for styling an AboutPage. It includes various CSS selectors and
+properties to define the styles for different elements on the page. */
 
+/* The CSS code `.about-facts li, .it-services-description li { margin-bottom: 18px; }` is setting a
+margin-bottom of 18 pixels for all list items (`li`) within elements with the class `about-facts`
+and `it-services-description`. This will create a spacing of 18 pixels between each list item. */
 .about-facts li,
 .it-services-description li {
-  margin-bottom: 18px; /* Increase or decrease this value as needed */
+  margin-bottom: 18px; 
 }
 
 
+/* The CSS code `.about-page` is defining the styles for an element with the class `about-page`. */
 .about-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
+
+/* The CSS code `.it-services { margin-top: 20px; }` is setting a top margin of 20 pixels for elements
+with the class `it-services`. This will create a spacing of 20 pixels between the top of the element
+and its preceding element. */
 .it-services {
-  margin-top: 20px; /* Adjust this value to move the content down */
+  margin-top: 20px; 
 }
 
+/* The CSS code `.about-title` is defining the styles for an element with the class `about-title`. */
 .about-title {
   line-height: 1.2;
   text-align: center;
@@ -26,6 +36,10 @@
   font-size: 60px;
 }
 
+/* The CSS code `.about-facts` is defining the styles for an element with the class `about-facts`. It
+sets the font family to "Source Sans Pro", font weight to 200, font size to 20 pixels, line height
+to 1.6, text color to black (#000000), and top margin to 60 pixels. These styles will be applied to
+any element with the class `about-facts`. */
 .about-facts {
   font-family: "Source Sans Pro";
   font-weight: 200;
@@ -35,6 +49,10 @@
   margin-top: 60px;
 }
 
+/* The CSS code `.about-facts-title` is defining the styles for an element with the class
+`about-facts-title`. It sets the font family to "Source Sans Pro", font weight to 600, font size to
+24 pixels, line height to 1.2, text color to black (#000000), and bottom margin to 20 pixels. These
+styles will be applied to any element with the class `about-facts-title`. */
 .about-facts-title {
   font-family: "Source Sans Pro";
   font-weight: 600;
@@ -44,6 +62,10 @@
   margin-bottom: 20px;
 }
 
+/* The CSS code `.it-services-title` is defining the styles for an element with the class
+`it-services-title`. It sets the font family to "Source Sans Pro", font weight to 600, font size to
+24 pixels, line height to 1.2, text color to black (#000000), and bottom margin to 20 pixels. These
+styles will be applied to any element with the class `it-services-title`. */
 .it-services-title {
   font-family: "Source Sans Pro";
   font-weight: 600;
@@ -53,6 +75,10 @@
   margin-bottom: 20px;
 }
 
+/* The CSS code `.it-services-description` is defining the styles for an element with the class
+`it-services-description`. It sets the font family to "Source Sans Pro", font weight to 200, font
+size to 20 pixels, line height to 1.6, text color to black (#000000), and bottom margin to 40
+pixels. These styles will be applied to any element with the class `it-services-description`. */
 .it-services-description {
   font-family: "Source Sans Pro";
   font-weight: 200;
@@ -62,7 +88,11 @@
   margin-bottom: 40px;
 }
 
+/* The CSS code `.it-services { margin-top: 60px; margin-left: 50px; }` is setting a top margin of 60
+pixels and a left margin of 50 pixels for elements with the class `it-services`. This will create a
+spacing of 60 pixels between the top of the element and its preceding element, and a spacing of 50
+pixels between the left edge of the element and its parent container. */
 .it-services {
-  margin-top: 60px; /* Adjust this value to move the content down */
+  margin-top: 60px; 
   margin-left: 50px;
 }

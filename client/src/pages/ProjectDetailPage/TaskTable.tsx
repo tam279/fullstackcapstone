@@ -1,3 +1,5 @@
+/* The above code is a TypeScript React component called "TaskTable". It is responsible for rendering a
+table of tasks and providing sorting and filtering functionality for the tasks. */
 import React, { useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 import { AiFillEdit } from "react-icons/ai";

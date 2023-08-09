@@ -1,3 +1,7 @@
+/* The code you provided is a TypeScript React component called `SidebarProject`. It is a sidebar
+navigation component that displays a logo, a list of projects, and various buttons for managing
+users, changing password, viewing profile, and logging out. */
+// Import required module and component imports
 import React, { useState, useEffect } from "react";
 import { Button, Navbar, Image } from "react-bootstrap";
 import { FaUsers, FaCog, FaProjectDiagram } from "react-icons/fa";
@@ -10,6 +14,7 @@ import { User, Role } from "../../problemdomain/Interface/Interface"; // import 
 import { fetchUserData } from "../../problemdomain/DataService/DataService"; // Import your fetch function
 
 const SidebarProject: React.FC = () => {
+  // Local state to manage user and modal visibility
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const userRole = localStorage.getItem("userRole") as Role;
 
@@ -23,16 +28,18 @@ const SidebarProject: React.FC = () => {
     project: false,
   });
 
+  // Hook to programmatically navigate
   const navigate = useNavigate();
 
+  // Handlers to manage modal visibility
   const handleShow = (modal: string) => {
     setShow({ ...show, [modal]: true });
   };
-
   const handleClose = (modal: string) => {
     setShow({ ...show, [modal]: false });
   };
 
+  // Handlers for various sidebar actions
   const handleLogout = () => {
     navigate("/");
   };
@@ -62,6 +69,7 @@ const SidebarProject: React.FC = () => {
     }
   };
 
+  // Render the sidebar component
   return (
     <Navbar
       className="d-flex flex-column px-2 py-3 bg-light vh-100"
@@ -71,7 +79,7 @@ const SidebarProject: React.FC = () => {
         <Image
           src="/vitralogo.png"
           fluid
-          style={{ borderRadius: "5px", width: "150px" }} // Adjust width as needed
+          style={{ borderRadius: "5px", width: "150px" }}
         />
       </Navbar.Brand>
 

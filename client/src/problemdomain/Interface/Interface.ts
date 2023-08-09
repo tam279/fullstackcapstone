@@ -1,4 +1,10 @@
-// Interface.ts . Path: C:\Users\nguye\OneDrive\Desktop\project-managment-website\fullstackcapstone\client\src\problemdomain\Interface\Interface.ts
+/* The code provided is defining a set of TypeScript interfaces that represent the data structure of a
+project management system. These interfaces define the shape and properties of various entities such
+as companies, users, projects, tasks, comments, and files. Each interface specifies the required
+fields and their types, allowing for type checking and enforcing a specific structure for the data
+used in the project management system. Additionally, there are enums defined for user roles and task
+statuses to provide a set of predefined values for these fields. */
+
 export interface Company {
   id: string;
   name: string;
@@ -8,10 +14,11 @@ export interface Company {
   users: User[];
   projects: Project[];
   deleted: boolean;
+    // Allow dynamic keys
     [key: string]: any;
-
 }
 
+// User interface with all necessary fields
 export interface User {
   id: string;
   email: string;
@@ -23,30 +30,24 @@ export interface User {
   companyId: string;
   phoneNumber: string;
   jobTitle: string;
-  tags: string; // Tag[];
+  tags: string; 
   tasks: Task[];
   comments: Comment[];
   projectsAsTechnician: Project[];
   projectsAsViewer: Project[];
   projectsAsManager: Project[];
   deleted: boolean;
+    // Allow dynamic keys
     [key: string]: any;
-
 }
 
+// Enum for user roles
 export enum Role {
   USER = "USER",
   ADMIN = "ADMIN",
 }
 
-// export interface Tag {
-//   id: string;
-//   name: string;
-//   users: User[];
-//   projects: Project[];
-//   deleted: boolean;
-// }
-
+// Project interface with all necessary fields
 export interface Project {
   id: string;
   name: string;
@@ -64,6 +65,7 @@ export interface Project {
   deleted: boolean;
 }
 
+// Task interface with all necessary fields
 export interface Task {
   id: string;
   name: string;
@@ -77,18 +79,19 @@ export interface Task {
   technicians: User[];
   comments: Comment[];
   files: File[];
-  dependencies: string;
+  dependencies?: string;
   deleted: boolean;
   label?: string;
 }
 
-
+// Enum for task statuses
 export enum Status {
   NOT_STARTED = "NOT_STARTED",
   IN_PROGRESS = "IN_PROGRESS",
   COMPLETED = "COMPLETED",
 }
 
+// Comment interface with all necessary fields
 export interface Comment {
   User: any;
   id: string;
@@ -101,7 +104,7 @@ export interface Comment {
   userId: string | null;
   deleted: boolean;
 }
-
+// File interface with all necessary fields
 export interface File {
   id: string;
   name: string;
