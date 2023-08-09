@@ -1,13 +1,20 @@
+// Prisma Client configuration.
 generator client {
+  // Define the Prisma client provider.
   provider   = "prisma-client-js"
+  // Define the type of engine used by Prisma.
   engineType = "binary"
 }
 
+// Database connection details.
 datasource db {
+  // Define the type of database being used.
   provider = "cockroachdb"
+  // Fetch database connection string from environment variables.
   url      = env("DATABASE_URL")
 }
 
+// Define the Company model.
 model Company {
   id          String    @id @default(uuid())
   name        String
@@ -19,6 +26,7 @@ model Company {
   users       User[]
 }
 
+// Define the User model.
 model User {
   id                   String    @id @default(uuid())
   email                String    @unique
@@ -39,6 +47,7 @@ model User {
   projectsAsViewer     Project[] @relation("Viewers")
 }
 
+// Define the Project model.
 model Project {
   id          String   @id @default(uuid())
   name        String
@@ -55,6 +64,7 @@ model Project {
   viewers     User[]   @relation("Viewers")
 }
 
+// Define the Task model.
 model Task {
   id            String    @id @default(uuid())
   name          String
@@ -71,6 +81,7 @@ model Task {
   technicians   User[]    @relation("TaskToUser")
 }
 
+// Define the Comment model.
 model Comment {
   id        String   @id @default(uuid())
   comment   String
@@ -83,6 +94,7 @@ model Comment {
   files     File[]
 }
 
+// Define the File model.
 model File {
   id        String   @id @default(uuid())
   name      String
@@ -93,6 +105,7 @@ model File {
   Comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 
+// Define a model for potential new comment integration.
 model prisma_new_comment {
   COMMENTID Int       @id(map: "comment_pkey") @default(sequence())
   COMMENT   String?
@@ -103,11 +116,13 @@ model prisma_new_comment {
   @@map("_prisma_new_comment")
 }
 
+// Define the user roles using an enum.
 enum Role {
   USER
   ADMIN
 }
 
+// Define the task status using an enum.
 enum Status {
   NOT_STARTED
   IN_PROGRESS

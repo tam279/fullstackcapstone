@@ -1,3 +1,11 @@
+/**
+ * The function `sendContactEmail` sends a contact form email using Nodemailer and Gmail SMTP.
+ * @param formData - An object containing the data submitted through the contact form. It should have
+ * the following properties:
+ * @param recipientEmail - The `recipientEmail` parameter is the email address where you want to send
+ * the contact form submission. It is the email address of the person or team who should receive the
+ * contact form information.
+ */
 // Import required modules
 require('dotenv').config();
 const nodemailer = require("nodemailer");

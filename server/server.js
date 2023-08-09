@@ -1,28 +1,47 @@
+/**
+ * This is a Node.js server that uses Express to handle API routes for user, company, project, task,
+ * and comment management, as well as authentication and file uploading/downloading.
+ * @param req - The `req` parameter is an object that represents the HTTP request made by the client.
+ * It contains information about the request such as the request method, request headers, request body,
+ * URL, and query parameters. It is used to access and manipulate the data sent by the client to the
+ * server.
+ * @param res - The `res` parameter is the response object in Express. It is used to send a response
+ * back to the client. It has various methods and properties that can be used to customize the
+ * response, such as `res.send()`, `res.json()`, `res.status()`, etc.
+ */
+// Required libraries and dependencies
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const multer = require("multer");
+const helmet = require("helmet");
+
+// Controller imports
 const userController = require("./controllers/userController");
 const companyController = require("./controllers/companyController");
 const projectController = require("./controllers/projectController");
 const taskController = require("./controllers/taskController");
 const commentController = require("./controllers/commentController");
 
-const comment = require("./service/comment"); // Moved this line here
 
-const multer = require("multer");
+// Service imports
+const comment = require("./service/comment");
+const auth = require("./auth/api-auth");
+const passport = require("./auth/passport");
+
+// Set up express
+const app = express();
+
+// Multer configuration for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB in bytes
+    fileSize: 10 * 1024 * 1024, // Set maximum upload size to 10MB
   },
 });
-
-const bodyParser = require("body-parser");
-const session = require("express-session");
-
-const app = express();
-const helmet = require("helmet");
 
 // Set the limit option to a larger value
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -57,26 +76,27 @@ app.use(
 
 app.use(bodyParser.json());
 
+// Session configuration
 app.use(
   session({
-    secret: "mysecret", // replace this with your own secret
+    secret: "mysecret", // This should be an environment variable for production
     resave: false,
     saveUninitialized: false,
   })
 );
 
+// Serving favicon
 app.use("/favicon.ico", express.static(path.join(__dirname, "favicon.ico")));
 
+// Setting up the port
 const PORT = process.env.PORT || 5000;
 
+// Basic test route to ensure server is running
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });
-
-//auth
+// Authentication setup
 //auth dependencies
-const auth = require("./auth/api-auth");
-const passport = require("./auth/passport");
 app.use(passport.initialize());
 //auth ddependencies end
 //passport authenticate skips all middleware after it if auth failed and sends unauthorized message to the client
@@ -98,7 +118,7 @@ app.get(
 );
 //auth end
 // Completed intergrating new APi wtih Prisma:
-// To the user information:
+// User routes
 app.get("/api/users", userController.getUsers);
 app.post("/api/users", userController.createUser);
 app.put("/api/user/:id", userController.updateUser);
@@ -106,15 +126,7 @@ app.delete("/api/user/:id", userController.deleteUser);
 app.post("/changepassword", userController.changePassword);
 app.get("/api/user/email/:email", userController.getUserByEmail);
 
-// app.post("/forgotpassword", (req, res) => {
-//   const { email } = req.body;
-//   console.log("Received data:", email);
-//   // Add your password reset logic here
-//   // For simplicity, we're just logging the received data
-//   // In a real application, you would send a password reset email to the provided email address
-//   res.status(200).json({ message: "Password reset email sent." });
-// });
-
+// Forgot password route
 app.post(
   "/forgotpassword",
   passport.authenticate("magiclink", {
@@ -126,6 +138,7 @@ app.post(
   }
 );
 
+// Email verification route
 app.get(
   "/login/email/verify",
   passport.authenticate("magiclink", {
@@ -146,6 +159,7 @@ app.get(
   }
 );
 
+// Change password route
 const changeUserPassword = require("./service/reset-password");
 app.post("/newpassword", async (req, res) => {
   const { userId, newPassword } = req.body;
@@ -168,8 +182,8 @@ function handleNewPassword(req, res) {
   const { userId, password } = req.body;
 
   // Log the data (you can handle the password update logic here)
-  console.log("User ID:", userId);
-  console.log("New Password:", password);
+  // console.log("User ID:", userId);
+  // console.log("New Password:", password);
 
   // Respond with a success message or any other desired response
   res.status(200).json({ message: "Password updated successfully!" });
@@ -181,52 +195,22 @@ app.post("/api/companies", companyController.createCompany);
 app.put("/api/company/:id", companyController.updateCompany);
 app.delete("/api/company/:id", companyController.deleteCompany);
 
-// This is
-// app.get("/api/user/:email", async (req, res) => {
-//   try {
-//     const email = req.params.email;
-//     const user = await userController.getUserByEmail(email);
-//     res.status(200).json(user);
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ error: error.message });
-//   }
-// });
-
-// app.post('/api/createComments', upload.single('file'), commentController.createComment);
-
-// projects
-// app.get(
-//   "/api/projects",
-//   passport.authenticate("jwt", { session: false }),
-//   projectController.getProjects
-// );
-// app.get("/api/projects", projectController.getProjects);
-
+// Projects routes
 app.get(
   "/api/projects",
   passport.authenticate("jwt", { session: false }),
   projectController.getProjects
 );
-
 app.post("/api/projects", projectController.createProject);
 app.put("/api/project/:id", projectController.updateProject);
 app.delete("/api/project/:id", projectController.deleteProject);
 app.get("/api/project/:id", projectController.getProject);
 
-// tasks
+// Tasks routes
 app.get("/api/project/:projectId/tasks", taskController.getTasks);
 app.post("/api/project/:projectId/tasks", taskController.createTask);
-// app.post(
-//   "/api/project/:projectId/tasks",
-//   passport.authenticate("jwt", { session: false }),
-//   taskController.createTask
-// );
-
 app.put("/api/project/:projectId/task/:taskId", taskController.updateTask);
 app.delete("/api/project/:projectId/task/:taskId", taskController.deleteTask);
-/* The code `app.get("/api/project/:projectId/task/:taskId", taskController.getTask);` is defining a
-GET route for retrieving a specific task within a project. */
 app.get("/api/project/:projectId/task/:taskId", taskController.getTask);
 
 // Comment routes
@@ -234,12 +218,10 @@ app.get("/api/tasks/:taskId/comments", commentController.getCommentsByTaskId);
 app.delete("/api/comments/:commentId", commentController.deleteComment);
 app.put("/api/comments/:commentId", commentController.updateComment);
 
+// Contact mail route
 const { sendContactEmail } = require("./service/contact-mail");
-// Handle POST requests to '/contact' endpoint
 app.post("/contact", (req, res) => {
-  // Here you can access the form data sent from the frontend
   const formData = req.body;
-  // console.log(formData);
 
   // Specify the recipient's email address for the contact form submission
   const recipientEmail = process.env.CONTACT_EMAIL; // Replace with the recipient's email address

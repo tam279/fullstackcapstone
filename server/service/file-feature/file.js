@@ -1,3 +1,13 @@
+/**
+ * This JavaScript code exports three functions for creating, fetching, and fetching all file entries
+ * from a database using Prisma.
+ * @param name - The name of the file entry that you want to create. It is a string value.
+ * @param data - The `data` parameter in the `createFileEntry` function represents the content or data
+ * of the file that you want to create. It can be any type of data, such as a string, JSON object, or
+ * binary data.
+ * @returns The module exports an object with three functions: `createFileEntry`, `getFileById`, and
+ * `getAllFiles`.
+ */
 const { prisma } = require("../../prisma/prisma");
 
 async function createFileEntry(name, data) {

@@ -1,3 +1,11 @@
+/**
+ * The above JavaScript code defines a function called `createComment` that creates a comment with
+ * associated files in a database using Prisma ORM.
+ * @param req - The `req` parameter is the request object that contains information about the incoming
+ * HTTP request, such as the request headers, request body, and request parameters.
+ * @param res - The `res` parameter is the response object that is used to send the response back to
+ * the client. It is an instance of the Express `Response` object.
+ */
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
@@ -14,7 +22,6 @@ async function createComment(req, res) {
       });
     }
   }
-  // Your comment creation logic here...
   try {
     const comment = await prisma.comment.create({
       data: {
