@@ -14,7 +14,7 @@ Additional libraries used:
 4. [passport](https://www.passportjs.org/)
 5. [multer](https://www.npmjs.com/package/multer)
 
-## Auth Process (pasport)
+## Auth Process (passport)
 
 Passwords are bcrypt hashed with salt 10 and are stored in the database.
 

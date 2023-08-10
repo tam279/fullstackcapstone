@@ -25,6 +25,12 @@ Environment Variables:
 - ALLOWED_ORIGINS, front end url without trailing forward slash
 - FRONTEND_URL, login url that will be sent to new users via email
 
+Build & Deploy
+
+- Root Directory `server`
+- Build Command `npm run startbuild`
+- Start Command `npm run startdep`
+
 ## Database
 
 [CockroachDB](https://www.cockroachlabs.com/), register for the serverless service.
